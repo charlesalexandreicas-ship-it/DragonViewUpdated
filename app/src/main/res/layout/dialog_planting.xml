@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/white" android:orientation="vertical" android:padding="20dp">
+    <EditText android:id="@+id/recordInput" style="@style/Widget.DragonView.DialogField" android:hint="Record number" android:maxLength="40" />
+    <EditText android:id="@+id/dateInput" style="@style/Widget.DragonView.DialogField" android:focusable="false" android:hint="Planting date" />
+    <EditText android:id="@+id/varietyInput" style="@style/Widget.DragonView.DialogField" android:hint="Variety (optional)" />
+    <EditText android:id="@+id/locationInput" style="@style/Widget.DragonView.DialogField" android:hint="Farm location or zone" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Planting material" android:textColor="@color/muted_ink" android:textSize="12sp" />
+    <Spinner android:id="@+id/cuttingTypeInput" android:layout_width="match_parent" android:layout_height="52dp" android:background="@drawable/dialog_field_background" android:paddingStart="12dp" android:paddingEnd="12dp" />
+    <EditText android:id="@+id/plantsInput" style="@style/Widget.DragonView.DialogField" android:hint="Number of stem cuttings" android:inputType="number" />
+    <TextView android:id="@+id/errorText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="@color/dragon_error" />
+</LinearLayout>

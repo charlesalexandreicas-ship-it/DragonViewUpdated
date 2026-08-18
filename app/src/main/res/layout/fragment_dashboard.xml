@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeRefresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dragon_surface"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="28dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/soft_pink_panel"
+                android:orientation="vertical"
+                android:padding="18dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome to"
+                    android:textColor="@color/muted_ink"
+                    android:textSize="13sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="DRAGON-VIEW"
+                    android:textAppearance="@style/TextAppearance.DragonView.TitleLarge"
+                    android:textColor="@color/dragon_magenta_dark"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Manage your farm smarter and easier."
+                    android:textColor="@color/muted_ink" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/errorText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/dragon_error"
+                android:visibility="gone" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:text="Quick Actions"
+                android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/addInventoryAction"
+                    style="@style/Widget.DragonView.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="76dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="Add Inventory\nTrack supplies"
+                    android:textColor="@color/ink"
+                    android:textSize="13sp"
+                    app:backgroundTint="@color/white"
+                    app:icon="@drawable/ic_inventory"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/dragon_magenta"
+                    app:strokeWidth="0dp" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/recordHarvestAction"
+                    style="@style/Widget.DragonView.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="76dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="Record Harvest\nLog yields"
+                    android:textColor="@color/ink"
+                    android:textSize="13sp"
+                    app:backgroundTint="@color/white"
+                    app:icon="@drawable/ic_plant"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/dragon_green"
+                    app:strokeWidth="0dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/viewAnalyticsButton"
+                    style="@style/Widget.DragonView.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="76dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="View Analytics\nFarm insights"
+                    android:textColor="@color/ink"
+                    android:textSize="13sp"
+                    app:backgroundTint="@color/white"
+                    app:icon="@drawable/ic_chart"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/dragon_blue"
+                    app:strokeWidth="0dp" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/schedulePlantAction"
+                    style="@style/Widget.DragonView.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="76dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="Schedule Plant\nPlan planting"
+                    android:textColor="@color/ink"
+                    android:textSize="13sp"
+                    app:backgroundTint="@color/white"
+                    app:icon="@drawable/ic_plant"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/dragon_yellow"
+                    app:strokeWidth="0dp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Farm Overview"
+                android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
+                android:textStyle="bold" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:columnCount="2"
+                android:useDefaultMargins="true">
+                <TextView android:id="@+id/inventoryValue" style="@style/DashboardMetric" android:text="—\nInventory" android:contentDescription="Inventory pieces" />
+                <TextView android:id="@+id/batchesValue" style="@style/DashboardMetric" android:text="—\nBatches" android:contentDescription="Active batches" />
+                <TextView android:id="@+id/salesValue" style="@style/DashboardMetric" android:text="—\nSales today" android:contentDescription="Sales today" />
+                <TextView android:id="@+id/revenueValue" style="@style/DashboardMetric" android:text="—\nRevenue" android:contentDescription="Monthly revenue" />
+                <TextView android:id="@+id/plantingValue" style="@style/DashboardMetric" android:text="—\nPlant groups" android:contentDescription="Planting groups" />
+                <TextView android:id="@+id/classificationValue" style="@style/DashboardMetric" android:text="—\nScans today" android:contentDescription="Classifications today" />
+            </GridLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Today so far"
+                        android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
+                        android:textStyle="bold" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:id="@+id/todayRevenueValue" style="@style/DashboardOverviewValue" android:text="—" />
+                            <TextView style="@style/DashboardOverviewLabel" android:text="Revenue" />
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:id="@+id/todayPiecesValue" style="@style/DashboardOverviewValue" android:text="—" />
+                            <TextView style="@style/DashboardOverviewLabel" android:text="Pieces sold" />
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:id="@+id/todayWeightValue" style="@style/DashboardOverviewValue" android:text="—" />
+                            <TextView style="@style/DashboardOverviewLabel" android:text="Weight sold" />
+                        </LinearLayout>
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/revenueTrendText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="No sales baseline from yesterday"
+                        android:textColor="@color/dragon_green"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

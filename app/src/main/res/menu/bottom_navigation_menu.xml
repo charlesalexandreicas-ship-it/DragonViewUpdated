@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/dashboardFragment" android:icon="@drawable/ic_home" android:title="Home" />
+    <item android:id="@+id/inventoryFragment" android:icon="@drawable/ic_inventory" android:title="Inventory" />
+    <item android:id="@+id/scannerFragment" android:icon="@drawable/ic_camera" android:title="Camera" />
+    <item android:id="@+id/plantingFragment" android:icon="@drawable/ic_plant" android:title="Planting" />
+    <item android:id="@+id/analyticsFragment" android:icon="@drawable/ic_chart" android:title="Analytics" />
+</menu>

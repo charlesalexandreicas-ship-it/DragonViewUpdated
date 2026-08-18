@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="15dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView android:id="@+id/typeText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/soft_pink_panel" android:paddingStart="8dp" android:paddingTop="4dp" android:paddingEnd="8dp" android:paddingBottom="4dp" android:textColor="@color/dragon_magenta_dark" android:textSize="11sp" android:textStyle="bold" />
+            <TextView android:id="@+id/dateStageText" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:layout_weight="1" android:gravity="end" android:textColor="@color/muted_ink" android:textSize="11sp" />
+        </LinearLayout>
+
+        <TextView android:id="@+id/noteText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:textColor="@color/ink" android:textSize="13sp" android:lineSpacingExtra="2dp" />
+        <TextView android:id="@+id/measurementText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="7dp" android:textColor="@color/dragon_green" android:textSize="12sp" android:textStyle="bold" />
+        <ImageView android:id="@+id/photoView" android:layout_width="match_parent" android:layout_height="180dp" android:layout_marginTop="10dp" android:contentDescription="Plant growth record photo" android:scaleType="centerCrop" android:visibility="gone" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

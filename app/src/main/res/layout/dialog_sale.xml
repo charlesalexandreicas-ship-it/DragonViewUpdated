@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/white" android:orientation="vertical" android:padding="20dp">
+        <EditText android:id="@+id/nameInput" style="@style/Widget.DragonView.DialogField" android:hint="Customer name" />
+        <EditText android:id="@+id/addressInput" style="@style/Widget.DragonView.DialogField" android:hint="Address" />
+        <EditText android:id="@+id/contactInput" style="@style/Widget.DragonView.DialogField" android:hint="Contact number" android:inputType="phone" />
+        <EditText android:id="@+id/emailInput" style="@style/Widget.DragonView.DialogField" android:hint="Email address" android:inputType="textEmailAddress" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="Fruit items" android:textAppearance="@style/TextAppearance.DragonView.TitleMedium" android:textStyle="bold" />
+        <LinearLayout android:id="@+id/itemsContainer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/addItemButton" style="@style/Widget.DragonView.Button.Outlined" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="+ Add fruit item" />
+        <TextView android:id="@+id/totalText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="end" android:text="Total: ₱0.00" android:textAppearance="@style/TextAppearance.DragonView.TitleMedium" android:textStyle="bold" />
+        <AutoCompleteTextView android:id="@+id/methodInput" style="@style/Widget.DragonView.DialogField" android:hint="Payment method" android:inputType="none" />
+        <EditText android:id="@+id/amountInput" style="@style/Widget.DragonView.DialogField" android:hint="Amount paid" android:inputType="numberDecimal" />
+        <EditText android:id="@+id/referenceInput" style="@style/Widget.DragonView.DialogField" android:hint="Payment reference (non-cash)" />
+        <EditText android:id="@+id/providerInput" style="@style/Widget.DragonView.DialogField" android:hint="Other e-wallet provider" />
+        <TextView android:id="@+id/errorText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/dragon_error" />
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Dragon View</string>
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Please login to your account</string>
+    <string name="email">Email address</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Login</string>
+    <string name="full_name">Full name</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="create_account">Create account</string>
+    <string name="new_account_prompt">New to Dragon View? Create an account</string>
+    <string name="existing_account_prompt">Already registered? Sign in</string>
+</resources>

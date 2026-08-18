@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/dashboardFragment">
+    <fragment android:id="@+id/dashboardFragment" android:name="ph.dragonview.mobile.ui.dashboard.DashboardFragment" android:label="Home" />
+    <fragment android:id="@+id/inventoryFragment" android:name="ph.dragonview.mobile.ui.inventory.InventoryFragment" android:label="Inventory">
+        <action android:id="@+id/action_inventory_to_harvest" app:destination="@id/harvestFragment" />
+        <action android:id="@+id/action_inventory_to_details" app:destination="@id/inventoryDetailsFragment" />
+    </fragment>
+    <fragment android:id="@+id/inventoryDetailsFragment" android:name="ph.dragonview.mobile.ui.inventory.InventoryDetailsFragment" android:label="Inventory Details">
+        <argument android:name="batchNumber" app:argType="string" />
+    </fragment>
+    <fragment android:id="@+id/harvestFragment" android:name="ph.dragonview.mobile.ui.inventory.HarvestFragment" android:label="Record Harvest" />
+    <fragment android:id="@+id/salesFragment" android:name="ph.dragonview.mobile.ui.sales.SalesFragment" android:label="Sales" />
+    <fragment android:id="@+id/plantingFragment" android:name="ph.dragonview.mobile.ui.planting.PlantingFragment" android:label="Planting &amp; Guidance">
+        <action android:id="@+id/action_planting_to_details" app:destination="@id/plantingDetailsFragment" />
+    </fragment>
+    <fragment android:id="@+id/plantingDetailsFragment" android:name="ph.dragonview.mobile.ui.planting.PlantingDetailsFragment" android:label="Plant Guidance">
+        <argument android:name="plantingId" app:argType="long" />
+    </fragment>
+    <fragment android:id="@+id/analyticsFragment" android:name="ph.dragonview.mobile.ui.analytics.AnalyticsFragment" android:label="Analytics" />
+    <fragment android:id="@+id/scannerFragment" android:name="ph.dragonview.mobile.ui.scanner.ScannerFragment" android:label="Live Scan" />
+</navigation>

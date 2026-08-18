@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/white" android:orientation="vertical" android:padding="20dp">
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Grade" android:textStyle="bold" />
+    <Spinner android:id="@+id/gradeInput" style="@style/Widget.DragonView.DialogSpinner" android:spinnerMode="dropdown" />
+    <TextView android:id="@+id/sizeLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Fruit size" android:textStyle="bold" />
+    <Spinner android:id="@+id/sizeInput" style="@style/Widget.DragonView.DialogSpinner" android:spinnerMode="dropdown" />
+    <EditText android:id="@+id/priceInput" style="@style/Widget.DragonView.DialogField" android:hint="Price per kilogram" android:inputType="numberDecimal" />
+    <TextView android:id="@+id/currentPricesText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" />
+    <TextView android:id="@+id/errorText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/dragon_error" />
+</LinearLayout>

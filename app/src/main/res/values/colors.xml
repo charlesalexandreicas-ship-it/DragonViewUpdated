@@ -1,0 +1,40 @@
+<resources>
+    <!-- Dragon View Figma foundations -->
+    <color name="obsidian_plum_950">#111827</color>
+    <color name="obsidian_plum_900">#AD1457</color>
+    <color name="obsidian_plum_800">#C2185B</color>
+    <color name="obsidian_plum_700">#D81B60</color>
+    <color name="obsidian_plum_600">#E91E63</color>
+    <color name="plum_orchid_400">#F06292</color>
+    <color name="plum_mist_100">#FCE4EC</color>
+    <color name="plum_mist_050">#FFF1F5</color>
+    <color name="warm_ivory">#F9FAFB</color>
+    <color name="ink">#212121</color>
+    <color name="muted_ink">#6B7280</color>
+
+    <!-- Existing semantic names retained so Java and XML behavior stays unchanged. -->
+    <color name="dragon_magenta">#E91E63</color>
+    <color name="dragon_magenta_dark">#C2185B</color>
+    <color name="dragon_violet_red">#D81B60</color>
+    <color name="dragon_deep_pink">#F06292</color>
+    <color name="dragon_green">#15803D</color>
+    <color name="dragon_surface">@color/warm_ivory</color>
+    <color name="dragon_surface_variant">@color/plum_mist_100</color>
+    <color name="dragon_outline">#E5E7EB</color>
+    <color name="dragon_green_soft">#DCFCE7</color>
+    <color name="dragon_error">#E11D48</color>
+    <color name="fifo_warning">#D97706</color>
+    <color name="fifo_warning_soft">#FFFBEB</color>
+    <color name="fifo_urgent_soft">#FFF1F2</color>
+    <color name="dragon_scanner">#111827</color>
+    <color name="dragon_blue">#2563EB</color>
+    <color name="dragon_blue_soft">#EFF6FF</color>
+    <color name="dragon_yellow">#F59E0B</color>
+    <color name="dragon_yellow_soft">#FFFBEB</color>
+    <color name="dragon_pink_soft">#FCE4EC</color>
+    <color name="dragon_text_soft">#9CA3AF</color>
+    <color name="dragon_surface_alt">#F3F4F6</color>
+    <color name="dragon_white_75">#BFFFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">@color/ink</color>
+</resources>
