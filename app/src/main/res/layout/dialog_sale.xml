@@ -6,7 +6,18 @@
         <EditText android:id="@+id/addressInput" style="@style/Widget.DragonView.DialogField" android:hint="Address" />
         <EditText android:id="@+id/contactInput" style="@style/Widget.DragonView.DialogField" android:hint="Contact number" android:inputType="phone" />
         <EditText android:id="@+id/emailInput" style="@style/Widget.DragonView.DialogField" android:hint="Email address" android:inputType="textEmailAddress" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="Fruit items" android:textAppearance="@style/TextAppearance.DragonView.TitleMedium" android:textStyle="bold" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="Sale type" android:textAppearance="@style/TextAppearance.DragonView.TitleMedium" android:textStyle="bold" />
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/saleModeGroup" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:orientation="horizontal" app:singleSelection="true" app:selectionRequired="true"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+            <com.google.android.material.button.MaterialButton android:id="@+id/selectedItemsButton" style="@style/Widget.DragonView.Button.Outlined" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:checkable="true" android:checked="true" android:text="Selected items" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/entireBatchButton" style="@style/Widget.DragonView.Button.Outlined" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:checkable="true" android:text="Entire batch" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+        <TextView android:id="@+id/modeHelpText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Choose one or more size and grade combinations. Oldest matching stock is deducted first." android:textColor="@color/muted_ink" />
+        <AutoCompleteTextView android:id="@+id/batchInput" style="@style/Widget.DragonView.DialogField" android:hint="Batch" android:inputType="none" android:visibility="gone" />
+        <EditText android:id="@+id/overrideReasonInput" style="@style/Widget.DragonView.DialogField" android:hint="Reason for skipping older stock" android:visibility="gone" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:text="Fruit items" android:textAppearance="@style/TextAppearance.DragonView.TitleMedium" android:textStyle="bold" />
         <LinearLayout android:id="@+id/itemsContainer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
         <com.google.android.material.button.MaterialButton android:id="@+id/addItemButton" style="@style/Widget.DragonView.Button.Outlined" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="+ Add fruit item" />
         <TextView android:id="@+id/totalText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="end" android:text="Total: ₱0.00" android:textAppearance="@style/TextAppearance.DragonView.TitleMedium" android:textStyle="bold" />

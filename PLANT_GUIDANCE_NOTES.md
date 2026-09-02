@@ -1,16 +1,18 @@
 # Plant Guidance Basis and Limits
 
-The feature begins with planted stem cuttings, not seeds. The Kaggle growth-process dataset supplied for the project is treated as a visual reference candidate only. Its images are not bundled in the APK until their reuse license, labels, and agricultural accuracy are confirmed.
+The feature supports two starting records: seed sowing and planted stem cutting. A seed-grown record can later be transitioned into the separate grafted pathway through **Record Grafting** after professional confirmation. The Kaggle growth-process dataset supplied for the project is treated as a visual reference candidate for the seed/early-growth pathway only. Its images are not bundled in the APK until their reuse license, labels, and agricultural accuracy are confirmed.
 
-The in-app guidance deliberately combines day age with farmer-confirmed milestones. Establishment and shoot timing can differ with cutting maturity, rooting status, variety, climate, drainage, and farm practice, so the app does not automatically diagnose plant health or force later growth stages by date.
+The in-app guidance deliberately combines estimated day/week ranges with farmer-confirmed milestones. Timing can differ with propagation material, cutting maturity, rooting status, variety, climate, drainage, artificial lighting, and farm practice, so the app does not automatically diagnose plant health or force later growth stages by date.
 
-The estimated fruit-harvest window is shown as 30–50 days after confirmed flowering. This is a broad planning range because published agricultural sources report different maturity timing by location and variety. The farmer still confirms the actual harvest stage.
+The fruit-development guidance uses an approximate 35–45 days after pollination as a planning range. Published agricultural sources differ by location and variety, and the farmer still confirms the actual harvest stage using visible signs and validated farm practice.
+
+The full in-app pathway content is provisional. Each stage is marked for professional validation, and stages without validated images intentionally show a pending-reference state rather than an invented plant image.
 
 Reference sources reviewed:
 
 - Kaggle, Dragon Fruit Cactus Growth Process: https://www.kaggle.com/datasets/mdahshanhabib/dragon-fruit-cactus-groth-proccess
 - University of Florida IFAS Extension, Pitaya Growing in the Florida Home Landscape: https://ask.ifas.ufl.edu/publication/HS303
-- Sri Lanka Department of Agriculture, Dragon Fruit: https://doa.gov.lk/fruit-crops-dragon-fruit-e/
-- ICAR-National Institute of Agricultural Marketing, Dragon Fruit Production Technology: https://niam.res.in/sites/default/files/pdfs/Technical_bulletin_Dragon%20fruit_POP_Final_ISBN.pdf
+- Sarawak Department of Agriculture, Pitaya Cultivation in Sarawak: https://doa.sarawak.gov.my/web/subpage/webpage_view/360
+- Phenological growth stages of dragon fruit (extended BBCH scale): https://www.sciencedirect.com/science/article/pii/S0304423816305477
 
 This feature is a farm guidance and record tool, not a replacement for a local agricultural technician or plant-disease diagnosis.

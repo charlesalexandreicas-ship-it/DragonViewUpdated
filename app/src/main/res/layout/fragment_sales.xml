@@ -23,7 +23,7 @@
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SALES" android:textColor="@color/dragon_magenta" android:textSize="11sp" android:textStyle="bold" />
             <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Transactions and pricing" android:textAppearance="@style/TextAppearance.DragonView.TitleMedium" android:textStyle="bold" />
         </LinearLayout>
-        <com.google.android.material.button.MaterialButton android:id="@+id/priceButton" style="@style/Widget.DragonView.Button.Outlined" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Prices" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/priceButton" style="@style/Widget.DragonView.Button.Outlined" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Prices" app:icon="@drawable/icon_streamline_prices" app:iconTint="@color/dragon_magenta" />
         <com.google.android.material.button.MaterialButton android:id="@+id/newSaleButton" style="@style/Widget.DragonView.Button" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_marginStart="8dp" android:text="New sale" />
     </LinearLayout>
     <TextView

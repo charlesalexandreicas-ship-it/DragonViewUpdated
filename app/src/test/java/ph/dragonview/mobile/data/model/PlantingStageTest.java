@@ -15,9 +15,10 @@ public final class PlantingStageTest {
     public void ageSuggestionStopsBeforeFarmDependentMilestones() {
         assertEquals(PlantingStage.PLANTED, PlantingStage.suggestedForAge(0));
         assertEquals(PlantingStage.ESTABLISHMENT, PlantingStage.suggestedForAge(1));
-        assertEquals(PlantingStage.ROOTING_AND_BUD, PlantingStage.suggestedForAge(15));
-        assertEquals(PlantingStage.SHOOT_DEVELOPMENT, PlantingStage.suggestedForAge(31));
-        assertEquals(PlantingStage.TRELLIS_TRAINING, PlantingStage.suggestedForAge(61));
+        assertEquals(PlantingStage.ESTABLISHMENT, PlantingStage.suggestedForAge(21));
+        assertEquals(PlantingStage.ROOTING_AND_BUD, PlantingStage.suggestedForAge(22));
+        assertEquals(PlantingStage.SHOOT_DEVELOPMENT, PlantingStage.suggestedForAge(43));
+        assertEquals(PlantingStage.TRELLIS_TRAINING, PlantingStage.suggestedForAge(71));
     }
 
     @Test

@@ -13,7 +13,7 @@
         android:id="@+id/inventoryHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/soft_pink_panel"
+        android:background="@drawable/home_hero_background"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="16dp"
@@ -29,7 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="INVENTORY"
-                android:textColor="@color/dragon_magenta"
+                android:textColor="@color/dragon_white_75"
                 android:textSize="11sp"
                 android:textStyle="bold" />
             <TextView
@@ -39,6 +39,7 @@
                 android:layout_marginTop="4dp"
                 android:text="FIFO inventory"
                 android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
+                android:textColor="@color/white"
                 android:textStyle="bold" />
         </LinearLayout>
         <com.google.android.material.button.MaterialButton
@@ -46,10 +47,25 @@
             style="@style/Widget.DragonView.Button"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
+            android:backgroundTint="@color/white"
             android:text="Record"
-            app:icon="@drawable/ic_plant"
-            app:iconTint="@color/white" />
+            android:textColor="@color/dragon_magenta"
+            app:icon="@drawable/icon_streamline_plant"
+            app:iconTint="@color/dragon_green" />
     </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/editPricesButton"
+        style="@style/Widget.DragonView.Button.Outlined"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:text="Edit prices"
+        app:icon="@drawable/icon_streamline_edit_prices"
+        app:iconTint="@color/dragon_magenta"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inventoryHeader" />
 
     <TextView
         android:id="@+id/recentLabel"
@@ -61,7 +77,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inventoryHeader" />
+        app:layout_constraintTop_toBottomOf="@id/editPricesButton" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"

@@ -21,4 +21,6 @@
     </fragment>
     <fragment android:id="@+id/analyticsFragment" android:name="ph.dragonview.mobile.ui.analytics.AnalyticsFragment" android:label="Analytics" />
     <fragment android:id="@+id/scannerFragment" android:name="ph.dragonview.mobile.ui.scanner.ScannerFragment" android:label="Live Scan" />
+    <fragment android:id="@+id/recentlyRemovedFragment" android:name="ph.dragonview.mobile.ui.archive.RecentlyRemovedFragment" android:label="Recently Removed" />
+    <fragment android:id="@+id/settingsFragment" android:name="ph.dragonview.mobile.ui.settings.SettingsFragment" android:label="Settings" />
 </navigation>

@@ -9,8 +9,9 @@ DragonViewMobile is the AndreiCopy Mobile capstone application for dragon-fruit 
 - FIFO harvest inventory grouped by batch
 - Multiple size and grade entries per harvest batch
 - Sales and configurable pricing
-- Stem-planting guidance with milestones, observations, measurements, and progress photos
-- Prospect quality-scanner interface
+- Seed, stem-cutting, and post-grafting farm guidance with accordion timelines, stage sheets, observations, measurements, and progress photos
+- Recoverable record removal with Recently Removed, restoration, and archive audit history
+- Camera and gallery quality-scanner workflow with optional on-device MobileNetV2 inference once the trained model is added
 
 ## Build requirements
 

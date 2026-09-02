@@ -9,64 +9,60 @@
     android:paddingTop="16dp"
     android:paddingEnd="20dp">
 
-    <LinearLayout
-        android:id="@+id/guidancePreview"
+    <TextView
+        android:id="@+id/introText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/soft_pink_panel"
-        android:orientation="vertical"
-        android:padding="16dp"
+        android:fontFamily="serif"
+        android:text="Choose a farm record to view its complete guidance timeline. Only one record opens at a time."
+        android:textColor="@color/muted_ink"
+        android:textSize="14sp"
+        android:lineSpacingExtra="3dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Guided Growth Records"
-                android:textColor="@color/dragon_magenta_dark"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-            <ImageView
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:background="@drawable/soft_green_panel"
-                android:contentDescription="Plant guidance"
-                android:padding="10dp"
-                android:src="@drawable/ic_plant"
-                app:tint="@color/dragon_green" />
-        </LinearLayout>
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:max="100"
-            android:progress="100"
-            app:indicatorColor="@color/dragon_magenta"
-            app:trackColor="@color/white" />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="start" android:text="Stem planting" android:textColor="@color/muted_ink" android:textSize="11sp" />
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Growth" android:textColor="@color/muted_ink" android:textSize="11sp" />
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Flowering" android:textColor="@color/muted_ink" android:textSize="11sp" />
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="end" android:text="Harvest" android:textColor="@color/dragon_magenta_dark" android:textSize="11sp" android:textStyle="bold" />
-        </LinearLayout>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Track day age, milestones, notes, measurements, and your own progress photos. Reference photos will be added only after they are validated and licensed."
-            android:textColor="@color/muted_ink"
-            android:textSize="12sp"
-            android:lineSpacingExtra="2dp" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/recordActions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/introText">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addButton"
+            style="@style/Widget.DragonView.Button"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:fontFamily="serif"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="Record planting"
+            android:textSize="13sp"
+            app:icon="@drawable/icon_streamline_plant"
+            app:iconPadding="5dp"
+            app:iconSize="18dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/graftButton"
+            style="@style/Widget.DragonView.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:fontFamily="serif"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="Record grafting"
+            android:textSize="13sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -74,36 +70,29 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guidancePreview">
-        <LinearLayout
-            android:layout_width="0dp"
+        app:layout_constraintTop_toBottomOf="@id/recordActions">
+
+        <TextView
+            android:id="@+id/summaryText"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/summaryText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Active planting groups"
-                android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
-                android:textStyle="bold" />
-            <TextView
-                android:id="@+id/messageText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/muted_ink"
-                android:textSize="12sp" />
-        </LinearLayout>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/addButton"
-            style="@style/Widget.DragonView.Button"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Add group" />
+            android:fontFamily="serif"
+            android:text="Farm records"
+            android:textColor="@color/ink"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/messageText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="serif"
+            android:textColor="@color/muted_ink"
+            android:textSize="13sp" />
     </LinearLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -115,11 +104,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/listHeader">
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/plantingList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="24dp" />
+            android:paddingBottom="28dp" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

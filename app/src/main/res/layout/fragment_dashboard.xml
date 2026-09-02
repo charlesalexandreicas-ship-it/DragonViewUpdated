@@ -24,14 +24,14 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/soft_pink_panel"
+                android:background="@drawable/home_hero_background"
                 android:orientation="vertical"
                 android:padding="18dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Welcome to"
-                    android:textColor="@color/muted_ink"
+                    android:textColor="@color/dragon_white_75"
                     android:textSize="13sp" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -39,14 +39,14 @@
                     android:layout_marginTop="2dp"
                     android:text="DRAGON-VIEW"
                     android:textAppearance="@style/TextAppearance.DragonView.TitleLarge"
-                    android:textColor="@color/dragon_magenta_dark"
+                    android:textColor="@color/white"
                     android:textStyle="bold" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="Manage your farm smarter and easier."
-                    android:textColor="@color/muted_ink" />
+                    android:textColor="@color/white" />
             </LinearLayout>
 
             <TextView
@@ -73,36 +73,30 @@
                 android:orientation="horizontal">
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/addInventoryAction"
-                    style="@style/Widget.DragonView.Button.Outlined"
+                    style="@style/Widget.DragonView.Button.QuickAction"
                     android:layout_width="0dp"
-                    android:layout_height="76dp"
+                    android:layout_height="88dp"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="Add Inventory\nTrack supplies"
-                    android:textColor="@color/ink"
                     android:textSize="13sp"
-                    app:backgroundTint="@color/white"
-                    app:icon="@drawable/ic_inventory"
+                    app:icon="@drawable/icon_streamline_inventory"
                     app:iconGravity="textStart"
-                    app:iconTint="@color/dragon_magenta"
-                    app:strokeWidth="0dp" />
+                    app:iconTint="@color/dragon_magenta" />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/recordHarvestAction"
-                    style="@style/Widget.DragonView.Button.Outlined"
+                    style="@style/Widget.DragonView.Button.QuickAction"
                     android:layout_width="0dp"
-                    android:layout_height="76dp"
+                    android:layout_height="88dp"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="Record Harvest\nLog yields"
-                    android:textColor="@color/ink"
                     android:textSize="13sp"
-                    app:backgroundTint="@color/white"
-                    app:icon="@drawable/ic_plant"
+                    app:icon="@drawable/icon_streamline_plant"
                     app:iconGravity="textStart"
-                    app:iconTint="@color/dragon_green"
-                    app:strokeWidth="0dp" />
+                    app:iconTint="@color/dragon_green" />
             </LinearLayout>
 
             <LinearLayout
@@ -113,36 +107,30 @@
                 android:orientation="horizontal">
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/viewAnalyticsButton"
-                    style="@style/Widget.DragonView.Button.Outlined"
+                    style="@style/Widget.DragonView.Button.QuickAction"
                     android:layout_width="0dp"
-                    android:layout_height="76dp"
+                    android:layout_height="88dp"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="View Analytics\nFarm insights"
-                    android:textColor="@color/ink"
                     android:textSize="13sp"
-                    app:backgroundTint="@color/white"
-                    app:icon="@drawable/ic_chart"
+                    app:icon="@drawable/icon_streamline_analytics"
                     app:iconGravity="textStart"
-                    app:iconTint="@color/dragon_blue"
-                    app:strokeWidth="0dp" />
+                    app:iconTint="@color/dragon_blue" />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/schedulePlantAction"
-                    style="@style/Widget.DragonView.Button.Outlined"
+                    style="@style/Widget.DragonView.Button.QuickAction"
                     android:layout_width="0dp"
-                    android:layout_height="76dp"
+                    android:layout_height="88dp"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="Schedule Plant\nPlan planting"
-                    android:textColor="@color/ink"
                     android:textSize="13sp"
-                    app:backgroundTint="@color/white"
-                    app:icon="@drawable/ic_plant"
+                    app:icon="@drawable/icon_streamline_plant"
                     app:iconGravity="textStart"
-                    app:iconTint="@color/dragon_yellow"
-                    app:strokeWidth="0dp" />
+                    app:iconTint="@color/dragon_yellow" />
             </LinearLayout>
 
             <TextView

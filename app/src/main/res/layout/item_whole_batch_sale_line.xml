@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_marginTop="8dp" android:background="@drawable/metric_card_background"
+    android:orientation="vertical" android:padding="12dp">
+    <TextView android:id="@+id/categoryText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/TextAppearance.DragonView.TitleMedium" android:textStyle="bold" />
+    <TextView android:id="@+id/detailsText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:textColor="@color/muted_ink" />
+    <EditText android:id="@+id/weightInput" style="@style/Widget.DragonView.DialogField" android:hint="Measured total weight (kg)" android:inputType="numberDecimal" />
+    <TextView android:id="@+id/subtotalText" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="end" android:text="Subtotal: ₱0.00" android:textStyle="bold" />
+</LinearLayout>

@@ -15,24 +15,10 @@
         android:paddingEnd="20dp"
         android:paddingBottom="30dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Record Harvest"
-            android:textAppearance="@style/TextAppearance.DragonView.TitleLarge"
-            android:textStyle="bold" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Add harvested dragon fruit to FIFO inventory"
-            android:textColor="@color/dragon_text_soft"
-            android:textSize="13sp" />
-
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="4dp"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="20dp"
             app:cardElevation="2dp"

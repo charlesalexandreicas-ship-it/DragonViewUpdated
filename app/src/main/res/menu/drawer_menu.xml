@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/mainDrawerGroup" android:checkableBehavior="single">
+        <item android:id="@+id/dashboardFragment" android:icon="@drawable/icon_streamline_home" android:title="Home" />
+        <item android:id="@+id/inventoryFragment" android:icon="@drawable/icon_streamline_inventory" android:title="Inventory" />
+        <item android:id="@+id/salesFragment" android:icon="@drawable/icon_streamline_sales" android:title="Sales" />
+        <item android:id="@+id/plantingFragment" android:icon="@drawable/icon_streamline_plant" android:title="Planting &amp; Guidance" />
+        <item android:id="@+id/analyticsFragment" android:icon="@drawable/icon_streamline_analytics" android:title="Analytics" />
+    </group>
+    <group android:id="@+id/utilityDrawerGroup">
+        <item android:id="@+id/recentlyRemovedFragment" android:icon="@drawable/icon_streamline_recently_removed" android:title="Recently Removed" />
+        <item android:id="@+id/settingsFragment" android:icon="@drawable/icon_streamline_settings" android:title="Settings" />
+        <item android:id="@+id/action_logout" android:icon="@drawable/icon_streamline_logout" android:title="Logout" />
+    </group>
+</menu>

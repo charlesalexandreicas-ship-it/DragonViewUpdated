@@ -14,9 +14,9 @@ import ph.dragonview.mobile.data.model.SessionUser;
 import ph.dragonview.mobile.databinding.ActivityLoginBinding;
 
 public final class LoginActivity extends AppCompatActivity {
-    private ActivityLoginBinding binding;
-    private SessionManager sessionManager;
-    private boolean registrationMode;
+    private ActivityLoginBinding binding; //LogIn
+    private SessionManager sessionManager;//RegistrationManager
+    private boolean registrationMode; //registrationmode
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

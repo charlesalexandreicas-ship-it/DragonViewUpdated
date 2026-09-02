@@ -16,7 +16,10 @@ import ph.dragonview.mobile.R;
 
 final class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Holder> {
     private final List<InventoryBatch> batches = new ArrayList<>();
-    interface Listener { void open(InventoryBatch batch); }
+    interface Listener {
+        void open(InventoryBatch batch);
+        void archive(InventoryBatch batch);
+    }
     private final Listener listener;
     InventoryAdapter(Listener listener) { this.listener = listener; }
 
@@ -48,8 +51,8 @@ final class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Holde
         }
         void bind(InventoryBatch batch, Listener listener) {
             binding.batchText.setText("#" + batch.getBatchNumber());
-            binding.detailsText.setText(batch.getAvailablePieces() + " available pieces • "
-                    + batch.getItemCount() + " size/grade entries\n"
+            binding.detailsText.setText(batch.getAvailablePieces() + " pieces available\n"
+                    + batch.getItemCount() + " size/grade entries  •  Harvested "
                     + batch.getHarvestDate().substring(0, 10));
             binding.gradeText.setText(batch.getItemCount() == 1
                     ? "1 ENTRY" : batch.getItemCount() + " ENTRIES");
@@ -84,6 +87,7 @@ final class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Holde
             binding.getRoot().setStrokeColor(accentColor);
             binding.getRoot().setStrokeWidth(batch.getNextOutItems() > 0 ? 3 : 1);
             binding.getRoot().setOnClickListener(v -> listener.open(batch));
+            binding.archiveButton.setOnClickListener(v -> listener.archive(batch));
         }
     }
 }

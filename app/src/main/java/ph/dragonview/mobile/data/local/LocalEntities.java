@@ -46,6 +46,8 @@ public final class LocalEntities {
         public int originalPieces;
         public int availablePieces;
         public long createdAt;
+        public Long archivedAt;
+        public String archiveReason;
     }
 
     @Entity(
@@ -112,6 +114,8 @@ public final class LocalEntities {
         public String paymentReference;
         public String provider;
         public long completedAt;
+        public Long archivedAt;
+        public String archiveReason;
     }
 
     @Entity(
@@ -154,12 +158,41 @@ public final class LocalEntities {
         @NonNull public String graftingDate = "";
         @NonNull public String variety = "";
         @NonNull public String location = "";
+        @NonNull public String propagationMethod = "STEM_CUTTING";
         @NonNull public String cuttingType = "UNROOTED";
         @NonNull public String currentStage = "PLANTED";
         public String floweringDate;
         public int numberOfPlants;
         public long createdAt;
         public long updatedAt;
+        public Long archivedAt;
+        public String archiveReason;
+    }
+
+    @Entity(
+            tableName = "grafting_events",
+            foreignKeys = {
+                    @ForeignKey(
+                            entity = User.class,
+                            parentColumns = "id",
+                            childColumns = "userId",
+                            onDelete = ForeignKey.CASCADE),
+                    @ForeignKey(
+                            entity = Planting.class,
+                            parentColumns = "id",
+                            childColumns = "plantingId",
+                            onDelete = ForeignKey.CASCADE)
+            },
+            indices = {@Index("userId"), @Index("plantingId")}
+    )
+    public static final class GraftingEvent {
+        @PrimaryKey(autoGenerate = true) public long id;
+        public long userId;
+        public long plantingId;
+        @NonNull public String graftingDate = "";
+        @NonNull public String scionVariety = "";
+        public String note;
+        public long createdAt;
     }
 
     @Entity(
@@ -189,5 +222,25 @@ public final class LocalEntities {
         public String photoUri;
         @NonNull public String recordedDate = "";
         public long createdAt;
+    }
+
+    @Entity(
+            tableName = "record_archive_events",
+            foreignKeys = @ForeignKey(
+                    entity = User.class,
+                    parentColumns = "id",
+                    childColumns = "userId",
+                    onDelete = ForeignKey.CASCADE),
+            indices = {@Index("userId"), @Index(value = {"recordType", "recordKey"})}
+    )
+    public static final class RecordArchiveEvent {
+        @PrimaryKey(autoGenerate = true) public long id;
+        public long userId;
+        @NonNull public String recordType = "";
+        @NonNull public String recordKey = "";
+        @NonNull public String recordTitle = "";
+        @NonNull public String action = "ARCHIVED";
+        public String reason;
+        public long eventAt;
     }
 }

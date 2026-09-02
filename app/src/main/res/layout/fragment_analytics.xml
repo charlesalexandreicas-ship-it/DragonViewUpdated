@@ -33,26 +33,55 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="vertical">
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="REPORTING PERIOD" android:textColor="@color/dragon_text_soft" android:textSize="10sp" android:textStyle="bold" />
-                    <Spinner
+                    <com.google.android.material.button.MaterialButtonToggleGroup
                         android:id="@+id/periodInput"
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:spinnerMode="dropdown" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        app:checkedButton="@id/periodDailyButton"
+                        app:selectionRequired="true"
+                        app:singleSelection="true">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/periodDailyButton"
+                            style="@style/Widget.DragonView.Button.Period"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="Daily" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/periodWeeklyButton"
+                            style="@style/Widget.DragonView.Button.Period"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="Weekly" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/periodMonthlyButton"
+                            style="@style/Widget.DragonView.Button.Period"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="Monthly" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/periodAnnualButton"
+                            style="@style/Widget.DragonView.Button.Period"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="Annual" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
                 </LinearLayout>
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.DragonView.TextInputLayout"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="1"
+                    android:layout_marginTop="12dp"
                     android:hint="Selected date">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/dateInput"
@@ -69,17 +98,69 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="8dp" />
 
-            <GridLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:columnCount="2"
-                android:useDefaultMargins="true">
-                <TextView android:id="@+id/revenueText" style="@style/DashboardMetric" android:text="—" android:contentDescription="Revenue" />
-                <TextView android:id="@+id/salesText" style="@style/DashboardMetric" android:text="—" android:contentDescription="Completed sales" />
-                <TextView android:id="@+id/piecesText" style="@style/DashboardMetric" android:text="—" android:contentDescription="Pieces sold" />
-                <TextView android:id="@+id/weightText" style="@style/DashboardMetric" android:text="—" android:contentDescription="Total weight" />
-            </GridLayout>
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/Widget.DragonView.Card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="104dp" android:gravity="center_vertical" android:orientation="vertical" android:padding="16dp">
+                            <TextView android:id="@+id/revenueText" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="Revenue" android:ellipsize="end" android:fontFamily="sans-serif-medium" android:maxLines="1" android:text="—" android:textColor="@color/dragon_magenta_dark" android:textSize="22sp" android:textStyle="bold" app:autoSizeMaxTextSize="22sp" app:autoSizeMinTextSize="14sp" app:autoSizeStepGranularity="1sp" app:autoSizeTextType="uniform" />
+                            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Revenue" android:textColor="@color/muted_ink" android:textSize="12sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/Widget.DragonView.Card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="104dp" android:gravity="center_vertical" android:orientation="vertical" android:padding="16dp">
+                            <TextView android:id="@+id/salesText" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="Completed sales" android:fontFamily="sans-serif-medium" android:maxLines="1" android:text="—" android:textColor="@color/ink" android:textSize="22sp" android:textStyle="bold" />
+                            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Completed sales" android:textColor="@color/muted_ink" android:textSize="12sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/Widget.DragonView.Card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="104dp" android:gravity="center_vertical" android:orientation="vertical" android:padding="16dp">
+                            <TextView android:id="@+id/piecesText" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="Pieces sold" android:fontFamily="sans-serif-medium" android:maxLines="1" android:text="—" android:textColor="@color/dragon_green" android:textSize="22sp" android:textStyle="bold" />
+                            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Pieces sold" android:textColor="@color/muted_ink" android:textSize="12sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/Widget.DragonView.Card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="104dp" android:gravity="center_vertical" android:orientation="vertical" android:padding="16dp">
+                            <TextView android:id="@+id/weightText" android:layout_width="match_parent" android:layout_height="wrap_content" android:contentDescription="Total weight" android:ellipsize="end" android:fontFamily="sans-serif-medium" android:maxLines="1" android:text="—" android:textColor="@color/ink" android:textSize="22sp" android:textStyle="bold" app:autoSizeMaxTextSize="22sp" app:autoSizeMinTextSize="14sp" app:autoSizeStepGranularity="1sp" app:autoSizeTextType="uniform" />
+                            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Total weight" android:textColor="@color/muted_ink" android:textSize="12sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/comparisonText"
@@ -109,8 +190,9 @@
                     <ph.dragonview.mobile.ui.analytics.RevenueTrendChartView
                         android:id="@+id/trendChart"
                         android:layout_width="match_parent"
-                        android:layout_height="250dp"
-                        android:layout_marginTop="10dp" />
+                        android:layout_height="280dp"
+                        android:layout_marginTop="14dp"
+                        android:importantForAccessibility="yes" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -121,6 +203,28 @@
                 android:text="Size and Grade Summary"
                 android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
                 android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Sales totals grouped by fruit size and grade"
+                android:textColor="@color/dragon_text_soft"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/summaryEmptyText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/metric_card_background"
+                android:gravity="center"
+                android:minHeight="72dp"
+                android:padding="16dp"
+                android:text="No sold size and grade combinations for this period."
+                android:textColor="@color/muted_ink"
+                android:textSize="13sp"
+                android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/summaryList"

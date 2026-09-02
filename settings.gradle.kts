@@ -16,4 +16,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "DragonView"
 include(":app")
-

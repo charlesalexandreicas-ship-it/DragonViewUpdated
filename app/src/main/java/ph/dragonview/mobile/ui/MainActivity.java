@@ -2,22 +2,25 @@ package ph.dragonview.mobile.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
+import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import ph.dragonview.mobile.R;
 import ph.dragonview.mobile.data.SessionManager;
+import ph.dragonview.mobile.data.model.SessionUser;
 import ph.dragonview.mobile.databinding.ActivityMainBinding;
 
 public final class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private SessionManager session;
+    private AppBarConfiguration appBarConfiguration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,45 +38,110 @@ public final class MainActivity extends AppCompatActivity {
                 .findFragmentById(R.id.nav_host);
         if (host == null) throw new IllegalStateException("Navigation host is missing.");
         NavController controller = host.getNavController();
+        appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.dashboardFragment,
+                R.id.inventoryFragment,
+                R.id.scannerFragment,
+                R.id.plantingFragment,
+                R.id.analyticsFragment,
+                R.id.salesFragment,
+                R.id.recentlyRemovedFragment,
+                R.id.settingsFragment)
+                .setOpenableLayout(binding.drawerLayout)
+                .build();
+
         NavigationUI.setupWithNavController(binding.bottomNavigation, controller);
-        NavigationUI.setupActionBarWithNavController(this, controller);
+        NavigationUI.setupActionBarWithNavController(this, controller, appBarConfiguration);
+        configureDrawer(controller);
+        binding.bottomNavigation.setOnItemReselectedListener(item -> {
+            if (controller.getCurrentDestination() != null
+                    && controller.getCurrentDestination().getId() == item.getItemId()) {
+                return;
+            }
+            if (!controller.popBackStack(item.getItemId(), false)) {
+                controller.navigate(item.getItemId());
+            }
+        });
         binding.scannerButton.setOnClickListener(view ->
                 binding.bottomNavigation.setSelectedItemId(R.id.scannerFragment));
-
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-        return true;
+    private void configureDrawer(NavController controller) {
+        SessionUser user = session.getUser();
+        if (user != null && binding.navigationView.getHeaderCount() > 0) {
+            TextView userText = binding.navigationView.getHeaderView(0)
+                    .findViewById(R.id.drawerUserText);
+            userText.setText(user.getDisplayName());
+        }
+
+        binding.navigationView.setNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.action_logout) {
+                binding.drawerLayout.closeDrawer(GravityCompat.START);
+                signOut();
+                return true;
+            }
+            boolean handled = NavigationUI.onNavDestinationSelected(item, controller);
+            if (handled) {
+                item.setChecked(true);
+                binding.drawerLayout.closeDrawer(GravityCompat.START);
+            }
+            return handled;
+        });
+
+        controller.addOnDestinationChangedListener((navController, destination, arguments) -> {
+            int destinationId = destination.getId();
+            if (appBarConfiguration.getTopLevelDestinations().contains(destinationId)) {
+                binding.toolbar.setNavigationIcon(R.drawable.icon_streamline_menu);
+            }
+            if (binding.navigationView.getMenu().findItem(destinationId) != null) {
+                binding.navigationView.setCheckedItem(destinationId);
+            }
+            int bottomDestinationId = bottomDestinationFor(destinationId);
+            if (bottomDestinationId != View.NO_ID) {
+                binding.bottomNavigation.getMenu()
+                        .findItem(bottomDestinationId)
+                        .setChecked(true);
+            }
+            boolean settingsScreen = destinationId == R.id.settingsFragment;
+            binding.bottomNavigation.setVisibility(settingsScreen ? View.GONE : View.VISIBLE);
+            binding.scannerButton.setVisibility(settingsScreen ? View.GONE : View.VISIBLE);
+        });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_sales) {
-            NavHostFragment host = (NavHostFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.nav_host);
-            if (host != null) host.getNavController().navigate(R.id.salesFragment);
-            return true;
+    private static int bottomDestinationFor(int destinationId) {
+        if (destinationId == R.id.harvestFragment
+                || destinationId == R.id.inventoryDetailsFragment) {
+            return R.id.inventoryFragment;
         }
-        if (item.getItemId() == R.id.action_logout) {
-            logout();
-            return true;
+        if (destinationId == R.id.plantingDetailsFragment) {
+            return R.id.plantingFragment;
         }
-        return super.onOptionsItemSelected(item);
+        if (destinationId == R.id.dashboardFragment
+                || destinationId == R.id.inventoryFragment
+                || destinationId == R.id.scannerFragment
+                || destinationId == R.id.plantingFragment
+                || destinationId == R.id.analyticsFragment) {
+            return destinationId;
+        }
+        return View.NO_ID;
     }
 
     @Override
     public boolean onSupportNavigateUp() {
         NavHostFragment host = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host);
-        return host != null && host.getNavController().navigateUp();
+        return host != null && NavigationUI.navigateUp(
+                host.getNavController(), appBarConfiguration);
     }
 
-    private void logout() {
+    public void signOut() {
         if (session != null) session.clear();
         startActivity(new Intent(this, LoginActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
+    }
+
+    private void logout() {
+        signOut();
     }
 }

@@ -13,59 +13,83 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="16dp">
-        <ImageView
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/soft_green_panel"
-            android:contentDescription="Inventory batch"
-            android:padding="12dp"
-            android:src="@drawable/ic_inventory"
-            app:tint="@color/dragon_green" />
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/soft_green_panel"
+                android:contentDescription="Inventory batch"
+                android:padding="12dp"
+                android:src="@drawable/icon_streamline_inventory"
+                app:tint="@color/dragon_green" />
             <TextView
                 android:id="@+id/batchText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
                 android:textColor="@color/ink"
                 android:textSize="15sp"
                 android:textStyle="bold" />
-            <TextView
-                android:id="@+id/detailsText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/muted_ink"
-                android:textSize="12sp" />
-            <TextView
-                android:id="@+id/fifoStatusText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/soft_green_panel"
-                android:paddingStart="8dp"
-                android:paddingTop="4dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="4dp"
-                android:textColor="@color/dragon_green"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+            <ImageButton
+                android:id="@+id/archiveButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Remove inventory batch"
+                android:padding="13dp"
+                android:src="@android:drawable/ic_menu_delete"
+                app:tint="@color/dragon_magenta_dark" />
         </LinearLayout>
         <TextView
+            android:id="@+id/detailsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:lineSpacingExtra="2dp"
+            android:textColor="@color/muted_ink"
+            android:textSize="13sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+        <TextView
             android:id="@+id/gradeText"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/soft_pink_panel"
             android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="6dp"
             android:textColor="@color/dragon_magenta"
-            android:textSize="16sp"
+            android:textSize="12sp"
             android:textStyle="bold" />
+        <TextView
+            android:id="@+id/fifoStatusText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/soft_green_panel"
+            android:gravity="center"
+            android:maxLines="2"
+            android:paddingStart="8dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="6dp"
+            android:textColor="@color/dragon_green"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

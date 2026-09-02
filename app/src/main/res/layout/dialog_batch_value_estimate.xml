@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="20dp">
+        <TextView android:id="@+id/helpText" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textColor="@color/muted_ink"
+            android:text="Enter the measured available weight for each size and grade. This estimate does not record a sale." />
+        <LinearLayout android:id="@+id/itemsContainer" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="8dp"
+            android:orientation="vertical" />
+        <TextView android:id="@+id/totalText" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="16dp"
+            android:gravity="end" android:text="Estimated total: ₱0.00"
+            android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
+            android:textStyle="bold" />
+        <TextView android:id="@+id/errorText" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="8dp"
+            android:textColor="@color/dragon_error" />
+    </LinearLayout>
+</ScrollView>

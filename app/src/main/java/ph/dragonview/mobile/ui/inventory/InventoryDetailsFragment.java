@@ -1,6 +1,8 @@
 package ph.dragonview.mobile.ui.inventory;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,16 +18,25 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.Locale;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.text.NumberFormat;
 
 import ph.dragonview.mobile.R;
 import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.data.model.InventoryBatchDetails;
 import ph.dragonview.mobile.data.model.InventoryDetails;
+import ph.dragonview.mobile.data.model.FruitPrice;
+import ph.dragonview.mobile.databinding.DialogBatchValueEstimateBinding;
 import ph.dragonview.mobile.databinding.FragmentInventoryDetailsBinding;
+import ph.dragonview.mobile.databinding.ItemWholeBatchSaleLineBinding;
 
 public final class InventoryDetailsFragment extends Fragment {
     private FragmentInventoryDetailsBinding binding;
     private String batchNumber;
+    private InventoryBatchDetails currentDetails;
+    private List<FruitPrice> prices = Collections.emptyList();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -59,9 +70,16 @@ public final class InventoryDetailsFragment extends Fragment {
                         binding.messageText.setText(message);
                     }
                 });
+        LocalRepository.get(requireContext()).prices(new LocalRepository.Callback<>() {
+            @Override public void onSuccess(List<FruitPrice> values) { prices = values; }
+            @Override public void onError(String message) {
+                if (binding != null) binding.messageText.setText(message);
+            }
+        });
     }
 
     private void bind(InventoryBatchDetails details) {
+        currentDetails = details;
         binding.batchText.setText("#" + details.getBatchNumber());
         binding.gradeText.setText(details.getItems().size() == 1
                 ? "1 ENTRY" : details.getItems().size() + " ENTRIES");
@@ -72,6 +90,7 @@ public final class InventoryDetailsFragment extends Fragment {
                 "%,d available pieces • Harvested %s",
                 details.getAvailablePieces(), displayedDate));
         binding.itemsContainer.removeAllViews();
+        binding.estimateButton.setOnClickListener(v -> openEstimate());
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         for (InventoryBatchDetails.Item item : details.getItems()) {
             View row = inflater.inflate(
@@ -100,6 +119,69 @@ public final class InventoryDetailsFragment extends Fragment {
             regradeButton.setOnClickListener(v -> actionDialog(item, true));
             binding.itemsContainer.addView(row);
         }
+    }
+
+    private void openEstimate() {
+        if (currentDetails == null) return;
+        if (prices.isEmpty()) {
+            binding.messageText.setText("Price Management must contain active prices first.");
+            return;
+        }
+        DialogBatchValueEstimateBinding form = DialogBatchValueEstimateBinding.inflate(
+                getLayoutInflater());
+        List<EstimateLine> lines = new ArrayList<>();
+        NumberFormat php = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
+        boolean missingPrice = false;
+        for (InventoryBatchDetails.Item item : currentDetails.getItems()) {
+            if (item.getAvailablePieces() <= 0) continue;
+            double rate = price(item.getSize(), item.getGrade());
+            if (rate <= 0) missingPrice = true;
+            EstimateLine line = new EstimateLine(rate);
+            lines.add(line);
+            ItemWholeBatchSaleLineBinding row = ItemWholeBatchSaleLineBinding.inflate(
+                    getLayoutInflater(), form.itemsContainer, false);
+            row.categoryText.setText(formatSize(item.getSize()) + " • Grade " + item.getGrade());
+            row.detailsText.setText(String.format(Locale.US, "%,d pieces • %s/kg",
+                    item.getAvailablePieces(), rate > 0 ? php.format(rate) : "No active price"));
+            row.subtotalText.setText("Estimated subtotal: " + php.format(0));
+            row.weightInput.addTextChangedListener(new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    try { line.weight = Double.parseDouble(s.toString().trim()); }
+                    catch (NumberFormatException ignored) { line.weight = 0; }
+                    row.subtotalText.setText("Estimated subtotal: "
+                            + php.format(line.weight * line.rate));
+                    updateEstimateTotal(form, lines, php);
+                }
+                @Override public void afterTextChanged(Editable s) { }
+            });
+            form.itemsContainer.addView(row.getRoot());
+        }
+        form.errorText.setText(missingPrice
+                ? "Some categories have no active price. Update Price Management to include them." : "");
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setTitle("Batch #" + currentDetails.getBatchNumber() + " estimate")
+                .setView(form.getRoot()).setNegativeButton("Close", null).create();
+        dialog.show();
+    }
+
+    private void updateEstimateTotal(DialogBatchValueEstimateBinding form,
+                                     List<EstimateLine> lines, NumberFormat php) {
+        double total = 0;
+        for (EstimateLine line : lines) total += line.weight * line.rate;
+        form.totalText.setText("Estimated total: " + php.format(total));
+        binding.estimateSummaryText.setText("Latest estimate: " + php.format(total)
+                + " • not yet recorded as a sale");
+    }
+
+    private double price(String size, String grade) {
+        for (FruitPrice price : prices) {
+            if (grade.equals(price.getGrade())
+                    && ("C".equals(grade) || size.equals(price.getSize()))) {
+                return price.getPricePerKilogram();
+            }
+        }
+        return 0;
     }
 
     private String history(InventoryBatchDetails.Item item) {
@@ -199,5 +281,11 @@ public final class InventoryDetailsFragment extends Fragment {
     public void onDestroyView() {
         binding = null;
         super.onDestroyView();
+    }
+
+    private static final class EstimateLine {
+        final double rate;
+        double weight;
+        EstimateLine(double rate) { this.rate = rate; }
     }
 }

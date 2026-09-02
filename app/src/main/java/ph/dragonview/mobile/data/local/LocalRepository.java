@@ -7,6 +7,7 @@ import android.os.Looper;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -20,15 +21,19 @@ import java.util.concurrent.Executors;
 import ph.dragonview.mobile.data.SessionManager;
 import ph.dragonview.mobile.data.local.LocalEntities.Inventory;
 import ph.dragonview.mobile.data.local.LocalEntities.InventoryTransaction;
+import ph.dragonview.mobile.data.local.LocalEntities.GraftingEvent;
 import ph.dragonview.mobile.data.local.LocalEntities.Planting;
 import ph.dragonview.mobile.data.local.LocalEntities.PlantingUpdate;
 import ph.dragonview.mobile.data.local.LocalEntities.Price;
+import ph.dragonview.mobile.data.local.LocalEntities.RecordArchiveEvent;
 import ph.dragonview.mobile.data.local.LocalEntities.Sale;
 import ph.dragonview.mobile.data.local.LocalEntities.SaleItem;
 import ph.dragonview.mobile.data.local.LocalEntities.User;
 import ph.dragonview.mobile.data.model.CompleteSaleRequest;
+import ph.dragonview.mobile.data.model.ArchivedRecord;
 import ph.dragonview.mobile.data.model.DashboardData;
 import ph.dragonview.mobile.data.model.FruitPrice;
+import ph.dragonview.mobile.data.model.GraftingRequest;
 import ph.dragonview.mobile.data.model.HarvestRequest;
 import ph.dragonview.mobile.data.model.InventoryDetails;
 import ph.dragonview.mobile.data.model.InventoryBatch;
@@ -39,6 +44,7 @@ import ph.dragonview.mobile.data.model.PlantingGroup;
 import ph.dragonview.mobile.data.model.PlantingRequest;
 import ph.dragonview.mobile.data.model.PlantingStage;
 import ph.dragonview.mobile.data.model.PlantingUpdateRequest;
+import ph.dragonview.mobile.data.model.PropagationMethod;
 import ph.dragonview.mobile.data.model.SaleSummary;
 import ph.dragonview.mobile.data.model.SalesAnalytics;
 import ph.dragonview.mobile.data.model.SessionUser;
@@ -401,8 +407,11 @@ public final class LocalRepository {
                 planting.variety = request.getVariety();
                 planting.location = request.getLocation();
                 planting.numberOfPlants = request.getNumberOfPlants();
+                planting.propagationMethod = request.getPropagationMethod().name();
                 planting.cuttingType = request.getCuttingType();
-                planting.currentStage = PlantingStage.PLANTED.name();
+                PlantingStage initialStage = PlantingStage.firstFor(
+                        request.getPropagationMethod());
+                planting.currentStage = initialStage.name();
                 planting.createdAt = now;
                 planting.updatedAt = now;
                 planting.id = dao.insertPlanting(planting);
@@ -411,8 +420,9 @@ public final class LocalRepository {
                 update.userId = userId;
                 update.plantingId = planting.id;
                 update.type = "MILESTONE";
-                update.stage = PlantingStage.PLANTED.name();
-                update.note = "Planting record created.";
+                update.stage = initialStage.name();
+                update.note = request.getPropagationMethod().getDisplayName()
+                        + " record created.";
                 update.recordedDate = request.getGraftingDate();
                 update.createdAt = now;
                 dao.insertPlantingUpdate(update);
@@ -448,6 +458,191 @@ public final class LocalRepository {
                         ? "Stage confirmed: " + stage.getDisplayName() : note.trim();
                 update.recordedDate = recordedDate;
                 update.createdAt = System.currentTimeMillis();
+                dao.insertPlantingUpdate(update);
+            });
+            return null;
+        }, callback);
+    }
+
+    public void archiveInventoryBatch(
+            String batchNumber, String reason, Callback<Void> callback
+    ) {
+        execute(() -> {
+            long userId = userId();
+            database.runInTransaction(() -> {
+                List<Inventory> rows = dao.inventoryByBatch(userId, batchNumber);
+                if (rows.isEmpty()) {
+                    throw new IllegalArgumentException("Inventory batch not found.");
+                }
+                long now = System.currentTimeMillis();
+                if (dao.archiveInventoryBatch(userId, batchNumber, now,
+                        normalizedReason(reason)) < 1) {
+                    throw new IllegalStateException("Inventory batch could not be archived.");
+                }
+                recordArchiveEvent(userId, ArchivedRecord.Type.INVENTORY_BATCH,
+                        batchNumber, "Batch #" + batchNumber, "ARCHIVED", reason, now);
+            });
+            return null;
+        }, callback);
+    }
+
+    public void archiveSale(long saleId, String reason, Callback<Void> callback) {
+        execute(() -> {
+            long userId = userId();
+            database.runInTransaction(() -> {
+                Sale sale = dao.saleById(userId, saleId);
+                if (sale == null) throw new IllegalArgumentException("Sale not found.");
+                long now = System.currentTimeMillis();
+                if (dao.archiveSale(userId, saleId, now, normalizedReason(reason)) < 1) {
+                    throw new IllegalStateException("Sale could not be archived.");
+                }
+                recordArchiveEvent(userId, ArchivedRecord.Type.SALE,
+                        String.valueOf(saleId), "Sale #" + saleId, "ARCHIVED", reason, now);
+            });
+            return null;
+        }, callback);
+    }
+
+    public void archivePlanting(
+            long plantingId, String reason, Callback<Void> callback
+    ) {
+        execute(() -> {
+            long userId = userId();
+            database.runInTransaction(() -> {
+                Planting planting = dao.plantingById(plantingId, userId);
+                if (planting == null) {
+                    throw new IllegalArgumentException("Planting record not found.");
+                }
+                long now = System.currentTimeMillis();
+                if (dao.archivePlanting(userId, plantingId, now,
+                        normalizedReason(reason)) < 1) {
+                    throw new IllegalStateException("Planting record could not be archived.");
+                }
+                recordArchiveEvent(userId, ArchivedRecord.Type.PLANTING,
+                        String.valueOf(plantingId),
+                        "Farm Section " + planting.recordNumber,
+                        "ARCHIVED", reason, now);
+            });
+            return null;
+        }, callback);
+    }
+
+    public void archivedRecords(Callback<List<ArchivedRecord>> callback) {
+        execute(() -> {
+            long userId = userId();
+            List<ArchivedRecord> records = new ArrayList<>();
+            Map<String, List<Inventory>> batches = new LinkedHashMap<>();
+            for (Inventory item : dao.archivedInventory(userId)) {
+                batches.computeIfAbsent(item.batchNumber,
+                        ignored -> new ArrayList<>()).add(item);
+            }
+            for (Map.Entry<String, List<Inventory>> entry : batches.entrySet()) {
+                int pieces = 0;
+                long archivedAt = 0;
+                String reason = null;
+                for (Inventory item : entry.getValue()) {
+                    pieces += item.availablePieces;
+                    if (item.archivedAt != null && item.archivedAt > archivedAt) {
+                        archivedAt = item.archivedAt;
+                        reason = item.archiveReason;
+                    }
+                }
+                records.add(new ArchivedRecord(ArchivedRecord.Type.INVENTORY_BATCH,
+                        entry.getKey(), "Batch #" + entry.getKey(),
+                        pieces + " pieces unavailable while archived", reason, archivedAt));
+            }
+            for (Planting planting : dao.archivedPlantings(userId)) {
+                records.add(new ArchivedRecord(ArchivedRecord.Type.PLANTING,
+                        String.valueOf(planting.id),
+                        "Farm Section " + planting.recordNumber,
+                        planting.location + " • " + planting.variety,
+                        planting.archiveReason, valueOrZero(planting.archivedAt)));
+            }
+            for (Sale sale : dao.archivedSales(userId)) {
+                records.add(new ArchivedRecord(ArchivedRecord.Type.SALE,
+                        String.valueOf(sale.id), "Sale #" + sale.id,
+                        sale.customerName + " • accounting history retained",
+                        sale.archiveReason, valueOrZero(sale.archivedAt)));
+            }
+            records.sort(Comparator.comparingLong(
+                    ArchivedRecord::getArchivedAt).reversed());
+            return records;
+        }, callback);
+    }
+
+    public void restoreArchivedRecord(
+            ArchivedRecord.Type type, String key, Callback<Void> callback
+    ) {
+        execute(() -> {
+            long userId = userId();
+            database.runInTransaction(() -> {
+                long now = System.currentTimeMillis();
+                int restored;
+                String title;
+                if (type == ArchivedRecord.Type.INVENTORY_BATCH) {
+                    restored = dao.restoreInventoryBatch(userId, key);
+                    title = "Batch #" + key;
+                } else if (type == ArchivedRecord.Type.SALE) {
+                    long id = Long.parseLong(key);
+                    restored = dao.restoreSale(userId, id);
+                    title = "Sale #" + key;
+                } else {
+                    long id = Long.parseLong(key);
+                    restored = dao.restorePlanting(userId, id, now);
+                    title = "Planting record #" + key;
+                }
+                if (restored < 1) {
+                    throw new IllegalStateException("This record is no longer archived.");
+                }
+                recordArchiveEvent(userId, type, key, title,
+                        "RESTORED", null, now);
+            });
+            return null;
+        }, callback);
+    }
+
+    public void recordGrafting(GraftingRequest request, Callback<Void> callback) {
+        execute(() -> {
+            long userId = userId();
+            database.runInTransaction(() -> {
+                Planting planting = dao.plantingById(request.getPlantingId(), userId);
+                if (planting == null) {
+                    throw new IllegalArgumentException("Planting record not found.");
+                }
+                PropagationMethod current = PropagationMethod.fromCode(
+                        planting.propagationMethod);
+                if (current != PropagationMethod.SEED) {
+                    throw new IllegalArgumentException(
+                            "Only a seed-grown record can be transferred into this grafting pathway.");
+                }
+                long now = System.currentTimeMillis();
+                GraftingEvent event = new GraftingEvent();
+                event.userId = userId;
+                event.plantingId = planting.id;
+                event.graftingDate = request.getGraftingDate();
+                event.scionVariety = request.getScionVariety();
+                event.note = request.getNote() == null
+                        || request.getNote().trim().isEmpty()
+                        ? null : request.getNote().trim();
+                event.createdAt = now;
+                dao.insertGraftingEvent(event);
+
+                planting.propagationMethod = PropagationMethod.GRAFTED.name();
+                planting.currentStage = PlantingStage.GRAFT_UNION.name();
+                planting.variety = request.getScionVariety();
+                planting.updatedAt = now;
+                dao.updatePlanting(planting);
+
+                PlantingUpdate update = new PlantingUpdate();
+                update.userId = userId;
+                update.plantingId = planting.id;
+                update.type = "GRAFTING";
+                update.stage = PlantingStage.GRAFT_UNION.name();
+                update.note = event.note == null
+                        ? "Grafting recorded with scion variety " + event.scionVariety + "."
+                        : event.note;
+                update.recordedDate = event.graftingDate;
+                update.createdAt = now;
                 dao.insertPlantingUpdate(update);
             });
             return null;
@@ -523,24 +718,71 @@ public final class LocalRepository {
     }
 
     private void completeSaleTransaction(long userId, CompleteSaleRequest request) {
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Add at least one sale item.");
+        }
+        Map<Long, Inventory> exactBatchLots = new HashMap<>();
+        boolean fifoOverride = false;
+        if (request.isEntireBatch()) {
+            if (request.getBatchNumber() == null || request.getBatchNumber().trim().isEmpty()) {
+                throw new IllegalArgumentException("Select a batch to sell.");
+            }
+            Set<Long> requestedIds = new HashSet<>();
+            for (CompleteSaleRequest.Item item : request.getItems()) {
+                if (item.getInventoryId() == null || !requestedIds.add(item.getInventoryId())) {
+                    throw new IllegalArgumentException("Whole-batch items are invalid.");
+                }
+            }
+            Set<Long> activeBatchIds = new HashSet<>();
+            for (Inventory lot : dao.inventoryByBatch(userId, request.getBatchNumber())) {
+                if (lot.availablePieces <= 0) continue;
+                activeBatchIds.add(lot.id);
+                exactBatchLots.put(lot.id, lot);
+            }
+            if (activeBatchIds.isEmpty() || !activeBatchIds.equals(requestedIds)) {
+                throw new IllegalStateException(
+                        "The batch changed. Reload it before completing the sale.");
+            }
+            for (CompleteSaleRequest.Item item : request.getItems()) {
+                Inventory lot = exactBatchLots.get(item.getInventoryId());
+                if (lot == null || !lot.size.equals(item.getSize())
+                        || !lot.grade.equals(item.getGrade())
+                        || lot.availablePieces != item.getPieces()) {
+                    throw new IllegalStateException(
+                            "Whole-batch piece counts must match current inventory.");
+                }
+                List<Inventory> fifo = dao.fifoInventory(userId, lot.size, lot.grade);
+                if (!fifo.isEmpty() && fifo.get(0).id != lot.id) fifoOverride = true;
+            }
+            if (fifoOverride && (request.getFifoOverrideReason() == null
+                    || request.getFifoOverrideReason().trim().isEmpty())) {
+                throw new IllegalArgumentException(
+                        "Explain why older matching stock is being skipped.");
+            }
+        }
         double total = 0;
         List<Price> matchedPrices = new ArrayList<>();
         Map<String, Integer> requestedByCategory = new HashMap<>();
         for (CompleteSaleRequest.Item requested : request.getItems()) {
+            if (requested.getPieces() < 1 || requested.getWeightKilograms() <= 0) {
+                throw new IllegalArgumentException(
+                        "Every sale item needs pieces and measured weight.");
+            }
             Price price = dao.activePrice(
                     userId, requested.getGrade(), requested.getSize());
             if (price == null) {
                 throw new IllegalStateException(
                         "No active price exists for a sale item.");
             }
-            int available = 0;
-            for (Inventory lot : dao.fifoInventory(
+            int available = request.isEntireBatch()
+                    ? exactBatchLots.get(requested.getInventoryId()).availablePieces : 0;
+            if (!request.isEntireBatch()) for (Inventory lot : dao.fifoInventory(
                     userId, requested.getSize(), requested.getGrade())) {
                 available += lot.availablePieces;
             }
             String category = requested.getSize() + "|" + requested.getGrade();
-            int cumulativeRequested = requestedByCategory.getOrDefault(category, 0)
-                    + requested.getPieces();
+            int cumulativeRequested = request.isEntireBatch() ? requested.getPieces()
+                    : requestedByCategory.getOrDefault(category, 0) + requested.getPieces();
             requestedByCategory.put(category, cumulativeRequested);
             if (available < cumulativeRequested) {
                 throw new IllegalStateException(
@@ -587,14 +829,22 @@ public final class LocalRepository {
             dao.insertSaleItem(item);
 
             int remaining = requested.getPieces();
-            for (Inventory lot : dao.fifoInventory(
-                    userId, item.size, item.grade)) {
+            List<Inventory> sources = request.isEntireBatch()
+                    ? List.of(exactBatchLots.get(requested.getInventoryId()))
+                    : dao.fifoInventory(userId, item.size, item.grade);
+            for (Inventory lot : sources) {
                 if (remaining == 0) break;
                 int allocated = Math.min(remaining, lot.availablePieces);
                 lot.availablePieces -= allocated;
                 dao.updateInventory(lot);
+                String remarks = "Sale #" + sale.id;
+                if (request.isEntireBatch()) {
+                    remarks += " • Entire batch " + request.getBatchNumber();
+                    if (fifoOverride) remarks += " • FIFO override: "
+                            + request.getFifoOverrideReason().trim();
+                }
                 addTransaction(userId, lot.id, "SALE_OUT", -allocated,
-                        "Sale #" + sale.id, user.displayName);
+                        remarks, user.displayName);
                 remaining -= allocated;
             }
         }
@@ -773,6 +1023,30 @@ public final class LocalRepository {
         dao.insertInventoryTransaction(transaction);
     }
 
+    private void recordArchiveEvent(
+            long userId, ArchivedRecord.Type type, String key, String title,
+            String action, String reason, long eventAt
+    ) {
+        RecordArchiveEvent event = new RecordArchiveEvent();
+        event.userId = userId;
+        event.recordType = type.name();
+        event.recordKey = key;
+        event.recordTitle = title;
+        event.action = action;
+        event.reason = normalizedReason(reason);
+        event.eventAt = eventAt;
+        dao.insertArchiveEvent(event);
+    }
+
+    private static String normalizedReason(String reason) {
+        return reason == null || reason.trim().isEmpty()
+                ? "No reason provided" : reason.trim();
+    }
+
+    private static long valueOrZero(Long value) {
+        return value == null ? 0L : value;
+    }
+
     private static void validateRegrade(String source, String target) {
         boolean valid = ("A".equals(source)
                 && ("B".equals(target) || "C".equals(target)))
@@ -782,18 +1056,27 @@ public final class LocalRepository {
     }
 
     private PlantingGroup plantingGroup(Planting item) throws Exception {
-        Calendar grafted = Calendar.getInstance();
-        grafted.setTime(new SimpleDateFormat("yyyy-MM-dd", Locale.US)
-                .parse(item.graftingDate));
-        zeroTime(grafted);
+        PropagationMethod method = PropagationMethod.fromCode(item.propagationMethod);
+        String trackingDate = item.graftingDate;
+        if (method == PropagationMethod.GRAFTED) {
+            List<GraftingEvent> events = dao.graftingEvents(item.userId, item.id);
+            if (!events.isEmpty()) trackingDate = events.get(0).graftingDate;
+        }
+        Calendar started = Calendar.getInstance();
+        started.setTime(new SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                .parse(trackingDate));
+        zeroTime(started);
         Calendar today = Calendar.getInstance();
         zeroTime(today);
         int elapsed = (int) Math.max(0,
-                (today.getTimeInMillis() - grafted.getTimeInMillis()) / 86_400_000L);
-        PlantingStage currentStage = PlantingStage.fromCode(item.currentStage);
-        PlantingStage ageSuggestion = PlantingStage.suggestedForAge(elapsed);
-        PlantingStage suggestedStage = currentStage.ordinal() < ageSuggestion.ordinal()
-                ? ageSuggestion : currentStage.next();
+                (today.getTimeInMillis() - started.getTimeInMillis()) / 86_400_000L);
+        PlantingStage currentStage = PlantingStage.fromCode(item.currentStage, method);
+        PlantingStage ageSuggestion = PlantingStage.suggestedForAge(method, elapsed);
+        List<PlantingStage> pathway = PlantingStage.forMethod(method);
+        int currentIndex = pathway.indexOf(currentStage);
+        int ageIndex = pathway.indexOf(ageSuggestion);
+        PlantingStage suggestedStage = currentIndex < ageIndex
+                ? ageSuggestion : currentStage.next(method);
         Integer fruitAge = item.floweringDate == null
                 ? null : daysSince(item.floweringDate);
         String harvestWindow = item.floweringDate == null
@@ -803,7 +1086,7 @@ public final class LocalRepository {
         return new PlantingGroup(
                 item.id, item.recordNumber, item.graftingDate,
                 item.variety, item.location, item.numberOfPlants,
-                item.cuttingType, elapsed, currentStage, suggestedStage,
+                item.cuttingType, elapsed, method, currentStage, suggestedStage,
                 fruitAge, harvestWindow);
     }
 

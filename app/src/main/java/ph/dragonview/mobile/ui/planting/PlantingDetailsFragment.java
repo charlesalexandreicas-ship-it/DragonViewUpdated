@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import ph.dragonview.mobile.R;
@@ -94,12 +95,14 @@ public final class PlantingDetailsFragment extends Fragment {
         binding.recordText.setText("#" + group.getRecordNumber());
         binding.stageText.setText(guidance.getDisplayName());
         binding.detailsText.setText(group.getLocation() + " • " + group.getVariety()
-                + " • " + group.getNumberOfPlants() + " cuttings");
+                + " • " + group.getNumberOfPlants() + " "
+                + group.getPropagationMethod().getQuantityLabel());
         binding.progressIndicator.setProgress(guidance.getProgressPercent());
-        binding.ageText.setText("Day " + group.getElapsedDays()
-                + " since planting • "
-                + ("ROOTED".equals(group.getCuttingType())
-                ? "Rooted cutting" : "Unrooted cutting"));
+        String ageAnchor = group.getPropagationMethod()
+                == ph.dragonview.mobile.data.model.PropagationMethod.GRAFTED
+                ? " since grafting" : " since planting";
+        binding.ageText.setText("Day " + group.getElapsedDays() + ageAnchor
+                + " • " + group.getPropagationMethod().getDisplayName());
         if (group.getFruitAgeDays() == null) {
             binding.fruitAgeText.setText("Fruit-age tracking starts when flowering is confirmed.");
         } else {
@@ -130,8 +133,15 @@ public final class PlantingDetailsFragment extends Fragment {
             ImageView photoView = row.findViewById(R.id.photoView);
 
             PlantingStage stage = PlantingStage.fromCode(update.getStage());
-            typeText.setText("MILESTONE".equals(update.getType())
-                    ? stage.getDisplayName() : "Progress record");
+            if ("MILESTONE".equals(update.getType())) {
+                typeText.setText(stage.getDisplayName());
+            } else if ("GRAFTING".equals(update.getType())) {
+                typeText.setText("Grafting event");
+            } else if ("PHOTO".equals(update.getType())) {
+                typeText.setText("Progress photo");
+            } else {
+                typeText.setText("Progress record");
+            }
             dateStageText.setText(update.getRecordedDate() + " • "
                     + stage.getDisplayName());
             String note = update.getNote();
@@ -162,9 +172,11 @@ public final class PlantingDetailsFragment extends Fragment {
         if (details == null) return;
         DialogPlantingStageBinding form = DialogPlantingStageBinding.inflate(
                 getLayoutInflater());
-        String[] labels = new String[PlantingStage.values().length];
+        List<PlantingStage> stages = PlantingStage.forMethod(
+                details.getGroup().getPropagationMethod());
+        String[] labels = new String[stages.size()];
         for (int index = 0; index < labels.length; index++) {
-            labels[index] = PlantingStage.values()[index].getDisplayName();
+            labels[index] = stages.get(index).getDisplayName();
         }
         form.stageInput.setAdapter(new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_dropdown_item_1line, labels));
@@ -181,7 +193,8 @@ public final class PlantingDetailsFragment extends Fragment {
                 .create();
         dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 .setOnClickListener(v -> {
-                    PlantingStage stage = stageForLabel(text(form.stageInput.getText()));
+                    PlantingStage stage = stageForLabel(
+                            text(form.stageInput.getText()), stages);
                     String date = text(form.dateInput.getText());
                     if (stage == null || date.isEmpty()) {
                         form.errorText.setText("Select a stage and event date.");
@@ -264,8 +277,9 @@ public final class PlantingDetailsFragment extends Fragment {
                 now.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    private static PlantingStage stageForLabel(String label) {
-        for (PlantingStage stage : PlantingStage.values()) {
+    private static PlantingStage stageForLabel(
+            String label, List<PlantingStage> stages) {
+        for (PlantingStage stage : stages) {
             if (stage.getDisplayName().equals(label)) return stage;
         }
         return null;

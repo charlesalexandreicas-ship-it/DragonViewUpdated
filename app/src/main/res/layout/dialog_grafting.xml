@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="20dp">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif"
+        android:text="Choose a seed-grown farm record that a professional has confirmed is suitable for grafting."
+        android:textColor="@color/muted_ink"
+        android:textSize="13sp" />
+    <Spinner
+        android:id="@+id/sourceRecordInput"
+        style="@style/Widget.DragonView.DialogSpinner"
+        android:layout_marginTop="12dp" />
+    <EditText android:id="@+id/dateInput" style="@style/Widget.DragonView.DialogField" android:focusable="false" android:hint="Grafting date" />
+    <EditText android:id="@+id/scionVarietyInput" style="@style/Widget.DragonView.DialogField" android:hint="Scion variety" />
+    <EditText android:id="@+id/noteInput" style="@style/Widget.DragonView.DialogField" android:hint="Professional or grafting note (optional)" android:minLines="2" />
+    <TextView android:id="@+id/errorText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="serif" android:textColor="@color/dragon_error" />
+</LinearLayout>

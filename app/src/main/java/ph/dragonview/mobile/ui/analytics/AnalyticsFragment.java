@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,22 +37,11 @@ public final class AnalyticsFragment extends Fragment {
         adapter = new AnalyticsAdapter();
         binding.summaryList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.summaryList.setAdapter(adapter);
-        String[] periods = {"Daily", "Weekly", "Monthly", "Annual"};
-        binding.periodInput.setAdapter(new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, periods));
-        binding.periodInput.setSelection(0);
         binding.dateInput.setText(
                 new SimpleDateFormat("yyyy-MM-dd", Locale.US)
                         .format(Calendar.getInstance().getTime()));
-        binding.periodInput.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            private boolean initialized;
-            @Override public void onItemSelected(
-                    AdapterView<?> parent, View selected, int position, long id
-            ) {
-                if (initialized) load();
-                initialized = true;
-            }
-            @Override public void onNothingSelected(AdapterView<?> parent) { }
+        binding.periodInput.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) load();
         });
         binding.dateInput.setOnClickListener(v -> chooseDate());
         load();
@@ -95,10 +82,10 @@ public final class AnalyticsFragment extends Fragment {
 
     private void bind(SalesAnalytics report) {
         NumberFormat php = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
-        binding.revenueText.setText(php.format(report.getTotals().getRevenue()) + "\nRevenue");
-        binding.salesText.setText(report.getTotals().getCompletedSales() + "\nCompleted sales");
-        binding.piecesText.setText(report.getTotals().getPieces() + "\nPieces sold");
-        binding.weightText.setText(String.format(Locale.US, "%.3f kg\nTotal weight",
+        binding.revenueText.setText(php.format(report.getTotals().getRevenue()));
+        binding.salesText.setText(String.valueOf(report.getTotals().getCompletedSales()));
+        binding.piecesText.setText(String.valueOf(report.getTotals().getPieces()));
+        binding.weightText.setText(String.format(Locale.US, "%.3f kg",
                 report.getTotals().getWeightKilograms()));
         Double change = report.getComparisonPercent();
         binding.comparisonText.setText(change == null ? "No previous-period baseline"
@@ -110,13 +97,19 @@ public final class AnalyticsFragment extends Fragment {
         binding.trendChart.setData(
                 report.getTrend() == null ? Collections.emptyList() : report.getTrend(),
                 report.getPeriod());
-        adapter.submit(report.getSummary() == null ? Collections.emptyList() : report.getSummary());
+        List<SalesAnalytics.Summary> summaries = report.getSummary() == null
+                ? Collections.emptyList() : report.getSummary();
+        adapter.submit(summaries);
+        binding.summaryEmptyText.setVisibility(
+                summaries.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private String selectedPeriod() {
-        Object selected = binding.periodInput.getSelectedItem();
-        return selected == null ? "daily"
-                : selected.toString().toLowerCase(Locale.US);
+        int checkedId = binding.periodInput.getCheckedButtonId();
+        if (checkedId == ph.dragonview.mobile.R.id.periodWeeklyButton) return "weekly";
+        if (checkedId == ph.dragonview.mobile.R.id.periodMonthlyButton) return "monthly";
+        if (checkedId == ph.dragonview.mobile.R.id.periodAnnualButton) return "annual";
+        return "daily";
     }
 
     private void error() { binding.messageText.setText("Analytics could not be loaded."); }

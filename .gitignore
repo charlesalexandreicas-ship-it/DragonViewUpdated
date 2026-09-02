@@ -7,3 +7,11 @@ captures/
 review-temp/
 build-verify.*
 lint-recheck.*
+/.android_home/
+/.vscode/
+/artifacts/
+/app/output/
+/dragon-view-offline.db
+*.apk
+*.aab
+*.log

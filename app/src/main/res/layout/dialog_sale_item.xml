@@ -3,6 +3,7 @@
     android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/white" android:orientation="vertical" android:padding="20dp">
     <AutoCompleteTextView android:id="@+id/sizeInput" style="@style/Widget.DragonView.DialogField" android:hint="Fruit size" android:inputType="none" />
     <AutoCompleteTextView android:id="@+id/gradeInput" style="@style/Widget.DragonView.DialogField" android:hint="Grade" android:inputType="none" />
+    <TextView android:id="@+id/availableText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:layout_marginBottom="4dp" android:text="Available: 0 pieces" android:textColor="@color/muted_ink" />
     <EditText android:id="@+id/piecesInput" style="@style/Widget.DragonView.DialogField" android:hint="Number of pieces" android:inputType="number" />
     <EditText android:id="@+id/weightInput" style="@style/Widget.DragonView.DialogField" android:hint="Total weight (kg)" android:inputType="numberDecimal" />
     <TextView android:id="@+id/errorText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/dragon_error" />
