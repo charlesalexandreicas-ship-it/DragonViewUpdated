@@ -32,11 +32,16 @@ if "%DIRNAME%"=="" set DIRNAME=.
 set APP_BASE_NAME=%~n0
 set APP_HOME=%DIRNAME%
 
+@rem Use the project-scoped Java 17 runtime when it is available. This is
+@rem scoped to this wrapper process and does not change Windows JAVA_HOME.
+set "DRAGONVIEW_JAVA_HOME=C:\Users\Charlesalexandre\.gradle\jdks\temurin17-dragonview\jdk-17.0.20.1+1"
+if exist "%DRAGONVIEW_JAVA_HOME%\bin\java.exe" set "JAVA_HOME=%DRAGONVIEW_JAVA_HOME%"
+
 @rem Resolve any "." and ".." in APP_HOME to make it shorter.
 for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
 
 @rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
-set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
+set DEFAULT_JVM_OPTS="-Xmx2048m" "-Dfile.encoding=UTF-8"
 
 @rem Find java.exe
 if defined JAVA_HOME goto findJavaFromJavaHome
