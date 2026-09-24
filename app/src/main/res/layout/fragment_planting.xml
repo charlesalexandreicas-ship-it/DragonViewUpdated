@@ -13,8 +13,7 @@
         android:id="@+id/introText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="serif"
-        android:text="Choose a farm record to view its complete guidance timeline. Only one record opens at a time."
+        android:text="Record work and keep plants on track."
         android:textColor="@color/muted_ink"
         android:textSize="14sp"
         android:lineSpacingExtra="3dp"
@@ -34,35 +33,37 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/addButton"
-            style="@style/Widget.DragonView.Button"
+            style="@style/Widget.DragonView.HomeQuickAction"
             android:layout_width="0dp"
-            android:layout_height="52dp"
+            android:layout_height="76dp"
             android:layout_weight="1"
-            android:fontFamily="serif"
             android:gravity="center"
             android:maxLines="1"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:text="Record planting"
             android:textSize="13sp"
-            app:icon="@drawable/icon_streamline_plant"
+            app:icon="@drawable/icon_dataset_planting"
+            app:iconGravity="top"
             app:iconPadding="5dp"
             app:iconSize="18dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/graftButton"
-            style="@style/Widget.DragonView.Button.Outlined"
+            style="@style/Widget.DragonView.HomeQuickAction"
             android:layout_width="0dp"
-            android:layout_height="52dp"
+            android:layout_height="76dp"
             android:layout_marginStart="10dp"
             android:layout_weight="1"
-            android:fontFamily="serif"
             android:gravity="center"
             android:maxLines="1"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:text="Record grafting"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            app:icon="@drawable/icon_dataset_planting"
+            app:iconGravity="top"
+            app:iconTint="@color/dragon_magenta" />
     </LinearLayout>
 
     <LinearLayout
@@ -70,7 +71,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
+        android:background="@drawable/metric_card_background"
         android:orientation="vertical"
+        android:padding="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/recordActions">
@@ -79,7 +82,6 @@
             android:id="@+id/summaryText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="serif"
             android:text="Farm records"
             android:textColor="@color/ink"
             android:textSize="18sp"
@@ -90,7 +92,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:fontFamily="serif"
             android:textColor="@color/muted_ink"
             android:textSize="13sp" />
     </LinearLayout>
@@ -105,11 +106,39 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/listHeader">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/plantingList"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="28dp" />
+            android:layout_height="match_parent">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/plantingList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="28dp" />
+            <LinearLayout
+                android:id="@+id/emptyState"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="28dp"
+                android:visibility="gone">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No planting records yet."
+                    android:textColor="@color/muted_ink" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/emptyActionButton"
+                    style="@style/Widget.DragonView.Button.Outlined"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="12dp"
+                    android:text="Record planting"
+                    android:textColor="@color/dragon_magenta"
+                    app:icon="@drawable/icon_dataset_add"
+                    app:iconTint="@color/dragon_magenta" />
+            </LinearLayout>
+        </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

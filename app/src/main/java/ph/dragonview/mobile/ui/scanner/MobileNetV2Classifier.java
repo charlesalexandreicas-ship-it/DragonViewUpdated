@@ -35,6 +35,15 @@ import java.util.List;
 final class MobileNetV2Classifier implements AutoCloseable {
     static final String MODEL_ASSET = "ml/mobilenet_v2.tflite";
     static final String LABELS_ASSET = "ml/labels.txt";
+    private static final String CLASS_A_LABEL = "Class A";
+    private static final String CLASS_B_LABEL = "Class B";
+    private static final float CLASS_A_MODEL_THRESHOLD = 0.89f;
+    private static final float CLASS_A_SHADE_THRESHOLD = 0.78f;
+    private static final float CLASS_A_MODEL_FLOOR = 0.04f;
+    private static final float MIN_SHADE_SATURATION = 55.0f / 255.0f;
+    private static final float MIN_SHADE_VALUE = 35.0f / 255.0f;
+    private static final float RED_HUE_MAX = 8.0f * 360.0f / 255.0f;
+    private static final float MAGENTA_HUE_MIN = 225.0f * 360.0f / 255.0f;
 
     enum Availability {
         READY,
@@ -71,11 +80,14 @@ final class MobileNetV2Classifier implements AutoCloseable {
     static final class Classification {
         @NonNull final String label;
         final float confidence;
+        final float redMagentaRatio;
         final long inferenceMillis;
 
-        private Classification(@NonNull String label, float confidence, long inferenceMillis) {
+        private Classification(@NonNull String label, float confidence,
+                               float redMagentaRatio, long inferenceMillis) {
             this.label = label;
             this.confidence = confidence;
+            this.redMagentaRatio = redMagentaRatio;
             this.inferenceMillis = inferenceMillis;
         }
     }
@@ -165,8 +177,10 @@ final class MobileNetV2Classifier implements AutoCloseable {
 
         Bitmap inputBitmap = createCenterCrop(source, inputWidth, inputHeight);
         ByteBuffer inputBuffer;
+        float redMagentaRatio;
         try {
             inputBuffer = bitmapToInputBuffer(inputBitmap);
+            redMagentaRatio = redMagentaRatio(inputBitmap);
         } finally {
             if (inputBitmap != source) inputBitmap.recycle();
         }
@@ -178,7 +192,14 @@ final class MobileNetV2Classifier implements AutoCloseable {
 
         float[] probabilities = toProbabilities(output[0]);
         int bestIndex = topIndex(probabilities);
-        return new Classification(labels.get(bestIndex), probabilities[bestIndex], elapsedMillis);
+        int classAIndex = labels.indexOf(CLASS_A_LABEL);
+        int classBIndex = labels.indexOf(CLASS_B_LABEL);
+        if (labels.size() == 2 && classAIndex >= 0 && classBIndex >= 0) {
+            bestIndex = isClassA(probabilities[classAIndex], redMagentaRatio)
+                    ? classAIndex : classBIndex;
+        }
+        return new Classification(labels.get(bestIndex), probabilities[bestIndex],
+                redMagentaRatio, elapsedMillis);
     }
 
     @Override
@@ -245,6 +266,64 @@ final class MobileNetV2Classifier implements AutoCloseable {
 
     static float normalizeChannel(int value) {
         return (value / 127.5f) - 1.0f;
+    }
+
+    static boolean isClassA(float classAProbability, float redMagentaRatio) {
+        return classAProbability >= CLASS_A_MODEL_THRESHOLD
+                || (redMagentaRatio >= CLASS_A_SHADE_THRESHOLD
+                && classAProbability >= CLASS_A_MODEL_FLOOR);
+    }
+
+    static float redMagentaRatio(@NonNull Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int[] pixels = new int[width * height];
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+        return redMagentaRatio(pixels, width, height);
+    }
+
+    static float redMagentaRatio(@NonNull int[] pixels, int width, int height) {
+        if (width <= 0 || height <= 0 || pixels.length != width * height) {
+            throw new IllegalArgumentException("Pixels must match the image dimensions");
+        }
+        float centerX = (width - 1) / 2.0f;
+        float centerY = (height - 1) / 2.0f;
+        float radiusX = width * (90.0f / 224.0f);
+        float radiusY = height * (90.0f / 224.0f);
+        int eligible = 0;
+        int redMagenta = 0;
+        for (int y = 0; y < height; y++) {
+            float normalizedY = (y - centerY) / radiusY;
+            for (int x = 0; x < width; x++) {
+                float normalizedX = (x - centerX) / radiusX;
+                if (normalizedX * normalizedX + normalizedY * normalizedY > 1.0f) continue;
+
+                int pixel = pixels[y * width + x];
+                float red = ((pixel >> 16) & 0xFF) / 255.0f;
+                float green = ((pixel >> 8) & 0xFF) / 255.0f;
+                float blue = (pixel & 0xFF) / 255.0f;
+                float maximum = Math.max(red, Math.max(green, blue));
+                float minimum = Math.min(red, Math.min(green, blue));
+                float difference = maximum - minimum;
+                float saturation = maximum == 0.0f ? 0.0f : difference / maximum;
+                if (saturation <= MIN_SHADE_SATURATION || maximum <= MIN_SHADE_VALUE) continue;
+
+                eligible++;
+                float hue;
+                if (difference == 0.0f) {
+                    hue = 0.0f;
+                } else if (maximum == red) {
+                    hue = 60.0f * (((green - blue) / difference) % 6.0f);
+                } else if (maximum == green) {
+                    hue = 60.0f * (((blue - red) / difference) + 2.0f);
+                } else {
+                    hue = 60.0f * (((red - green) / difference) + 4.0f);
+                }
+                if (hue < 0.0f) hue += 360.0f;
+                if (hue <= RED_HUE_MAX || hue >= MAGENTA_HUE_MIN) redMagenta++;
+            }
+        }
+        return eligible == 0 ? 0.0f : redMagenta / (float) eligible;
     }
 
     static int topIndex(@NonNull float[] values) {

@@ -1,0 +1,24 @@
+{
+  "name": "andreicopy-mobile(latest)",
+  "version": "1.0.0",
+  "description": "DragonView is AndreiCopy Mobile's Java/XML Android application for dragon-fruit farm records, inventory, planting, sales, analytics, and offline quality scanning.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charlesalexandreicas-ship-it/DragonViewUpdated.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/charlesalexandreicas-ship-it/DragonViewUpdated/issues"
+  },
+  "homepage": "https://github.com/charlesalexandreicas-ship-it/DragonViewUpdated#readme",
+  "devDependencies": {
+    "supabase": "^2.117.0"
+  }
+}

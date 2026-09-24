@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import ph.dragonview.mobile.data.model.CompleteSaleRequest;
+import ph.dragonview.mobile.data.SessionManager;
 import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.data.model.FruitPrice;
 import ph.dragonview.mobile.data.model.InventoryLot;
@@ -41,6 +42,13 @@ public final class SalesFragment extends Fragment {
     private SalesAdapter adapter;
     private List<FruitPrice> prices = Collections.emptyList();
     private List<InventoryLot> inventory = Collections.emptyList();
+    private boolean salePrerequisitesLoading;
+    private boolean pricesRequestComplete;
+    private boolean inventoryRequestComplete;
+    private boolean salePrerequisitesReady;
+    private boolean pendingSaleOpen;
+    private String salePrerequisiteError;
+    private int saleDataGeneration;
 
     @Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle state) {
         binding = FragmentSalesBinding.inflate(inflater, parent, false);
@@ -48,12 +56,14 @@ public final class SalesFragment extends Fragment {
     }
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
-        adapter = new SalesAdapter(this::confirmArchive);
+        boolean owner = new SessionManager(requireContext()).isWorkspaceOwner();
+        adapter = new SalesAdapter(this::confirmArchive, owner);
         binding.salesList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.salesList.setAdapter(adapter);
         binding.swipeRefresh.setOnRefreshListener(this::load);
         binding.newSaleButton.setOnClickListener(v -> openSale());
-        binding.priceButton.setVisibility(View.VISIBLE);
+        binding.emptyActionButton.setOnClickListener(v -> openSale());
+        binding.priceButton.setVisibility(owner ? View.VISIBLE : View.GONE);
         binding.priceButton.setOnClickListener(v -> openPrices());
         load();
     }
@@ -66,32 +76,110 @@ public final class SalesFragment extends Fragment {
                 if (binding == null) return;
                 binding.swipeRefresh.setRefreshing(false);
                 adapter.submit(rows);
-                binding.messageText.setText(rows.isEmpty() ? "No sales recorded." : "");
+                double revenue = 0d;
+                for (SaleSummary row : rows) revenue += row.getTotalAmount();
+                NumberFormat php = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
+                binding.salesSummaryText.setText(rows.size()
+                        + (rows.size() == 1 ? " sale • " : " sales • ")
+                        + php.format(revenue));
+                if (salePrerequisiteError == null) {
+                    binding.messageText.setText("Transactions and pricing");
+                }
+                binding.emptyState.setVisibility(rows.isEmpty() ? View.VISIBLE : View.GONE);
             }
             @Override public void onError(String message) {
                 if (binding == null) return;
                 binding.swipeRefresh.setRefreshing(false);
+                binding.emptyState.setVisibility(View.GONE);
                 binding.messageText.setText(message);
             }
         });
+        loadSalePrerequisites(false);
+    }
+
+    private void openSale() {
+        if (salePrerequisitesReady) {
+            showSaleDialog();
+            return;
+        }
+        pendingSaleOpen = true;
+        binding.messageText.setText("Loading prices and available inventory…");
+        loadSalePrerequisites(true);
+    }
+
+    private void loadSalePrerequisites(boolean openWhenReady) {
+        pendingSaleOpen |= openWhenReady;
+        if (salePrerequisitesLoading) return;
+
+        salePrerequisitesLoading = true;
+        salePrerequisitesReady = false;
+        pricesRequestComplete = false;
+        inventoryRequestComplete = false;
+        salePrerequisiteError = null;
+        int generation = ++saleDataGeneration;
+        LocalRepository repository = LocalRepository.get(requireContext());
         repository.prices(new LocalRepository.Callback<>() {
-            @Override public void onSuccess(List<FruitPrice> values) { prices = values; }
+            @Override public void onSuccess(List<FruitPrice> values) {
+                if (generation != saleDataGeneration || binding == null) return;
+                prices = values == null ? Collections.emptyList() : values;
+                pricesRequestComplete = true;
+                finishSalePrerequisiteLoad(generation);
+            }
             @Override public void onError(String message) {
-                if (binding != null) binding.messageText.setText(message);
+                if (generation != saleDataGeneration || binding == null) return;
+                failSalePrerequisiteLoad(generation, message);
+                pricesRequestComplete = true;
+                finishSalePrerequisiteLoad(generation);
             }
         });
         repository.inventory(new LocalRepository.Callback<>() {
-            @Override public void onSuccess(List<InventoryLot> values) { inventory = values; }
+            @Override public void onSuccess(List<InventoryLot> values) {
+                if (generation != saleDataGeneration || binding == null) return;
+                inventory = values == null ? Collections.emptyList() : values;
+                inventoryRequestComplete = true;
+                finishSalePrerequisiteLoad(generation);
+            }
             @Override public void onError(String message) {
-                if (binding != null) binding.messageText.setText(message);
+                if (generation != saleDataGeneration || binding == null) return;
+                failSalePrerequisiteLoad(generation, message);
+                inventoryRequestComplete = true;
+                finishSalePrerequisiteLoad(generation);
             }
         });
     }
 
-    private void openSale() {
-        if (prices.isEmpty() || inventory.isEmpty()) {
-            binding.messageText.setText("Prices and available inventory must load before checkout.");
-            load();
+    private void failSalePrerequisiteLoad(int generation, String message) {
+        if (generation != saleDataGeneration || binding == null) return;
+        if (salePrerequisiteError == null) salePrerequisiteError = message;
+    }
+
+    private void finishSalePrerequisiteLoad(int generation) {
+        if (generation != saleDataGeneration || binding == null
+                || !pricesRequestComplete || !inventoryRequestComplete) return;
+        salePrerequisitesLoading = false;
+        if (salePrerequisiteError != null) {
+            salePrerequisitesReady = false;
+            pendingSaleOpen = false;
+            binding.messageText.setText("New sale could not be loaded. "
+                    + salePrerequisiteError);
+            return;
+        }
+        salePrerequisitesReady = true;
+        if (pendingSaleOpen) {
+            pendingSaleOpen = false;
+            showSaleDialog();
+        }
+    }
+
+    private void showSaleDialog() {
+        if (inventory.isEmpty()) {
+            binding.messageText.setText(
+                    "No available inventory. Register a harvest before creating a sale.");
+            return;
+        }
+        if (prices.isEmpty()) {
+            binding.messageText.setText(
+                    "No active prices. Configure prices before creating a sale.");
             return;
         }
         DialogSaleBinding form = DialogSaleBinding.inflate(getLayoutInflater());
@@ -426,7 +514,12 @@ public final class SalesFragment extends Fragment {
         return separator < 0 ? label.trim() : label.substring(0, separator).trim();
     }
     private static String text(CharSequence value) { return value == null ? "" : value.toString().trim(); }
-    @Override public void onDestroyView() { binding = null; super.onDestroyView(); }
+    @Override public void onDestroyView() {
+        saleDataGeneration++;
+        pendingSaleOpen = false;
+        binding = null;
+        super.onDestroyView();
+    }
 
     private static final class SaleLine {
         final String size, grade; final int pieces; double weight; final double price;

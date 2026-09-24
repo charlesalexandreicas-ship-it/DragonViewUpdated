@@ -32,6 +32,7 @@ import java.util.Locale;
 
 import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.R;
+import ph.dragonview.mobile.data.SessionManager;
 import ph.dragonview.mobile.data.model.GraftingRequest;
 import ph.dragonview.mobile.data.model.PlantingGroup;
 import ph.dragonview.mobile.data.model.PlantingRequest;
@@ -79,12 +80,13 @@ public final class PlantingFragment extends Fragment {
             public void archive(PlantingGroup group) {
                 confirmArchive(group);
             }
-        });
+        }, new SessionManager(requireContext()).isWorkspaceOwner());
         binding.plantingList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.plantingList.setAdapter(adapter);
         binding.swipeRefresh.setOnRefreshListener(this::load);
         binding.addButton.setOnClickListener(v -> showCreateDialog());
         binding.graftButton.setOnClickListener(v -> showGraftingDialog());
+        binding.emptyActionButton.setOnClickListener(v -> showCreateDialog());
         load();
     }
 
@@ -104,12 +106,15 @@ public final class PlantingFragment extends Fragment {
                         }
                         binding.summaryText.setText(rows.size() + " planting groups • "
                                 + ready + " ready for harvest");
-                        binding.messageText.setText(rows.isEmpty() ? "No planting groups found." : "");
+                        binding.messageText.setText("");
+                        binding.emptyState.setVisibility(
+                                rows.isEmpty() ? View.VISIBLE : View.GONE);
                     }
                     @Override
                     public void onError(String message) {
                         if (binding == null) return;
                         binding.swipeRefresh.setRefreshing(false);
+                        binding.emptyState.setVisibility(View.GONE);
                         binding.messageText.setText(message);
                     }
                 });
@@ -152,8 +157,17 @@ public final class PlantingFragment extends Fragment {
                             year, month + 1, day)), now.get(Calendar.YEAR),
                     now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show();
         });
-        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setOnClickListener(v -> create(dialog, dialogBinding)));
+        dialog.setOnShowListener(ignored -> {
+            // Keep these dialog actions flat, including the pressed elevation state.
+            for (int which : new int[]{AlertDialog.BUTTON_NEGATIVE, AlertDialog.BUTTON_POSITIVE}) {
+                View button = dialog.getButton(which);
+                button.setStateListAnimator(null);
+                button.setElevation(0f);
+                button.setTranslationZ(0f);
+            }
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    .setOnClickListener(v -> create(dialog, dialogBinding));
+        });
         dialog.show();
     }
 
@@ -205,12 +219,19 @@ public final class PlantingFragment extends Fragment {
             }
         }
         if (seedRows.isEmpty()) {
-            new AlertDialog.Builder(requireContext())
+            AlertDialog notice = new AlertDialog.Builder(requireContext())
                     .setTitle("No eligible seed record")
                     .setMessage("Create a seed-grown farm record first. Record grafting only "
                             + "after its suitability has been professionally confirmed.")
                     .setPositiveButton("OK", null)
-                    .show();
+                    .create();
+            notice.setOnShowListener(ignored -> {
+                View button = notice.getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setStateListAnimator(null);
+                button.setElevation(0f);
+                button.setTranslationZ(0f);
+            });
+            notice.show();
             return;
         }
 
@@ -290,10 +311,21 @@ public final class PlantingFragment extends Fragment {
         sheet.sourceText.setText(stage.getReferenceTitle() + "\n"
                 + stage.getReferenceUrl());
         Linkify.addLinks(sheet.sourceText, Linkify.WEB_URLS);
+        PlantGuidanceContent.bind(sheet, stage);
         sheet.sourcesToggle.setOnClickListener(v -> sheet.sourcesContainer.setVisibility(
                 sheet.sourcesContainer.getVisibility() == View.VISIBLE
                         ? View.GONE : View.VISIBLE));
         sheet.closeButton.setOnClickListener(v -> dialog.dismiss());
+        if (stage == PlantingStage.READY_FOR_HARVEST) {
+            com.google.android.material.button.MaterialButton review =
+                    new com.google.android.material.button.MaterialButton(requireContext());
+            review.setText("Post-harvest guide / Gabay pagkatapos ng ani");
+            ((ViewGroup) sheet.getRoot()).addView(review);
+            review.setOnClickListener(v -> {
+                dialog.dismiss();
+                showGuidanceSheet(group, PlantingStage.HARVESTED);
+            });
+        }
 
         boolean current = stage == group.getCurrentStage();
         sheet.optionalPhotoButton.setVisibility(current ? View.VISIBLE : View.GONE);

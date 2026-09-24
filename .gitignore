@@ -9,9 +9,23 @@ build-verify.*
 lint-recheck.*
 /.android_home/
 /.vscode/
-/artifacts/
+/QA and Testing/
 /app/output/
 /dragon-view-offline.db
+/dragon-view-offline.db-shm
+/dragon-view-offline.db-wal
+/dragon-view-offline.db-journal
+*.keystore
+*.jks
+supabase/.temp/
+supabase/.branches/
 *.apk
 *.aab
 *.log
+ml/.venv/
+ml/outputs/
+ml/datasets/
+yolo*.pt
+__pycache__/
+*.py[cod]
+node_modules/

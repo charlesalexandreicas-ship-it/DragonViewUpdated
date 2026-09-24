@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/neo_surface_high"
     android:orientation="vertical"
     android:paddingStart="20dp"
     android:paddingTop="10dp"
@@ -80,7 +80,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:contentDescription="Reference image pending validation"
-                    android:src="@drawable/icon_streamline_plant"
+                    android:src="@drawable/icon_dataset_planting"
                     app:tint="@color/dragon_green" />
                 <TextView
                     android:layout_width="wrap_content"

@@ -14,6 +14,7 @@ import ph.dragonview.mobile.data.model.SessionUser;
 import ph.dragonview.mobile.databinding.ActivityLoginBinding;
 
 public final class LoginActivity extends AppCompatActivity {
+    public static final String EXTRA_AUTH_MESSAGE = "auth_message";
     private ActivityLoginBinding binding; //LogIn
     private SessionManager sessionManager;//RegistrationManager
     private boolean registrationMode; //registrationmode
@@ -28,7 +29,12 @@ public final class LoginActivity extends AppCompatActivity {
         }
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        String authenticationMessage = getIntent().getStringExtra(EXTRA_AUTH_MESSAGE);
+        if (authenticationMessage != null && !authenticationMessage.trim().isEmpty()) {
+            showError(authenticationMessage);
+        }
         binding.signInButton.setOnClickListener(view -> submit());
+        binding.forgotPasswordButton.setOnClickListener(view -> requestPasswordReset());
         binding.modeSwitch.setOnClickListener(
                 view -> setRegistrationMode(!registrationMode));
     }
@@ -92,7 +98,36 @@ public final class LoginActivity extends AppCompatActivity {
         binding.modeSwitch.setText(enabled
                 ? R.string.existing_account_prompt
                 : R.string.new_account_prompt);
+        binding.forgotPasswordButton.setVisibility(enabled ? View.GONE : View.VISIBLE);
         clearErrors();
+    }
+
+    private void requestPasswordReset() {
+        String email = text(binding.emailInput.getText());
+        clearErrors();
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.emailLayout.setError(getString(R.string.recovery_enter_email));
+            binding.emailInput.requestFocus();
+            return;
+        }
+        setLoading(true);
+        LocalRepository.get(this).requestPasswordReset(email, new LocalRepository.Callback<>() {
+            @Override
+            public void onSuccess(Void ignored) {
+                if (isFinishing() || isDestroyed()) return;
+                setLoading(false);
+                binding.errorText.setTextColor(getColor(R.color.dragon_text_soft));
+                binding.errorText.setText(R.string.recovery_email_sent);
+                binding.errorText.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onError(String message) {
+                if (isFinishing() || isDestroyed()) return;
+                setLoading(false);
+                showError(message);
+            }
+        });
     }
 
     private void clearErrors() {
@@ -106,10 +141,11 @@ public final class LoginActivity extends AppCompatActivity {
     private void setLoading(boolean loading) {
         binding.signInButton.setEnabled(!loading);
         binding.modeSwitch.setEnabled(!loading);
+        binding.forgotPasswordButton.setEnabled(!loading);
         binding.progress.setVisibility(loading ? View.VISIBLE : View.GONE);
         if (loading) {
             binding.signInButton.setText(
-                    registrationMode ? "Creating local account…" : "Signing in…");
+                    registrationMode ? "Creating cloud account…" : "Signing in…");
         } else {
             binding.signInButton.setText(
                     registrationMode ? R.string.create_account : R.string.sign_in);
@@ -117,6 +153,7 @@ public final class LoginActivity extends AppCompatActivity {
     }
 
     private void showError(String message) {
+        binding.errorText.setTextColor(getColor(R.color.dragon_error));
         binding.errorText.setText(message);
         binding.errorText.setVisibility(View.VISIBLE);
     }

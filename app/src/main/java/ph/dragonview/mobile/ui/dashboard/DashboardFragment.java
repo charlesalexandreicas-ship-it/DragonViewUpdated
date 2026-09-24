@@ -14,11 +14,14 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import ph.dragonview.mobile.data.model.DashboardData;
+import ph.dragonview.mobile.data.SessionManager;
 import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.databinding.FragmentDashboardBinding;
+import ph.dragonview.mobile.ui.MainActivity;
 
 public final class DashboardFragment extends Fragment {
     private FragmentDashboardBinding binding;
+    private int salesToday;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle state) {
@@ -28,20 +31,23 @@ public final class DashboardFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
+        boolean owner = new SessionManager(requireContext()).isWorkspaceOwner();
+        binding.viewAnalyticsButton.setVisibility(owner ? View.VISIBLE : View.GONE);
         binding.swipeRefresh.setOnRefreshListener(this::load);
-        binding.viewAnalyticsButton.setOnClickListener(clicked ->
-                Navigation.findNavController(clicked)
-                        .navigate(ph.dragonview.mobile.R.id.analyticsFragment));
-        binding.addInventoryAction.setOnClickListener(clicked ->
-                Navigation.findNavController(clicked)
-                        .navigate(ph.dragonview.mobile.R.id.inventoryFragment));
+        binding.viewAnalyticsButton.setOnClickListener(clicked -> navigateToPrimaryDestination(
+                ph.dragonview.mobile.R.id.analyticsFragment));
         binding.recordHarvestAction.setOnClickListener(clicked ->
                 Navigation.findNavController(clicked)
                         .navigate(ph.dragonview.mobile.R.id.harvestFragment));
-        binding.schedulePlantAction.setOnClickListener(clicked ->
-                Navigation.findNavController(clicked)
-                        .navigate(ph.dragonview.mobile.R.id.plantingFragment));
+        binding.viewInventoryAction.setOnClickListener(clicked -> navigateToPrimaryDestination(
+                ph.dragonview.mobile.R.id.inventoryFragment));
+        binding.recordPlantingAction.setOnClickListener(clicked -> navigateToPrimaryDestination(
+                ph.dragonview.mobile.R.id.plantingFragment));
         load();
+    }
+
+    private void navigateToPrimaryDestination(int destinationId) {
+        ((MainActivity) requireActivity()).navigateToPrimaryDestination(destinationId);
     }
 
     private void load() {
@@ -67,30 +73,27 @@ public final class DashboardFragment extends Fragment {
     }
 
     private void bind(DashboardData.Summary summary) {
-        binding.inventoryValue.setText(summary.getInventoryPieces() + "\nInventory");
-        binding.batchesValue.setText(summary.getActiveBatches() + "\nBatches");
-        binding.salesValue.setText(summary.getSalesToday() + "\nSales today");
-        NumberFormat php = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
-        binding.revenueValue.setText(php.format(summary.getMonthlyRevenue()) + "\nRevenue");
-        binding.plantingValue.setText(summary.getPlantingGroups() + "\nPlant groups");
-        binding.classificationValue.setText(summary.getClassificationsToday() + "\nScans today");
+        binding.inventoryValue.setText(String.valueOf(summary.getInventoryPieces()));
+        binding.inventoryContextText.setText("Current workspace");
+        salesToday = summary.getSalesToday();
+        binding.plantingValue.setText(String.valueOf(summary.getPlantingGroups()));
+        binding.classificationValue.setText(String.valueOf(summary.getClassificationsToday()));
     }
 
     private void bindAnalytics(DashboardData.AnalyticsOverview overview) {
         NumberFormat php = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
         binding.todayRevenueValue.setText(php.format(overview.getRevenueToday()));
-        binding.todayPiecesValue.setText(String.valueOf(overview.getPiecesSoldToday()));
-        binding.todayWeightValue.setText(
-                String.format(Locale.US, "%.2f kg", overview.getWeightSoldToday()));
+        binding.salesContextText.setText(String.format(
+                Locale.US, "%d sales · %.2f kg",
+                salesToday, overview.getWeightSoldToday()));
 
         Double change = overview.getRevenueChangePercent();
         if (change == null) {
-            binding.revenueTrendText.setText("No sales baseline from yesterday");
+            binding.revenueTrendText.setText("—");
             binding.revenueTrendText.setTextColor(
                     requireContext().getColor(ph.dragonview.mobile.R.color.dragon_green));
         } else {
-            binding.revenueTrendText.setText(String.format(
-                    Locale.US, "%+.1f%% revenue vs yesterday", change));
+            binding.revenueTrendText.setText(String.format(Locale.US, "%+.1f%%", change));
             binding.revenueTrendText.setTextColor(requireContext().getColor(
                     change >= 0
                             ? ph.dragonview.mobile.R.color.dragon_green

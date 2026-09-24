@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dragon_surface"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.DragonView.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ACTIVE WORKSPACE"
+                    android:textColor="@color/dragon_magenta"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/workspaceNameText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Workspace"
+                    android:textAppearance="@style/TextAppearance.DragonView.HeadlineSmall"
+                    android:textColor="@color/ink"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/workspaceRoleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Owner"
+                    android:textColor="@color/dragon_green"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Your workspaces"
+            android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
+            android:textStyle="bold" />
+        <LinearLayout
+            android:id="@+id/workspaceListContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/createWorkspaceButton"
+                style="@style/Widget.DragonView.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:text="Create" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/joinWorkspaceButton"
+                style="@style/Widget.DragonView.Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:text="Join with code" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/invitePanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/soft_pink_panel"
+            android:orientation="vertical"
+            android:padding="18dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Farmer invite code"
+                android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/inviteCodeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:letterSpacing="0.18"
+                android:padding="12dp"
+                android:text="--------"
+                android:textColor="@color/dragon_magenta"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Share this code with farmers you trust. They must sign in before joining."
+                android:textColor="@color/muted_ink"
+                android:textSize="13sp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/regenerateInviteButton"
+                style="@style/Widget.DragonView.Button.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:text="Generate new code" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/membersHeading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Members"
+            android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
+            android:textStyle="bold" />
+        <LinearLayout
+            android:id="@+id/membersContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/deleteWorkspaceButton"
+            style="@style/Widget.DragonView.Button.Text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:elevation="0dp"
+            android:stateListAnimator="@null"
+            android:text="Delete workspace"
+            android:textColor="@color/dragon_error"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/leaveWorkspaceButton"
+            style="@style/Widget.DragonView.Button.Text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:elevation="0dp"
+            android:stateListAnimator="@null"
+            android:text="Leave workspace"
+            android:textColor="@color/dragon_error"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/messageText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:textColor="@color/dragon_error" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -20,6 +20,7 @@ public final class SalesAnalytics {
 
     public String getPeriod() { return period; }
     public String getSelectedDate() { return selectedDate; }
+    public double getPreviousRevenue() { return previousRevenue; }
     public Double getComparisonPercent() { return comparisonPercent; }
     public Totals getTotals() { return totals; }
     public List<Trend> getTrend() { return trend; }

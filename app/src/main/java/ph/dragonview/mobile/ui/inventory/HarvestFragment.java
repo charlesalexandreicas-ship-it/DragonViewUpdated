@@ -26,6 +26,8 @@ import ph.dragonview.mobile.data.model.HarvestRequest;
 import ph.dragonview.mobile.databinding.FragmentHarvestBinding;
 
 public final class HarvestFragment extends Fragment {
+    public static final String HARVEST_SAVED_RESULT = "harvest_saved";
+    public static final String HARVEST_BATCH_NUMBER = "harvest_batch_number";
     private static final String[] SIZES = {
             "EXTRA_SMALL", "SMALL", "MEDIUM", "LARGE", "JUMBO"
     };
@@ -75,7 +77,7 @@ public final class HarvestFragment extends Fragment {
                 .show();
     }
 
-    private void addOrUpdateItem() {
+    private boolean addOrUpdateItem() {
         String size = text(binding.sizeInput.getText());
         String grade = text(binding.gradeInput.getText());
         int pieces = parsePieces();
@@ -83,7 +85,7 @@ public final class HarvestFragment extends Fragment {
         binding.gradeLayout.setError(grade.isEmpty() ? "Select a grade." : null);
         binding.piecesLayout.setError(
                 pieces < 1 ? "Enter at least one piece." : null);
-        if (size.isEmpty() || grade.isEmpty() || pieces < 1) return;
+        if (size.isEmpty() || grade.isEmpty() || pieces < 1) return false;
 
         for (int index = 0; index < items.size(); index++) {
             HarvestRequest.Item item = items.get(index);
@@ -92,7 +94,7 @@ public final class HarvestFragment extends Fragment {
                     && item.getGrade().equals(grade)) {
                 binding.piecesLayout.setError(
                         "This size and grade combination is already in the batch.");
-                return;
+                return false;
             }
         }
 
@@ -105,6 +107,7 @@ public final class HarvestFragment extends Fragment {
         resetEditor();
         renderItems();
         binding.statusText.setText("");
+        return true;
     }
 
     private void editItem(int index) {
@@ -183,9 +186,13 @@ public final class HarvestFragment extends Fragment {
         binding.dateLayout.setError(
                 date.isEmpty() ? "Harvest date is required." : null);
         if (batch.isEmpty() || date.isEmpty()) return;
-        if (editingIndex >= 0) {
+
+        // Save what is currently entered as part of the batch. This keeps the
+        // two-step editor useful for multiple combinations without losing the
+        // final row when the user goes straight to Save.
+        if (!commitEditorForSave()) {
             binding.statusText.setText(
-                    "Finish updating the selected combination before saving.");
+                    "Check the current size, grade, and number of pieces.");
             return;
         }
         if (items.isEmpty()) {
@@ -202,6 +209,10 @@ public final class HarvestFragment extends Fragment {
                     public void onSuccess(Void ignored) {
                         if (binding == null) return;
                         setSaving(false);
+                        Bundle result = new Bundle();
+                        result.putString(HARVEST_BATCH_NUMBER, batch);
+                        getParentFragmentManager().setFragmentResult(
+                                HARVEST_SAVED_RESULT, result);
                         NavHostFragment.findNavController(
                                 HarvestFragment.this).navigateUp();
                     }
@@ -210,9 +221,16 @@ public final class HarvestFragment extends Fragment {
                     public void onError(String message) {
                         if (binding == null) return;
                         setSaving(false);
-                        binding.statusText.setText(message);
+                        binding.statusText.setText(HarvestErrorMessage.display(message));
                     }
                 });
+    }
+
+    private boolean commitEditorForSave() {
+        if (editingIndex < 0 && text(binding.piecesInput.getText()).isEmpty()) {
+            return true;
+        }
+        return addOrUpdateItem();
     }
 
     private void setSaving(boolean saving) {

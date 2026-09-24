@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -38,6 +39,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 import ph.dragonview.mobile.R;
@@ -52,6 +54,7 @@ public final class ScannerFragment extends Fragment {
     @Nullable private LiveData<CameraState> cameraStates;
     @Nullable private Observer<CameraState> cameraStateObserver;
     @Nullable private ScannerViewModel.State scanState;
+    @Nullable private DetectionOverlayView detectionOverlay;
     private ScannerViewModel viewModel;
     private boolean cameraStarting;
     private boolean cameraReady;
@@ -62,7 +65,10 @@ public final class ScannerFragment extends Fragment {
 
     private final ActivityResultLauncher<String[]> imagePicker = registerForActivityResult(
             new ActivityResultContracts.OpenDocument(), uri -> {
-                if (uri != null && viewModel != null) viewModel.loadImage(uri, null);
+                if (uri != null && isAdded()) {
+                    PhotoCropDialogFragment.newInstance(uri).show(
+                            getChildFragmentManager(), PhotoCropDialogFragment.TAG);
+                }
             });
 
     private final ActivityResultLauncher<String> permissionRequest = registerForActivityResult(
@@ -89,6 +95,18 @@ public final class ScannerFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         viewVersion++;
         binding = FragmentScannerBinding.inflate(inflater, parent, false);
+        int overlayId = getResources().getIdentifier(
+                "detectionOverlay", "id", requireContext().getPackageName());
+        detectionOverlay = binding.getRoot().findViewById(overlayId);
+        // Keep upgraded APKs compatible with an older compiled scanner layout.
+        if (detectionOverlay == null
+                && binding.selectedImagePreview.getParent() instanceof FrameLayout) {
+            FrameLayout previewFrame = (FrameLayout) binding.selectedImagePreview.getParent();
+            detectionOverlay = new DetectionOverlayView(requireContext(), null);
+            detectionOverlay.setVisibility(View.GONE);
+            previewFrame.addView(detectionOverlay, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
         return binding.getRoot();
     }
 
@@ -97,6 +115,13 @@ public final class ScannerFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         if (binding == null) return;
         viewModel = new ViewModelProvider(this).get(ScannerViewModel.class);
+        getChildFragmentManager().setFragmentResultListener(
+                PhotoCropDialogFragment.RESULT_KEY, getViewLifecycleOwner(), (key, result) -> {
+                    String path = result.getString(PhotoCropDialogFragment.RESULT_PATH);
+                    if (path == null || viewModel == null) return;
+                    File cropFile = new File(path);
+                    viewModel.loadImage(Uri.fromFile(cropFile), cropFile);
+                });
         binding.cameraPreview.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE);
         binding.cameraPreview.setScaleType(PreviewView.ScaleType.FILL_CENTER);
         binding.uploadButton.setOnClickListener(clicked -> imagePicker.launch(new String[]{"image/*"}));
@@ -264,13 +289,18 @@ public final class ScannerFragment extends Fragment {
         boolean hasImage = state.image != null;
         binding.selectedImagePreview.setImageBitmap(state.image);
         binding.selectedImagePreview.setVisibility(hasImage ? View.VISIBLE : View.GONE);
+        if (detectionOverlay != null) {
+            detectionOverlay.setVisibility(hasImage ? View.VISIBLE : View.GONE);
+            detectionOverlay.setDetections(state.result == null ? null : state.result.detections,
+                    hasImage ? state.image.getWidth() : 0, hasImage ? state.image.getHeight() : 0);
+        }
         binding.classificationProgress.setVisibility(state.busy ? View.VISIBLE : View.GONE);
         binding.retakeButton.setEnabled(hasImage && !state.busy);
         binding.retakeButton.setVisibility(hasImage ? View.VISIBLE : View.GONE);
         binding.uploadButton.setEnabled(!state.busy);
         if (hasImage) stopCamera();
 
-        boolean modelReady = state.modelAvailability == MobileNetV2Classifier.Availability.READY;
+        boolean modelReady = state.modelsReady();
         binding.modelStatusBadge.setText(modelReady
                 ? R.string.scanner_model_ready : R.string.scanner_model_pending);
         if (state.busy) {
@@ -281,13 +311,28 @@ public final class ScannerFragment extends Fragment {
             binding.resultDetailsText.setText(state.error == ScannerViewModel.ScanError.CAPTURE
                     ? R.string.scanner_capture_error : state.error == ScannerViewModel.ScanError.IMAGE_READ
                     ? R.string.scanner_image_error : R.string.scanner_inference_error);
-        } else if (state.classification != null) {
-            binding.resultLabelText.setText(state.classification.label);
-            binding.resultDetailsText.setText(getString(R.string.scanner_prediction_detail,
-                    state.classification.confidence * 100.0f, state.classification.inferenceMillis));
+        } else if (state.result != null) {
+            int count = state.result.fruitCount();
+            if (state.result.isGraded()) {
+                binding.resultLabelText.setText(scannerText("scanner_fruits_identified", count));
+                binding.resultDetailsText.setText(scannerText("scanner_batch_result_detail",
+                        state.result.classACount, state.result.classBCount,
+                        state.result.classCCount,
+                        state.result.detectorMillis, state.result.gradingMillis));
+            } else if (count == 0) {
+                binding.resultLabelText.setText(scannerText("scanner_object_unidentified"));
+                binding.resultDetailsText.setText(scannerText("scanner_object_unidentified_detail"));
+            } else if (count > ScannerViewModel.MAX_FRUIT_COUNT) {
+                binding.resultLabelText.setText(scannerText("scanner_too_many", count));
+                binding.resultDetailsText.setText(scannerText("scanner_maximum_eight"));
+            } else {
+                binding.resultLabelText.setText(R.string.scanner_image_ready);
+                binding.resultDetailsText.setText(R.string.scanner_model_missing_detail);
+            }
         } else if (hasImage) {
             binding.resultLabelText.setText(R.string.scanner_image_ready);
-            binding.resultDetailsText.setText(state.modelAvailability == MobileNetV2Classifier.Availability.INVALID_MODEL
+            binding.resultDetailsText.setText(state.detectorAvailability == DragonFruitDetector.Availability.INVALID_MODEL
+                    || state.qualityAvailability == MobileNetV2Classifier.Availability.INVALID_MODEL
                     ? R.string.scanner_invalid_model : R.string.scanner_model_missing_detail);
         } else {
             binding.resultLabelText.setText(R.string.scanner_awaiting_image);
@@ -321,11 +366,47 @@ public final class ScannerFragment extends Fragment {
                 Uri.fromParts("package", requireContext().getPackageName(), null)));
     }
 
+    @NonNull
+    private String scannerText(@NonNull String name, Object... arguments) {
+        int identifier = getResources().getIdentifier(
+                name, "string", requireContext().getPackageName());
+        if (identifier == 0) {
+            String fallback;
+            switch (name) {
+                case "scanner_fruits_identified":
+                    fallback = "%1$d dragon fruit(s) identified";
+                    break;
+                case "scanner_batch_result_detail":
+                    fallback = "Class A: %1$d  •  Class B: %2$d  •  Class C: %3$d\nIdentification: %4$d ms  •  Grading: %5$d ms";
+                    break;
+                case "scanner_object_unidentified":
+                    fallback = "Object unidentified";
+                    break;
+                case "scanner_object_unidentified_detail":
+                    fallback = "No dragon fruit was identified. Use a clear photo and try again.";
+                    break;
+                case "scanner_too_many":
+                    fallback = "%1$d dragon fruits detected";
+                    break;
+                case "scanner_maximum_eight":
+                    fallback = "Reframe the photo with no more than 8 visible dragon fruits.";
+                    break;
+                default:
+                    fallback = name;
+            }
+            return arguments.length == 0 ? fallback
+                    : String.format(Locale.getDefault(), fallback, arguments);
+        }
+        return arguments.length == 0 ? getString(identifier) : getString(identifier, arguments);
+    }
+
     @Override
     public void onDestroyView() {
         viewVersion++;
         stopCamera();
         if (binding != null) binding.selectedImagePreview.setImageDrawable(null);
+        if (detectionOverlay != null) detectionOverlay.setDetections(null, 0, 0);
+        detectionOverlay = null;
         binding = null;
         super.onDestroyView();
     }

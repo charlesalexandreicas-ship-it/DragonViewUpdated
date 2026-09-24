@@ -2,7 +2,6 @@ package ph.dragonview.mobile.ui.analytics;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -25,6 +24,7 @@ public final class RevenueTrendChartView extends View {
     private final Paint point = new Paint(Paint.ANTI_ALIAS_FLAG);
     private List<SalesAnalytics.Trend> points = Collections.emptyList();
     private String period = "daily";
+    private String statusMessage;
 
     public RevenueTrendChartView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -38,7 +38,7 @@ public final class RevenueTrendChartView extends View {
         line.setStyle(Paint.Style.STROKE);
         line.setStrokeCap(Paint.Cap.ROUND);
         line.setStrokeJoin(Paint.Join.ROUND);
-        fill.setColor(Color.parseColor("#2252745A"));
+        fill.setColor(context.getColor(R.color.chart_fill));
         fill.setStyle(Paint.Style.FILL);
         point.setColor(context.getColor(R.color.dragon_green));
         point.setStyle(Paint.Style.FILL);
@@ -47,34 +47,50 @@ public final class RevenueTrendChartView extends View {
     public void setData(List<SalesAnalytics.Trend> values, String selectedPeriod) {
         points = values == null ? Collections.emptyList() : values;
         period = selectedPeriod == null ? "daily" : selectedPeriod;
+        statusMessage = null;
         setContentDescription(points.isEmpty()
                 ? "Revenue trend chart. No completed sales in this period."
                 : "Revenue trend chart for the selected " + period + " period.");
         invalidate();
     }
 
+    public void showMessage(String message) {
+        points = Collections.emptyList();
+        statusMessage = message;
+        setContentDescription(message);
+        invalidate();
+    }
+
     @Override protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         float density = getResources().getDisplayMetrics().density;
-        float left = 62 * density, right = getWidth() - 12 * density;
+        // Keep enough room for peso labels while letting the plot use more of the card.
+        float left = 40 * density, right = getWidth() - 24 * density;
         float top = 30 * density, bottom = getHeight() - 36 * density;
         if (right <= left || bottom <= top) return;
 
         double max = 0;
         for (SalesAnalytics.Trend value : points) max = Math.max(max, value.getRevenue());
         max = niceMaximum(max);
+        float widestLabel = 0;
+        for (int index = 0; index <= 4; index++) {
+            widestLabel = Math.max(widestLabel, axisText.measureText(formatAxis(max * index / 4)));
+        }
+        left = Math.max(left, widestLabel + 8 * density);
+        if (right <= left) return;
         axisText.setTextAlign(Paint.Align.LEFT);
         canvas.drawText("Revenue (PHP)", left, 13 * density, axisText);
         axisText.setTextAlign(Paint.Align.RIGHT);
         for (int index = 0; index <= 4; index++) {
             float y = bottom - (bottom - top) * index / 4f;
             canvas.drawLine(left, y, right, y, grid);
-            canvas.drawText(formatAxis(max * index / 4), left - 7 * density,
+            canvas.drawText(formatAxis(max * index / 4), left - 6 * density,
                     y + 4 * density, axisText);
         }
-        if (points.isEmpty()) {
+        if (statusMessage != null || points.isEmpty()) {
             axisText.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("No completed sales in this period",
+            canvas.drawText(statusMessage == null
+                            ? "No completed sales in this period" : statusMessage,
                     (left + right) / 2, (top + bottom) / 2, axisText);
             return;
         }
@@ -88,10 +104,22 @@ public final class RevenueTrendChartView extends View {
             ys[index] = bottom - (float) (points.get(index).getRevenue() / max)
                     * (bottom - top);
         }
-        Path curve = smoothPath(xs, ys);
-        Path area = new Path(curve);
-        area.lineTo(xs[count - 1], bottom);
-        area.lineTo(xs[0], bottom);
+        Path curve;
+        Path area = new Path();
+        if (count == 1) {
+            curve = new Path();
+            curve.moveTo(left, ys[0]);
+            curve.lineTo(right, ys[0]);
+            area.moveTo(left, ys[0]);
+            area.lineTo(right, ys[0]);
+            area.lineTo(right, bottom);
+            area.lineTo(left, bottom);
+        } else {
+            curve = smoothPath(xs, ys);
+            area.set(curve);
+            area.lineTo(xs[count - 1], bottom);
+            area.lineTo(xs[0], bottom);
+        }
         area.close();
         canvas.drawPath(area, fill);
         canvas.drawPath(curve, line);
@@ -104,7 +132,10 @@ public final class RevenueTrendChartView extends View {
             if (index == count - 2 && count > 2 && labelStep > 1) drawLabel = false;
             if (index == count - 1) drawLabel = true;
             if (drawLabel) {
-                canvas.drawText(points.get(index).getLabel(), xs[index],
+                String label = points.get(index).getLabel();
+                float halfWidth = axisText.measureText(label) / 2;
+                float labelX = Math.max(halfWidth, Math.min(xs[index], getWidth() - halfWidth));
+                canvas.drawText(label, labelX,
                         bottom + 20 * density, axisText);
             }
         }
@@ -124,7 +155,7 @@ public final class RevenueTrendChartView extends View {
     private int labelStep(int count) {
         if ("daily".equals(period)) return 4;
         if ("monthly".equals(period)) return Math.max(1, count / 6);
-        if ("annual".equals(period)) return 2;
+        if ("yearly".equals(period)) return 2;
         return 1;
     }
 

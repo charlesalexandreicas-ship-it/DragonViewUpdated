@@ -1,110 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/dragon_surface"
-    android:paddingStart="20dp"
-    android:paddingTop="18dp"
-    android:paddingEnd="20dp">
-
-    <LinearLayout
-        android:id="@+id/inventoryHeader"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/home_hero_background"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="INVENTORY"
-                android:textColor="@color/dragon_white_75"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-            <TextView
-                android:id="@+id/summaryText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="FIFO inventory"
-                android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/dragon_surface" android:paddingStart="20dp" android:paddingTop="16dp" android:paddingEnd="20dp">
+    <com.google.android.material.card.MaterialCardView android:id="@+id/inventoryHeader" android:layout_width="0dp" android:layout_height="wrap_content" app:cardBackgroundColor="@color/white" app:cardCornerRadius="22dp" app:cardElevation="1dp" app:strokeColor="@color/neo_highlight" app:strokeWidth="1dp" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:padding="18dp">
+            <ImageView android:layout_width="56dp" android:layout_height="56dp" android:background="@drawable/soft_pink_panel" android:contentDescription="@null" android:padding="14dp" android:src="@drawable/icon_dataset_inventory" app:tint="@color/dragon_magenta" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total inventory" android:textColor="@color/muted_ink" android:textSize="13sp" />
+                <TextView android:id="@+id/summaryText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="Loading inventory" android:textColor="@color/ink" android:textSize="20sp" android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/recordHarvestButton"
-            style="@style/Widget.DragonView.Button"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:backgroundTint="@color/white"
-            android:text="Record"
-            android:textColor="@color/dragon_magenta"
-            app:icon="@drawable/icon_streamline_plant"
-            app:iconTint="@color/dragon_green" />
+    </com.google.android.material.card.MaterialCardView>
+    <LinearLayout android:id="@+id/inventoryActions" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/inventoryHeader">
+        <com.google.android.material.button.MaterialButton android:id="@+id/recordHarvestButton" style="@style/Widget.DragonView.HomeQuickAction" android:layout_width="0dp" android:layout_height="76dp" android:layout_marginEnd="6dp" android:layout_weight="1" android:gravity="center" android:text="Record harvest" android:textSize="13sp" app:icon="@drawable/icon_dataset_add" app:iconGravity="top" app:iconTint="@color/dragon_magenta" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/editPricesButton" style="@style/Widget.DragonView.HomeQuickAction" android:layout_width="0dp" android:layout_height="76dp" android:layout_marginStart="6dp" android:layout_weight="1" android:gravity="center" android:text="Edit prices" android:textSize="13sp" app:icon="@drawable/icon_streamline_edit_prices" app:iconGravity="top" app:iconTint="@color/dragon_magenta" />
     </LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/editPricesButton"
-        style="@style/Widget.DragonView.Button.Outlined"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="12dp"
-        android:text="Edit prices"
-        app:icon="@drawable/icon_streamline_edit_prices"
-        app:iconTint="@color/dragon_magenta"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inventoryHeader" />
-
-    <TextView
-        android:id="@+id/recentLabel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Recent Batches"
-        android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editPricesButton" />
-
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefresh"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recentLabel">
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/inventoryList"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingBottom="24dp" />
-            <TextView
-                android:id="@+id/emptyText"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:padding="32dp"
-                android:textColor="@color/dragon_text_soft"
-                android:visibility="gone" />
+    <TextView android:id="@+id/recentLabel" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Recent batches" android:textAppearance="@style/TextAppearance.DragonView.TitleLarge" android:textStyle="bold" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/inventoryActions" />
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:id="@+id/swipeRefresh" android:layout_width="0dp" android:layout_height="0dp" android:layout_marginTop="8dp" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/recentLabel">
+        <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent">
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/inventoryList" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:paddingBottom="24dp" />
+            <LinearLayout android:id="@+id/emptyState" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical" android:padding="32dp" android:visibility="gone">
+                <TextView android:id="@+id/emptyText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center" android:text="No inventory yet." android:textColor="@color/muted_ink" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/emptyActionButton" style="@style/Widget.DragonView.Button.Outlined" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_marginTop="12dp" android:text="Record harvest" android:textColor="@color/dragon_magenta" app:icon="@drawable/icon_dataset_add" app:iconTint="@color/dragon_magenta" />
+            </LinearLayout>
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

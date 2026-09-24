@@ -21,7 +21,11 @@ final class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Holde
         void archive(InventoryBatch batch);
     }
     private final Listener listener;
-    InventoryAdapter(Listener listener) { this.listener = listener; }
+    private final boolean canArchive;
+    InventoryAdapter(Listener listener, boolean canArchive) {
+        this.listener = listener;
+        this.canArchive = canArchive;
+    }
 
     void submit(List<InventoryBatch> newBatches) {
         batches.clear();
@@ -38,7 +42,7 @@ final class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Holde
 
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
-        holder.bind(batches.get(position), listener);
+        holder.bind(batches.get(position), listener, canArchive);
     }
 
     @Override public int getItemCount() { return batches.size(); }
@@ -49,7 +53,7 @@ final class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Holde
             super(binding.getRoot());
             this.binding = binding;
         }
-        void bind(InventoryBatch batch, Listener listener) {
+        void bind(InventoryBatch batch, Listener listener, boolean canArchive) {
             binding.batchText.setText("#" + batch.getBatchNumber());
             binding.detailsText.setText(batch.getAvailablePieces() + " pieces available\n"
                     + batch.getItemCount() + " size/grade entries  •  Harvested "
@@ -87,6 +91,8 @@ final class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Holde
             binding.getRoot().setStrokeColor(accentColor);
             binding.getRoot().setStrokeWidth(batch.getNextOutItems() > 0 ? 3 : 1);
             binding.getRoot().setOnClickListener(v -> listener.open(batch));
+            binding.archiveButton.setVisibility(canArchive
+                    ? android.view.View.VISIBLE : android.view.View.GONE);
             binding.archiveButton.setOnClickListener(v -> listener.archive(batch));
         }
     }

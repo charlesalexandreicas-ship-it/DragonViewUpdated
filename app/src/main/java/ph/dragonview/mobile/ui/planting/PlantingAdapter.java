@@ -27,10 +27,12 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
 
     private final List<PlantingGroup> rows = new ArrayList<>();
     private final Listener listener;
+    private final boolean canArchive;
     private long expandedId = -1L;
 
-    PlantingAdapter(Listener listener) {
+    PlantingAdapter(Listener listener, boolean canArchive) {
         this.listener = listener;
+        this.canArchive = canArchive;
     }
 
     void submit(List<PlantingGroup> values) {
@@ -50,7 +52,7 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
         PlantingGroup row = rows.get(position);
-        holder.bind(row, row.getId() == expandedId, listener,
+        holder.bind(row, row.getId() == expandedId, listener, canArchive,
                 () -> toggle(row.getId()));
     }
 
@@ -87,7 +89,7 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
         }
 
         void bind(PlantingGroup row, boolean expanded, Listener listener,
-                  Runnable toggle) {
+                  boolean canArchive, Runnable toggle) {
             String record = row.getRecordNumber();
             if (!record.toLowerCase(Locale.US).startsWith("farm")) {
                 record = "Farm Section " + record;
@@ -106,6 +108,7 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
                     (expanded ? "Collapse " : "Expand ") + record + " guidance");
             binding.accordionHeader.setOnClickListener(v -> toggle.run());
             binding.manageRecordButton.setOnClickListener(v -> listener.manage(row));
+            binding.archiveRecordButton.setVisibility(canArchive ? View.VISIBLE : View.GONE);
             binding.archiveRecordButton.setOnClickListener(v -> listener.archive(row));
 
             binding.stageContainer.removeAllViews();

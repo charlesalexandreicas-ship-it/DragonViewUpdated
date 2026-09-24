@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/white" android:orientation="vertical" android:padding="20dp">
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/neo_surface_high" android:orientation="vertical" android:padding="20dp">
     <AutoCompleteTextView android:id="@+id/sizeInput" style="@style/Widget.DragonView.DialogField" android:hint="Fruit size" android:inputType="none" />
     <AutoCompleteTextView android:id="@+id/gradeInput" style="@style/Widget.DragonView.DialogField" android:hint="Grade" android:inputType="none" />
     <TextView android:id="@+id/availableText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:layout_marginBottom="4dp" android:text="Available: 0 pieces" android:textColor="@color/muted_ink" />

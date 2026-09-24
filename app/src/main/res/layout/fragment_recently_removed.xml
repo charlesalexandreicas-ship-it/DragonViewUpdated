@@ -9,17 +9,43 @@
     android:paddingTop="16dp"
     android:paddingEnd="20dp">
 
-    <TextView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/introText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Removed records stay recoverable here. Restoring inventory also makes its remaining stock available again. Archived sales retain their accounting and FIFO history."
-        android:textColor="@color/muted_ink"
-        android:textSize="14sp"
-        android:lineSpacingExtra="3dp"
+        app:cardBackgroundColor="@color/dragon_green_soft"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#BDE8CD"
+        app:strokeWidth="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
+            <ImageView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/soft_green_panel"
+                android:contentDescription="@null"
+                android:padding="10dp"
+                android:src="@drawable/icon_streamline_recently_removed"
+                app:tint="@color/dragon_green" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Records can be restored" android:textColor="@color/ink" android:textSize="16sp" android:textStyle="bold" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="Removed items stay recoverable here." android:textColor="@color/muted_ink" android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/messageText"

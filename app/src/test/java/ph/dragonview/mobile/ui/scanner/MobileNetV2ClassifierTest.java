@@ -127,4 +127,27 @@ public final class MobileNetV2ClassifierTest {
             previous = normalized;
         }
     }
+
+    @Test
+    public void hybridDecisionAcceptsStrongModelOrCalibratedRedShade() {
+        assertTrue(MobileNetV2Classifier.isClassA(0.90f, 0.0f));
+        assertTrue(MobileNetV2Classifier.isClassA(0.10f, 0.80f));
+    }
+
+    @Test
+    public void hybridDecisionRejectsWeakOrNonRedEvidence() {
+        assertTrue(!MobileNetV2Classifier.isClassA(0.03f, 0.90f));
+        assertTrue(!MobileNetV2Classifier.isClassA(0.50f, 0.50f));
+    }
+
+    @Test
+    public void shadeCoverageCountsRedAndMagentaButNotGreen() {
+        int red = 0xFFFF0000;
+        int magenta = 0xFFFF0080;
+        int green = 0xFF00FF00;
+        assertEquals(1.0f, MobileNetV2Classifier.redMagentaRatio(
+                new int[]{red, magenta, red, magenta}, 2, 2), FLOAT_TOLERANCE);
+        assertEquals(0.0f, MobileNetV2Classifier.redMagentaRatio(
+                new int[]{green, green, green, green}, 2, 2), FLOAT_TOLERANCE);
+    }
 }

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="6dp"
     android:layout_marginBottom="6dp"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="@color/neo_surface_high"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
     app:strokeWidth="0dp">
@@ -26,7 +26,7 @@
                 android:background="@drawable/soft_green_panel"
                 android:contentDescription="Inventory batch"
                 android:padding="12dp"
-                android:src="@drawable/icon_streamline_inventory"
+                android:src="@drawable/icon_dataset_inventory"
                 app:tint="@color/dragon_green" />
             <TextView
                 android:id="@+id/batchText"

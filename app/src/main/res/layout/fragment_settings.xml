@@ -58,7 +58,7 @@
                         android:layout_marginTop="3dp"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="Offline account"
+                        android:text="Cloud account"
                         android:textColor="@color/muted_ink"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -75,7 +75,77 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="28dp"
             android:letterSpacing="0.12"
-            android:text="APP PREFERENCES"
+            android:text="WORKSPACE"
+            android:textColor="@color/dragon_text_soft"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/workspaceCard"
+            style="@style/Widget.DragonView.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/soft_green_panel"
+                    android:contentDescription="@null"
+                    android:padding="11dp"
+                    android:src="@drawable/icon_dataset_user"
+                    app:tint="@color/dragon_green" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/workspaceNameText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Workspace &amp; Farmers"
+                        android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/workspaceRoleText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Manage access and active workspace"
+                        android:textColor="@color/muted_ink"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textColor="@color/dragon_magenta"
+                    android:textSize="28sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="28dp"
+            android:letterSpacing="0.12"
+            android:text="SYNC"
             android:textColor="@color/dragon_text_soft"
             android:textSize="11sp"
             android:textStyle="bold" />
@@ -88,22 +158,26 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:padding="20dp">
+                <ImageView
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/soft_green_panel"
+                    android:contentDescription="@null"
+                    android:padding="11dp"
+                    android:src="@drawable/icon_dataset_home"
+                    app:tint="@color/dragon_green" />
                 <TextView
-                    android:layout_width="match_parent"
+                    android:id="@+id/syncStatusText"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
                     android:text="Current application settings"
                     android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
                     android:textStyle="bold" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Only settings supported by the current mobile application are shown. Additional controls will be added when their functions are available."
-                    android:textColor="@color/muted_ink"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="3dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -113,7 +187,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="28dp"
             android:letterSpacing="0.12"
-            android:text="SUPPORT &amp; INFO"
+            android:text="APP"
             android:textColor="@color/dragon_text_soft"
             android:textSize="11sp"
             android:textStyle="bold" />
@@ -134,9 +208,18 @@
                     android:orientation="horizontal"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/soft_pink_panel"
+                        android:contentDescription="@null"
+                        android:padding="10dp"
+                        android:src="@drawable/icon_dataset_analytics"
+                        app:tint="@color/dragon_magenta" />
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:text="About Dragon View"
                         android:textColor="@color/ink"
@@ -153,15 +236,20 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/dragon_outline" />
+                    android:background="@color/neo_highlight" />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/logoutButton"
                     style="@style/Widget.DragonView.Button.Text"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:elevation="0dp"
                     android:gravity="start|center_vertical"
                     android:text="Logout"
-                    android:textColor="@color/dragon_error" />
+                    android:textColor="@color/dragon_error"
+                    android:stateListAnimator="@null"
+                    app:icon="@drawable/icon_streamline_logout"
+                    app:iconTint="@color/dragon_error" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_navigation"
     app:startDestination="@id/dashboardFragment">
-    <fragment android:id="@+id/dashboardFragment" android:name="ph.dragonview.mobile.ui.dashboard.DashboardFragment" android:label="Home" />
+    <fragment android:id="@+id/dashboardFragment" android:name="ph.dragonview.mobile.ui.dashboard.DashboardFragment" android:label="DRAGON-VIEW" />
     <fragment android:id="@+id/inventoryFragment" android:name="ph.dragonview.mobile.ui.inventory.InventoryFragment" android:label="Inventory">
         <action android:id="@+id/action_inventory_to_harvest" app:destination="@id/harvestFragment" />
         <action android:id="@+id/action_inventory_to_details" app:destination="@id/inventoryDetailsFragment" />
@@ -23,4 +23,5 @@
     <fragment android:id="@+id/scannerFragment" android:name="ph.dragonview.mobile.ui.scanner.ScannerFragment" android:label="Live Scan" />
     <fragment android:id="@+id/recentlyRemovedFragment" android:name="ph.dragonview.mobile.ui.archive.RecentlyRemovedFragment" android:label="Recently Removed" />
     <fragment android:id="@+id/settingsFragment" android:name="ph.dragonview.mobile.ui.settings.SettingsFragment" android:label="Settings" />
+    <fragment android:id="@+id/workspaceFragment" android:name="ph.dragonview.mobile.ui.workspace.WorkspaceFragment" android:label="Workspace" />
 </navigation>

@@ -1,51 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/dragon_surface"
-    android:paddingStart="20dp"
-    android:paddingTop="18dp"
-    android:paddingEnd="20dp">
-    <LinearLayout
-        android:id="@+id/salesHeader"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/soft_pink_panel"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SALES" android:textColor="@color/dragon_magenta" android:textSize="11sp" android:textStyle="bold" />
-            <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Transactions and pricing" android:textAppearance="@style/TextAppearance.DragonView.TitleMedium" android:textStyle="bold" />
-        </LinearLayout>
-        <com.google.android.material.button.MaterialButton android:id="@+id/priceButton" style="@style/Widget.DragonView.Button.Outlined" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Prices" app:icon="@drawable/icon_streamline_prices" app:iconTint="@color/dragon_magenta" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/newSaleButton" style="@style/Widget.DragonView.Button" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_marginStart="8dp" android:text="New sale" />
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/dragon_surface" android:paddingStart="20dp" android:paddingTop="16dp" android:paddingEnd="20dp">
+    <LinearLayout android:id="@+id/salesHeader" android:layout_width="0dp" android:layout_height="wrap_content" android:orientation="horizontal" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+        <com.google.android.material.button.MaterialButton android:id="@+id/priceButton" style="@style/Widget.DragonView.HomeQuickAction" android:layout_width="0dp" android:layout_height="76dp" android:layout_marginEnd="6dp" android:layout_weight="1" android:gravity="center" android:text="Prices" app:icon="@drawable/icon_streamline_prices" app:iconGravity="top" app:iconTint="@color/dragon_magenta" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/newSaleButton" style="@style/Widget.DragonView.HomeQuickAction" android:layout_width="0dp" android:layout_height="76dp" android:layout_marginStart="6dp" android:layout_weight="1" android:gravity="center" android:text="New sale" app:icon="@drawable/icon_dataset_add" app:iconGravity="top" app:iconTint="@color/dragon_magenta" />
     </LinearLayout>
-    <TextView
-        android:id="@+id/recentSalesLabel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Recent Sales"
-        android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/salesHeader" />
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefresh"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recentSalesLabel">
-        <androidx.recyclerview.widget.RecyclerView android:id="@+id/salesList" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:paddingBottom="24dp" />
+    <com.google.android.material.card.MaterialCardView android:id="@+id/salesSummaryCard" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="12dp" app:cardBackgroundColor="@color/white" app:cardCornerRadius="22dp" app:cardElevation="1dp" app:strokeColor="@color/neo_highlight" app:strokeWidth="1dp" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/salesHeader">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:padding="18dp">
+            <ImageView android:layout_width="54dp" android:layout_height="54dp" android:background="@drawable/soft_pink_panel" android:contentDescription="@null" android:padding="14dp" android:src="@drawable/icon_dataset_analytics" app:tint="@color/dragon_magenta" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sales overview" android:textColor="@color/muted_ink" android:textSize="13sp" />
+                <TextView android:id="@+id/salesSummaryText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="Loading sales" android:textColor="@color/ink" android:textSize="21sp" android:textStyle="bold" />
+                <TextView android:id="@+id/messageText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:text="Transactions and pricing" android:textColor="@color/muted_ink" android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+    <TextView android:id="@+id/recentSalesLabel" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Recent sales" android:textAppearance="@style/TextAppearance.DragonView.TitleLarge" android:textStyle="bold" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/salesSummaryCard" />
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:id="@+id/swipeRefresh" android:layout_width="0dp" android:layout_height="0dp" android:layout_marginTop="8dp" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/recentSalesLabel">
+        <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent">
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/salesList" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:paddingBottom="24dp" />
+            <LinearLayout android:id="@+id/emptyState" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical" android:padding="28dp" android:visibility="gone">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="No sales yet." android:textColor="@color/muted_ink" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/emptyActionButton" style="@style/Widget.DragonView.Button.Outlined" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_marginTop="12dp" android:text="Create sale" android:textColor="@color/dragon_magenta" app:icon="@drawable/icon_dataset_add" app:iconTint="@color/dragon_magenta" />
+            </LinearLayout>
+        </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

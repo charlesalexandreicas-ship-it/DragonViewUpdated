@@ -1,0 +1,12 @@
+{
+  "model": "YOLO26n",
+  "input_size": 320,
+  "confidence_threshold": 0.05,
+  "nms_iou_threshold": 0.45,
+  "max_scanner_fruit_count": 8,
+  "class_names": [
+    "dragon_fruit"
+  ],
+  "preprocessing": "RGB letterbox, 114 padding, divide by 255",
+  "output": "end-to-end xyxy, confidence, class [1,300,6]"
+}

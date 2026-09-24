@@ -11,10 +11,13 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.Collections;
 import java.util.List;
 
 import ph.dragonview.mobile.R;
+import ph.dragonview.mobile.data.SessionManager;
 import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.data.model.InventoryBatch;
 import ph.dragonview.mobile.databinding.FragmentInventoryBinding;
@@ -33,6 +36,7 @@ public final class InventoryFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
+        boolean owner = new SessionManager(requireContext()).isWorkspaceOwner();
         adapter = new InventoryAdapter(new InventoryAdapter.Listener() {
             @Override public void open(InventoryBatch batch) {
                 Bundle args = new Bundle();
@@ -44,11 +48,14 @@ public final class InventoryFragment extends Fragment {
             @Override public void archive(InventoryBatch batch) {
                 confirmArchive(batch);
             }
-        });
+        }, owner);
         binding.inventoryList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.inventoryList.setAdapter(adapter);
         binding.swipeRefresh.setOnRefreshListener(this::load);
         binding.recordHarvestButton.setOnClickListener(v ->
+                NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_inventory_to_harvest));
+        binding.emptyActionButton.setOnClickListener(v ->
                 NavHostFragment.findNavController(this)
                         .navigate(R.id.action_inventory_to_harvest));
         binding.editPricesButton.setOnClickListener(v ->
@@ -71,12 +78,26 @@ public final class InventoryFragment extends Fragment {
                         }
                     }
                 }));
+        binding.editPricesButton.setVisibility(owner ? View.VISIBLE : View.GONE);
+        getParentFragmentManager().setFragmentResultListener(
+                HarvestFragment.HARVEST_SAVED_RESULT,
+                getViewLifecycleOwner(),
+                (requestKey, result) -> {
+                    String batchNumber = result.getString(
+                            HarvestFragment.HARVEST_BATCH_NUMBER, "");
+                    Snackbar.make(binding.getRoot(),
+                            batchNumber.isEmpty()
+                                    ? "Harvest saved to inventory."
+                                    : "Batch #" + batchNumber + " saved to inventory.",
+                            Snackbar.LENGTH_LONG).show();
+                    load();
+                });
         load();
     }
 
     private void load() {
         binding.swipeRefresh.setRefreshing(true);
-        binding.emptyText.setVisibility(View.GONE);
+        binding.emptyState.setVisibility(View.GONE);
         LocalRepository.get(requireContext()).inventoryBatches(
                 new LocalRepository.Callback<>() {
                     @Override
@@ -90,24 +111,28 @@ public final class InventoryFragment extends Fragment {
                         }
                         binding.summaryText.setText(batches.size() + " active batches • "
                                 + pieces + " available pieces");
-                        binding.emptyText.setVisibility(
+                        binding.emptyState.setVisibility(
                                 batches.isEmpty() ? View.VISIBLE : View.GONE);
-                        binding.emptyText.setText("No active inventory batches.");
+                        binding.emptyText.setText("No inventory yet.");
+                        binding.emptyActionButton.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onError(String message) {
                         if (binding == null) return;
                         binding.swipeRefresh.setRefreshing(false);
-                        showError();
+                        showError(message);
                     }
                 });
     }
 
-    private void showError() {
+    private void showError(String message) {
         adapter.submit(Collections.emptyList());
-        binding.emptyText.setText("Inventory could not be loaded from this device.");
-        binding.emptyText.setVisibility(View.VISIBLE);
+        binding.emptyText.setText(message == null || message.trim().isEmpty()
+                ? "Inventory could not be loaded from this device."
+                : message);
+        binding.emptyState.setVisibility(View.VISIBLE);
+        binding.emptyActionButton.setVisibility(View.GONE);
     }
 
     private void confirmArchive(InventoryBatch batch) {

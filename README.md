@@ -1,27 +1,41 @@
-# DragonViewMobile Application
+# DragonView Mobile
 
-DragonViewMobile is the AndreiCopy Mobile capstone application for dragon-fruit farm records and operations.
+DragonView is AndreiCopy Mobile's Java/XML Android application for dragon-fruit farm records, inventory, planting, sales, analytics, and offline quality scanning.
 
-## Current features
+## Architecture
 
-- Offline local accounts and Room database storage
-- Dashboard and sales analytics
-- FIFO harvest inventory grouped by batch
-- Multiple size and grade entries per harvest batch
-- Sales and configurable pricing
-- Seed, stem-cutting, and post-grafting farm guidance with accordion timelines, stage sheets, observations, measurements, and progress photos
-- Recoverable record removal with Recently Removed, restoration, and archive audit history
-- Camera and gallery quality-scanner workflow with optional on-device MobileNetV2 inference once the trained model is added
+`Android app -> Supabase Auth/Data API/RPC -> PostgreSQL`
 
-## Build requirements
+- Supabase PostgreSQL is authoritative for farm records.
+- A workspace can contain one owner and any number of farmers; business records are scoped to the selected workspace.
+- Room stores per-user, per-workspace read snapshots and an idempotent offline outbox.
+- Sales and inventory-reducing actions require internet to prevent stock conflicts.
+- Harvests, planting records, observations, pricing, and archive requests can queue offline.
+- Camera/gallery preprocessing and LiteRT inference remain entirely on-device.
 
-- Android Studio with JDK 17
-- Android SDK 36
+## Quality scanner model
 
-Build the debug APK from the repository root:
+The Android scanner consumes a local MobileNetV2 LiteRT model and never uploads
+photos for inference. Dataset auditing, training, and export instructions are in
+[`ml/README.md`](ml/README.md). The training script exports the finished model and
+labels directly to `app/src/main/assets/ml/` using the tensor contract enforced by
+the existing Java classifier.
+
+## Configure
+
+1. Create a Supabase project and deploy the migrations under `supabase/migrations`.
+2. Copy `local.properties.example` to `local.properties`.
+3. Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` using the project's public API values.
+4. Never place the database password or service-role key in this repository or APK.
+
+Full instructions are in [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
+
+## Build
+
+Requirements: Android SDK 36 and Java 17.
 
 ```powershell
-.\gradlew.bat :app:assembleDebug
+.\build-dragonview.ps1
 ```
 
-The image-classification model, validated plant-stage reference-image dataset, farm mapping, and weight-workflow redesign are intentionally deferred.
+Numbered APKs are written to `releases/`.

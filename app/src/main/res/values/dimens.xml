@@ -12,7 +12,9 @@
     <dimen name="touch_target">48dp</dimen>
     <dimen name="field_height">56dp</dimen>
     <dimen name="corner_button">12dp</dimen>
-    <dimen name="corner_card">16dp</dimen>
+    <dimen name="corner_card">20dp</dimen>
+    <dimen name="neo_elevation">5dp</dimen>
+    <dimen name="neo_inset">3dp</dimen>
     <dimen name="header_height">96dp</dimen>
     <dimen name="bottom_nav_height">80dp</dimen>
 </resources>

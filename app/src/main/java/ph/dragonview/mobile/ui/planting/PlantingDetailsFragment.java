@@ -115,6 +115,12 @@ public final class PlantingDetailsFragment extends Fragment {
         binding.expectedText.setText(guidance.getExpectedAppearance());
         binding.tasksText.setText(guidance.getTasks());
         binding.warningsText.setText(guidance.getWarnings());
+        String[] reviewedGuidance = PlantGuidanceContent.get(requireContext(), guidance);
+        if (reviewedGuidance != null) {
+            binding.expectedText.setText(reviewedGuidance[1]);
+            binding.tasksText.setText(reviewedGuidance[2]);
+            binding.warningsText.setText(reviewedGuidance[4]);
+        }
         renderHistory(value);
     }
 

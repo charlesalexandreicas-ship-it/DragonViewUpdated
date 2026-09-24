@@ -18,23 +18,29 @@ final class SalesAdapter extends RecyclerView.Adapter<SalesAdapter.Holder> {
     interface Listener { void archive(SaleSummary sale); }
     private final List<SaleSummary> rows = new ArrayList<>();
     private final Listener listener;
-    SalesAdapter(Listener listener) { this.listener = listener; }
+    private final boolean canArchive;
+    SalesAdapter(Listener listener, boolean canArchive) {
+        this.listener = listener;
+        this.canArchive = canArchive;
+    }
     void submit(List<SaleSummary> values) { rows.clear(); rows.addAll(values); notifyDataSetChanged(); }
     @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
         return new Holder(ItemSaleBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
     @Override public void onBindViewHolder(@NonNull Holder holder, int position) {
-        holder.bind(rows.get(position), listener);
+        holder.bind(rows.get(position), listener, canArchive);
     }
     @Override public int getItemCount() { return rows.size(); }
     static final class Holder extends RecyclerView.ViewHolder {
         private final ItemSaleBinding binding;
         Holder(ItemSaleBinding binding) { super(binding.getRoot()); this.binding = binding; }
-        void bind(SaleSummary sale, Listener listener) {
+        void bind(SaleSummary sale, Listener listener, boolean canArchive) {
             binding.titleText.setText("Sale #" + sale.getId() + " • " + sale.getCustomerName());
             String date = sale.getTransactionDate() == null ? "" : sale.getTransactionDate().replace('T', ' ');
             binding.detailsText.setText(sale.getStatus() + " • " + sale.getTotalPieces() + " pieces\n" + date);
             binding.totalText.setText(NumberFormat.getCurrencyInstance(new Locale("en", "PH")).format(sale.getTotalAmount()));
+            binding.archiveButton.setVisibility(canArchive
+                    ? android.view.View.VISIBLE : android.view.View.GONE);
             binding.archiveButton.setOnClickListener(v -> listener.archive(sale));
         }
     }

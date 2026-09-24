@@ -40,8 +40,8 @@ public final class AnalyticsFragment extends Fragment {
         binding.dateInput.setText(
                 new SimpleDateFormat("yyyy-MM-dd", Locale.US)
                         .format(Calendar.getInstance().getTime()));
-        binding.periodInput.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (isChecked) load();
+        binding.periodInput.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (!checkedIds.isEmpty()) load();
         });
         binding.dateInput.setOnClickListener(v -> chooseDate());
         load();
@@ -61,6 +61,7 @@ public final class AnalyticsFragment extends Fragment {
     private void load() {
         binding.progress.setVisibility(View.VISIBLE);
         binding.messageText.setText("");
+        binding.trendChart.showMessage("Loading analytics…");
         LocalRepository.get(requireContext()).analytics(
                 selectedPeriod(),
                 binding.dateInput.getText().toString(),
@@ -75,7 +76,7 @@ public final class AnalyticsFragment extends Fragment {
                     public void onError(String message) {
                         if (binding == null) return;
                         binding.progress.setVisibility(View.GONE);
-                        error();
+                        error(message);
                     }
                 });
     }
@@ -88,8 +89,7 @@ public final class AnalyticsFragment extends Fragment {
         binding.weightText.setText(String.format(Locale.US, "%.3f kg",
                 report.getTotals().getWeightKilograms()));
         Double change = report.getComparisonPercent();
-        binding.comparisonText.setText(change == null ? "No previous-period baseline"
-                : String.format(Locale.US, "%+.1f%% vs previous period", change));
+        binding.comparisonText.setText(formatComparisonMessage(report));
         binding.comparisonText.setTextColor(requireContext().getColor(
                 change == null || change >= 0
                         ? ph.dragonview.mobile.R.color.dragon_green
@@ -104,14 +104,37 @@ public final class AnalyticsFragment extends Fragment {
                 summaries.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
+    static String formatComparisonMessage(SalesAnalytics report) {
+        double previousRevenue = report.getPreviousRevenue();
+        double currentRevenue = report.getTotals().getRevenue();
+        if (previousRevenue == 0.0 && currentRevenue > 0.0) {
+            NumberFormat amount = NumberFormat.getNumberInstance(Locale.US);
+            amount.setMinimumFractionDigits(2);
+            amount.setMaximumFractionDigits(2);
+            return "New revenue: ₱" + amount.format(currentRevenue)
+                    + " (no percentage baseline).";
+        }
+        if (previousRevenue == 0.0 && currentRevenue == 0.0) {
+            return "No sales in either period.";
+        }
+        Double change = report.getComparisonPercent();
+        return change == null ? "No previous-period baseline"
+                : String.format(Locale.US, "%+.1f%% vs previous period", change);
+    }
+
     private String selectedPeriod() {
-        int checkedId = binding.periodInput.getCheckedButtonId();
+        int checkedId = binding.periodInput.getCheckedChipId();
         if (checkedId == ph.dragonview.mobile.R.id.periodWeeklyButton) return "weekly";
         if (checkedId == ph.dragonview.mobile.R.id.periodMonthlyButton) return "monthly";
-        if (checkedId == ph.dragonview.mobile.R.id.periodAnnualButton) return "annual";
+        if (checkedId == ph.dragonview.mobile.R.id.periodAnnualButton) return "yearly";
         return "daily";
     }
 
-    private void error() { binding.messageText.setText("Analytics could not be loaded."); }
+    private void error(String message) {
+        String detail = message == null || message.trim().isEmpty()
+                ? "Check your connection and try again." : message.trim();
+        binding.messageText.setText("Analytics could not be loaded. " + detail);
+        binding.trendChart.showMessage("Revenue trend is unavailable");
+    }
     @Override public void onDestroyView() { binding = null; super.onDestroyView(); }
 }

@@ -20,7 +20,7 @@
         android:background="@drawable/soft_green_panel"
         android:contentDescription="Stage reference image pending validation"
         android:padding="20dp"
-        android:src="@drawable/icon_streamline_plant"
+        android:src="@drawable/icon_dataset_planting"
         app:tint="@color/dragon_green" />
 
     <LinearLayout

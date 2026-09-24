@@ -1,11 +1,15 @@
 package ph.dragonview.mobile.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -14,6 +18,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import ph.dragonview.mobile.R;
 import ph.dragonview.mobile.data.SessionManager;
+import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.data.model.SessionUser;
 import ph.dragonview.mobile.databinding.ActivityMainBinding;
 
@@ -21,6 +26,15 @@ public final class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private SessionManager session;
     private AppBarConfiguration appBarConfiguration;
+    private boolean sessionReceiverRegistered;
+    private boolean redirectingToLogin;
+    private final BroadcastReceiver sessionExpiredReceiver = new BroadcastReceiver() {
+        @Override public void onReceive(Context context, Intent intent) {
+            if (SessionManager.ACTION_SESSION_EXPIRED.equals(intent.getAction())) {
+                openLoginForExpiredSession();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +67,12 @@ public final class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.bottomNavigation, controller);
         NavigationUI.setupActionBarWithNavController(this, controller, appBarConfiguration);
         configureDrawer(controller);
+        binding.bottomNavigation.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.dashboardFragment) {
+                return returnToDashboard(controller);
+            }
+            return NavigationUI.onNavDestinationSelected(item, controller);
+        });
         binding.bottomNavigation.setOnItemReselectedListener(item -> {
             if (controller.getCurrentDestination() != null
                     && controller.getCurrentDestination().getId() == item.getItemId()) {
@@ -64,15 +84,78 @@ public final class MainActivity extends AppCompatActivity {
         });
         binding.scannerButton.setOnClickListener(view ->
                 binding.bottomNavigation.setSelectedItemId(R.id.scannerFragment));
+        if (session.getActiveWorkspaceId().isEmpty()) {
+            LocalRepository.get(this).ensureActiveWorkspace(new LocalRepository.Callback<>() {
+                @Override public void onSuccess(Void ignored) {
+                    if (!isFinishing() && !isDestroyed()) recreate();
+                }
+                @Override public void onError(String message) {
+                    // The workspace screen surfaces the actionable backend error.
+                }
+            });
+        }
+    }
+
+    @Override protected void onStart() {
+        super.onStart();
+        if (!sessionReceiverRegistered) {
+            ContextCompat.registerReceiver(this, sessionExpiredReceiver,
+                    new IntentFilter(SessionManager.ACTION_SESSION_EXPIRED),
+                    ContextCompat.RECEIVER_NOT_EXPORTED);
+            sessionReceiverRegistered = true;
+        }
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        if (session != null && binding != null && !session.isAuthenticated()) {
+            openLoginForExpiredSession();
+        }
+    }
+
+    @Override protected void onStop() {
+        if (sessionReceiverRegistered) {
+            unregisterReceiver(sessionExpiredReceiver);
+            sessionReceiverRegistered = false;
+        }
+        super.onStop();
+    }
+
+    /** Opens a primary tab through the same navigation path used by the bottom bar. */
+    public void navigateToPrimaryDestination(int destinationId) {
+        binding.bottomNavigation.setSelectedItemId(destinationId);
+    }
+
+    private static boolean returnToDashboard(NavController controller) {
+        if (controller.getCurrentDestination() != null
+                && controller.getCurrentDestination().getId() == R.id.dashboardFragment) {
+            return true;
+        }
+        if (!controller.popBackStack(R.id.dashboardFragment, false)) {
+            controller.navigate(R.id.dashboardFragment);
+        }
+        return true;
     }
 
     private void configureDrawer(NavController controller) {
         SessionUser user = session.getUser();
         if (user != null && binding.navigationView.getHeaderCount() > 0) {
-            TextView userText = binding.navigationView.getHeaderView(0)
-                    .findViewById(R.id.drawerUserText);
+            View header = binding.navigationView.getHeaderView(0);
+            TextView userText = header.findViewById(R.id.drawerUserText);
             userText.setText(user.getDisplayName());
+            TextView workspaceText = header.findViewById(R.id.drawerWorkspaceText);
+            TextView roleText = header.findViewById(R.id.drawerRoleText);
+            workspaceText.setText(session.getActiveWorkspaceName().isEmpty()
+                    ? "No workspace selected" : session.getActiveWorkspaceName());
+            roleText.setText(session.isWorkspaceOwner() ? "Workspace owner"
+                    : session.isWorkspaceFarmer() ? "Farmer" : "Workspace loading");
         }
+
+        boolean owner = session.isWorkspaceOwner();
+        binding.navigationView.getMenu().findItem(R.id.recentlyRemovedFragment)
+                .setVisible(owner);
+        binding.bottomNavigation.getMenu().findItem(R.id.analyticsFragment)
+                .setVisible(owner);
 
         binding.navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.action_logout) {
@@ -102,9 +185,12 @@ public final class MainActivity extends AppCompatActivity {
                         .findItem(bottomDestinationId)
                         .setChecked(true);
             }
-            boolean settingsScreen = destinationId == R.id.settingsFragment;
-            binding.bottomNavigation.setVisibility(settingsScreen ? View.GONE : View.VISIBLE);
-            binding.scannerButton.setVisibility(settingsScreen ? View.GONE : View.VISIBLE);
+            boolean fullScreenDestination = destinationId == R.id.settingsFragment
+                    || destinationId == R.id.workspaceFragment;
+            binding.bottomNavigation.setVisibility(
+                    fullScreenDestination ? View.GONE : View.VISIBLE);
+            binding.scannerButton.setVisibility(
+                    fullScreenDestination ? View.GONE : View.VISIBLE);
         });
     }
 
@@ -115,6 +201,12 @@ public final class MainActivity extends AppCompatActivity {
         }
         if (destinationId == R.id.plantingDetailsFragment) {
             return R.id.plantingFragment;
+        }
+        if (destinationId == R.id.salesFragment) {
+            return R.id.dashboardFragment;
+        }
+        if (destinationId == R.id.recentlyRemovedFragment) {
+            return R.id.inventoryFragment;
         }
         if (destinationId == R.id.dashboardFragment
                 || destinationId == R.id.inventoryFragment
@@ -135,7 +227,7 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public void signOut() {
-        if (session != null) session.clear();
+        LocalRepository.get(this).signOut();
         startActivity(new Intent(this, LoginActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
@@ -143,5 +235,15 @@ public final class MainActivity extends AppCompatActivity {
 
     private void logout() {
         signOut();
+    }
+
+    private void openLoginForExpiredSession() {
+        if (redirectingToLogin || isFinishing() || isDestroyed()) return;
+        redirectingToLogin = true;
+        startActivity(new Intent(this, LoginActivity.class)
+                .putExtra(LoginActivity.EXTRA_AUTH_MESSAGE,
+                        "Your session expired. Sign in again to continue.")
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+        finish();
     }
 }

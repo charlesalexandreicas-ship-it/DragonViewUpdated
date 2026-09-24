@@ -1,22 +1,32 @@
 <resources>
-    <style name="Theme.DragonView.Base" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.DragonView.Base" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/dragon_magenta</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/on_accent</item>
         <item name="colorPrimaryContainer">@color/dragon_surface_variant</item>
         <item name="colorOnPrimaryContainer">@color/dragon_magenta_dark</item>
         <item name="colorSecondary">@color/dragon_green</item>
-        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorOnSecondary">@color/on_accent</item>
         <item name="colorSecondaryContainer">@color/dragon_green_soft</item>
         <item name="colorOnSecondaryContainer">@color/black</item>
-        <item name="colorTertiary">@color/plum_orchid_400</item>
+        <item name="colorTertiary">@color/dragon_yellow</item>
+        <item name="colorOnTertiary">@color/on_accent</item>
+        <item name="colorTertiaryContainer">@color/dragon_yellow_soft</item>
+        <item name="colorOnTertiaryContainer">@color/dragon_yellow</item>
         <item name="colorSurface">@color/dragon_surface</item>
-        <item name="colorSurfaceContainer">@color/white</item>
+        <item name="colorSurfaceContainer">@color/neo_surface_high</item>
         <item name="colorOnSurface">@color/black</item>
         <item name="colorOutline">@color/dragon_outline</item>
         <item name="colorError">@color/dragon_error</item>
+        <item name="colorOnError">@color/on_accent</item>
+        <item name="colorErrorContainer">@color/fifo_urgent_soft</item>
+        <item name="colorOnErrorContainer">@color/dragon_error</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="fontFamily">sans-serif</item>
         <item name="materialButtonStyle">@style/Widget.DragonView.Button</item>
+        <item name="buttonBarButtonStyle">@style/Widget.DragonView.DialogButton</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.DragonView.DialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.DragonView.DialogButton</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.DragonView.DialogButton</item>
         <item name="materialCardViewStyle">@style/Widget.DragonView.Card</item>
         <item name="textInputStyle">@style/Widget.DragonView.TextInputLayout</item>
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.DragonView.Small</item>
@@ -27,11 +37,31 @@
         <item name="textAppearanceTitleMedium">@style/TextAppearance.DragonView.TitleMedium</item>
         <item name="textAppearanceBodyLarge">@style/TextAppearance.DragonView.BodyLarge</item>
         <item name="textAppearanceBodyMedium">@style/TextAppearance.DragonView.BodyMedium</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:statusBarColor">@color/dragon_magenta</item>
-        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/neo_surface_high</item>
+        <item name="android:navigationBarColor">@color/neo_surface_high</item>
         <item name="android:colorAccent">@color/dragon_magenta</item>
         <item name="android:windowBackground">@color/warm_ivory</item>
+        <item name="android:colorBackground">@color/dragon_surface</item>
+        <item name="colorBackgroundFloating">@color/neo_surface_high</item>
+        <item name="android:colorBackgroundFloating">@color/neo_surface_high</item>
+        <item name="android:colorForeground">@color/ink</item>
+        <item name="android:textColorPrimary">@color/ink</item>
+        <item name="android:textColorSecondary">@color/muted_ink</item>
+        <item name="android:textColorHint">@color/muted_ink</item>
+        <item name="android:textColorLink">@color/dragon_magenta</item>
+        <item name="colorSurfaceVariant">@color/neo_surface_low</item>
+        <item name="colorOnSurfaceVariant">@color/muted_ink</item>
+        <item name="colorSurfaceInverse">@color/ink</item>
+        <item name="colorOnSurfaceInverse">@color/white</item>
+        <item name="colorPrimaryInverse">@color/plum_orchid_400</item>
+        <item name="colorSurfaceBright">@color/neo_surface_high</item>
+        <item name="colorSurfaceDim">@color/dragon_surface</item>
+        <item name="colorSurfaceContainerLow">@color/neo_surface_low</item>
+        <item name="colorSurfaceContainerHigh">@color/neo_surface_high</item>
+        <item name="colorSurfaceContainerHighest">@color/neo_surface_high</item>
+        <item name="colorControlNormal">@color/muted_ink</item>
+        <item name="colorControlActivated">@color/dragon_magenta</item>
     </style>
 
     <style name="Theme.DragonView" parent="Theme.DragonView.Base" />
@@ -64,7 +94,10 @@
         <item name="android:insetBottom">0dp</item>
         <item name="backgroundTint">@color/button_primary_background</item>
         <item name="android:textColor">@color/button_primary_text</item>
-        <item name="rippleColor">@color/plum_orchid_400</item>
+        <item name="iconTint">@color/button_primary_text</item>
+        <item name="rippleColor">@color/focus_ripple</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
     </style>
     <style name="Widget.DragonView.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="shapeAppearance">@style/ShapeAppearance.DragonView.Small</item>
@@ -79,11 +112,13 @@
         <item name="iconPadding">8dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="strokeColor">@color/dragon_magenta</item>
+        <item name="strokeColor">@color/neo_highlight</item>
         <item name="strokeWidth">1dp</item>
         <item name="backgroundTint">@color/button_secondary_background</item>
         <item name="android:textColor">@color/button_secondary_text</item>
-        <item name="rippleColor">@color/plum_mist_100</item>
+        <item name="rippleColor">@color/focus_ripple</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
     </style>
     <style name="Widget.DragonView.Button.Period" parent="Widget.Material3.Button.OutlinedButton">
         <item name="shapeAppearance">@style/ShapeAppearance.DragonView.Small</item>
@@ -100,7 +135,7 @@
         <item name="android:textColor">@color/period_button_text</item>
         <item name="strokeColor">@color/dragon_magenta</item>
         <item name="strokeWidth">1dp</item>
-        <item name="rippleColor">@color/plum_orchid_400</item>
+        <item name="rippleColor">@color/focus_ripple</item>
     </style>
     <style name="Widget.DragonView.Button.Text" parent="Widget.Material3.Button.TextButton">
         <item name="shapeAppearance">@style/ShapeAppearance.DragonView.Small</item>
@@ -116,8 +151,15 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
     </style>
+    <style name="Widget.DragonView.DialogButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
     <style name="Widget.DragonView.Button.Success" parent="Widget.DragonView.Button">
-        <item name="backgroundTint">@color/dragon_green</item>
+        <item name="backgroundTint">@color/action_success</item>
     </style>
     <style name="Widget.DragonView.Button.QuickAction" parent="Widget.Material3.Button.ElevatedButton">
         <item name="shapeAppearance">@style/ShapeAppearance.DragonView.Medium</item>
@@ -129,30 +171,34 @@
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">@color/ink</item>
-        <item name="backgroundTint">@color/white</item>
+        <item name="backgroundTint">@color/neo_surface_high</item>
         <item name="iconPadding">10dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
+        <item name="android:elevation">5dp</item>
+        <item name="strokeColor">@color/neo_highlight</item>
+        <item name="strokeWidth">1dp</item>
     </style>
 
     <style name="Widget.DragonView.Card" parent="Widget.Material3.CardView.Filled">
-        <item name="cardBackgroundColor">@color/white</item>
-        <item name="cardCornerRadius">16dp</item>
-        <item name="cardElevation">2dp</item>
-        <item name="strokeWidth">0dp</item>
+        <item name="cardBackgroundColor">@color/neo_surface_high</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">1dp</item>
+        <item name="strokeColor">@color/neo_highlight</item>
+        <item name="strokeWidth">1dp</item>
     </style>
 
     <style name="Widget.DragonView.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="shapeAppearance">@style/ShapeAppearance.DragonView.Small</item>
-        <item name="boxBackgroundColor">@color/white</item>
-        <item name="boxStrokeColor">@color/dragon_outline</item>
+        <item name="boxBackgroundColor">@color/neo_surface_high</item>
+        <item name="boxStrokeColor">@color/text_input_stroke</item>
         <item name="boxStrokeWidth">1dp</item>
         <item name="boxStrokeWidthFocused">2dp</item>
         <item name="hintTextColor">@color/muted_ink</item>
     </style>
     <style name="Widget.DragonView.TextInputLayout.Dropdown" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
         <item name="shapeAppearance">@style/ShapeAppearance.DragonView.Small</item>
-        <item name="boxStrokeColor">@color/dragon_outline</item>
+        <item name="boxStrokeColor">@color/text_input_stroke</item>
         <item name="boxStrokeWidth">1dp</item>
         <item name="boxStrokeWidthFocused">2dp</item>
     </style>
@@ -177,7 +223,7 @@
         <item name="android:background">@drawable/dialog_field_background</item>
         <item name="android:paddingStart">14dp</item>
         <item name="android:paddingEnd">14dp</item>
-        <item name="android:popupBackground">@color/white</item>
+        <item name="android:popupBackground">@color/neo_surface_high</item>
     </style>
 
     <style name="TextAppearance.DragonView.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
@@ -185,6 +231,13 @@
         <item name="android:textColor">@color/ink</item>
         <item name="android:textSize">24sp</item>
         <item name="android:letterSpacing">-0.01</item>
+    </style>
+    <style name="TextAppearance.DragonView.ToolbarTitle" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.02</item>
     </style>
     <style name="TextAppearance.DragonView.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:fontFamily">sans-serif-medium</item>
@@ -229,18 +282,54 @@
         <item name="android:textSize">11sp</item>
         <item name="android:letterSpacing">0.02</item>
     </style>
-    <style name="DashboardMetric" parent="Widget.Material3.CardView.Filled">
+    <style name="DashboardMetricCard">
         <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">116dp</item>
+        <item name="android:layout_height">136dp</item>
         <item name="android:layout_columnWeight">1</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:padding">16dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingBottom">14dp</item>
         <item name="android:background">@drawable/metric_card_background</item>
-        <item name="android:textColor">@color/ink</item>
-        <item name="android:textSize">22sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="DashboardMetricFigure" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:textColor">@color/instrument_ink</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:letterSpacing">-0.03</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="DashboardMetricLabel" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:textColor">@color/muted_ink</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="AnalyticsMetricBody">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">96dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">14dp</item>
+    </style>
+    <style name="AnalyticsMetricFigure" parent="DashboardMetricFigure">
+        <item name="android:textSize">25sp</item>
+    </style>
+    <style name="AnalyticsMetricLabel" parent="DashboardMetricLabel">
+        <item name="android:layout_marginTop">4dp</item>
     </style>
     <style name="DashboardOverviewValue" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:layout_width">match_parent</item>
