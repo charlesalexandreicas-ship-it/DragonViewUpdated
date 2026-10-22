@@ -22,6 +22,12 @@ import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.data.model.SessionUser;
 import ph.dragonview.mobile.databinding.ActivityMainBinding;
 
+/**
+ * Hosts DragonView's navigation drawer, primary tabs, and centered scanner action.
+ *
+ * <p>Learning note: feature screens live in Fragments. This Activity coordinates the
+ * shared application shell and keeps its navigation indicators synchronized.</p>
+ */
 public final class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private SessionManager session;
@@ -37,6 +43,7 @@ public final class MainActivity extends AppCompatActivity {
     };
 
     @Override
+    /** Creates the shared app shell and connects it to the Navigation component. */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         session = new SessionManager(this);
@@ -46,6 +53,11 @@ public final class MainActivity extends AppCompatActivity {
         }
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        // Match the system status bar to the shared berry toolbar so the header reads as one surface.
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.botanical_header));
+        getWindow().getDecorView().setSystemUiVisibility(
+                getWindow().getDecorView().getSystemUiVisibility()
+                        & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         setSupportActionBar(binding.toolbar);
 
         NavHostFragment host = (NavHostFragment) getSupportFragmentManager()
@@ -96,6 +108,7 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Starts listening for authentication expiry while the Activity is visible. */
     @Override protected void onStart() {
         super.onStart();
         if (!sessionReceiverRegistered) {
@@ -106,6 +119,7 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Rechecks authentication after returning from another screen or application. */
     @Override protected void onResume() {
         super.onResume();
         if (session != null && binding != null && !session.isAuthenticated()) {
@@ -113,6 +127,7 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Unregisters the receiver to avoid retaining an inactive Activity instance. */
     @Override protected void onStop() {
         if (sessionReceiverRegistered) {
             unregisterReceiver(sessionExpiredReceiver);
@@ -126,6 +141,7 @@ public final class MainActivity extends AppCompatActivity {
         binding.bottomNavigation.setSelectedItemId(destinationId);
     }
 
+    /** Returns to the existing dashboard destination instead of stacking duplicates. */
     private static boolean returnToDashboard(NavController controller) {
         if (controller.getCurrentDestination() != null
                 && controller.getCurrentDestination().getId() == R.id.dashboardFragment) {
@@ -137,6 +153,7 @@ public final class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /** Binds account information, role visibility, drawer actions, and tab state. */
     private void configureDrawer(NavController controller) {
         SessionUser user = session.getUser();
         if (user != null && binding.navigationView.getHeaderCount() > 0) {
@@ -194,6 +211,7 @@ public final class MainActivity extends AppCompatActivity {
         });
     }
 
+    /** Maps child screens back to the primary tab that conceptually owns them. */
     private static int bottomDestinationFor(int destinationId) {
         if (destinationId == R.id.harvestFragment
                 || destinationId == R.id.inventoryDetailsFragment) {
@@ -201,6 +219,11 @@ public final class MainActivity extends AppCompatActivity {
         }
         if (destinationId == R.id.plantingDetailsFragment) {
             return R.id.plantingFragment;
+        }
+        if (destinationId == R.id.historicalRecordsFragment
+                || destinationId == R.id.historicalCaptureFragment
+                || destinationId == R.id.historicalEditorFragment) {
+            return R.id.analyticsFragment;
         }
         if (destinationId == R.id.salesFragment) {
             return R.id.dashboardFragment;
@@ -219,6 +242,7 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    /** Gives the toolbar Up button the same behavior as the navigation graph. */
     public boolean onSupportNavigateUp() {
         NavHostFragment host = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host);
@@ -226,6 +250,7 @@ public final class MainActivity extends AppCompatActivity {
                 host.getNavController(), appBarConfiguration);
     }
 
+    /** Clears local authentication, opens Login, and removes authenticated screens. */
     public void signOut() {
         LocalRepository.get(this).signOut();
         startActivity(new Intent(this, LoginActivity.class)
@@ -233,10 +258,12 @@ public final class MainActivity extends AppCompatActivity {
         finish();
     }
 
+    /** Kept as the unauthenticated-startup entry point for the common sign-out flow. */
     private void logout() {
         signOut();
     }
 
+    /** Redirects once when a token expires and explains why the user must sign in. */
     private void openLoginForExpiredSession() {
         if (redirectingToLogin || isFinishing() || isDestroyed()) return;
         redirectingToLogin = true;

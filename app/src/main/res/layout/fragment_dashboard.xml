@@ -1,237 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/swipeRefresh"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/dragon_surface"
-        android:clipToPadding="false">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingTop="20dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="28dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Today at a glance"
-                android:textAppearance="@style/TextAppearance.DragonView.HeadlineSmall"
-                android:textColor="@color/ink"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeRefresh" android:layout_width="match_parent" android:layout_height="match_parent">
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="match_parent"
+        android:background="@color/dragon_surface" android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:paddingStart="20dp" android:paddingTop="12dp"
+            android:paddingEnd="20dp" android:paddingBottom="28dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Farm overview" android:textColor="@color/ink" android:textSize="18sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/errorText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:textColor="@color/dragon_error"
+            <TextView android:id="@+id/errorText" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:textColor="@color/dragon_error"
                 android:visibility="gone" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:text="Quick Actions"
-                android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal">
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/recordHarvestAction"
-                    style="@style/Widget.DragonView.HomeQuickAction"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Record harvest"
-                    android:textSize="13sp"
-                    app:icon="@drawable/icon_dataset_add"
-                    app:iconGravity="top"
-                    app:iconTint="@color/dragon_violet_red" />
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/viewInventoryAction"
-                    style="@style/Widget.DragonView.HomeQuickAction.Green"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="View inventory"
-                    android:textSize="13sp"
-                    app:icon="@drawable/icon_dataset_inventory"
-                    app:iconGravity="top"
-                    app:iconTint="@color/dragon_violet_red" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal">
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/viewAnalyticsButton"
-                    style="@style/Widget.DragonView.HomeQuickAction"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Analytics"
-                    android:textSize="13sp"
-                    app:icon="@drawable/icon_dataset_analytics"
-                    app:iconGravity="top"
-                    app:iconTint="@color/dragon_violet_red" />
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/recordPlantingAction"
-                    style="@style/Widget.DragonView.HomeQuickAction.Green"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Record planting"
-                    android:textSize="13sp"
-                    app:icon="@drawable/icon_dataset_planting"
-                    app:iconGravity="top"
-                    app:iconTint="@color/dragon_violet_red" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Farm Overview"
-                android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
-                android:textStyle="bold" />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_sm"
-                android:clipToPadding="false"
-                android:fillViewport="false"
-                android:overScrollMode="never"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        style="@style/HomeMetricCard"
-                        android:layout_marginEnd="12dp">
-                        <ImageView
-                            android:layout_width="@dimen/home_metric_icon"
-                            android:layout_height="@dimen/home_metric_icon"
-                            android:contentDescription="@null"
-                            android:src="@drawable/icon_dataset_inventory"
-                            app:tint="@color/dragon_magenta" />
-                        <TextView
-                            android:id="@+id/inventoryValue"
-                            style="@style/HomeMetricFigure"
-                            android:text="—" />
-                        <TextView style="@style/HomeMetricLabel" android:text="Inventory pieces" />
-                        <TextView
-                            android:id="@+id/inventoryContextText"
-                            style="@style/HomeSummaryContext"
-                            android:text="Current workspace" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        style="@style/HomeMetricCard"
-                        android:layout_marginEnd="12dp">
-                        <ImageView
-                            android:layout_width="@dimen/home_metric_icon"
-                            android:layout_height="@dimen/home_metric_icon"
-                            android:contentDescription="@null"
-                            android:src="@drawable/icon_streamline_sales"
-                            app:tint="@color/dragon_magenta" />
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/todayRevenueValue"
-                            style="@style/HomeMetricFigure"
-                            android:maxLines="1"
-                            android:text="—"
-                            app:autoSizeMaxTextSize="24sp"
-                            app:autoSizeMinTextSize="12sp"
-                            app:autoSizeStepGranularity="1sp"
-                            app:autoSizeTextType="uniform" />
-                        <TextView style="@style/HomeMetricLabel" android:text="Sales today" />
-                        <TextView
-                            android:id="@+id/salesContextText"
-                            style="@style/HomeSummaryContext"
-                            android:text="— sales · — kg" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        style="@style/HomeMetricCard"
-                        android:layout_marginEnd="12dp">
-                        <ImageView
-                            android:layout_width="@dimen/home_metric_icon"
-                            android:layout_height="@dimen/home_metric_icon"
-                            android:contentDescription="@null"
-                            android:src="@drawable/icon_dataset_planting"
-                            app:tint="@color/dragon_green" />
-                        <TextView
-                            android:id="@+id/plantingValue"
-                            style="@style/HomeMetricFigure"
-                            android:text="—" />
-                        <TextView style="@style/HomeMetricLabel" android:text="Plant groups" />
-                        <TextView style="@style/HomeSummaryContext" android:text="Active records" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        style="@style/HomeMetricCard"
-                        android:layout_marginEnd="12dp">
-                        <ImageView
-                            android:layout_width="@dimen/home_metric_icon"
-                            android:layout_height="@dimen/home_metric_icon"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_camera"
-                            app:tint="@color/dragon_magenta" />
-                        <TextView
-                            android:id="@+id/classificationValue"
-                            style="@style/HomeMetricFigure"
-                            android:text="—" />
-                        <TextView style="@style/HomeMetricLabel" android:text="Scans today" />
-                        <TextView style="@style/HomeSummaryContext" android:text="On-device quality" />
-                    </LinearLayout>
-
-                    <LinearLayout style="@style/HomeMetricCard">
-                        <ImageView
-                            android:layout_width="@dimen/home_metric_icon"
-                            android:layout_height="@dimen/home_metric_icon"
-                            android:contentDescription="@null"
-                            android:src="@drawable/icon_dataset_analytics"
-                            app:tint="@color/dragon_green" />
-                        <TextView
-                            android:id="@+id/revenueTrendText"
-                            style="@style/HomeMetricFigure"
-                            android:maxLines="2"
-                            android:text="—" />
-                        <TextView style="@style/HomeMetricLabel" android:text="Revenue trend" />
-                        <TextView style="@style/HomeSummaryContext" android:text="Versus yesterday" />
-                    </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" android:orientation="horizontal">
+                <LinearLayout style="@style/HomeSummaryCard" android:layout_marginEnd="6dp" android:orientation="vertical">
+                    <ImageView android:layout_width="22dp" android:layout_height="22dp"
+                        android:contentDescription="@null" android:src="@drawable/icon_streamline_inventory"
+                        app:tint="@color/dragon_magenta" />
+                    <TextView android:id="@+id/batchesValue" style="@style/HomeMetricFigure" android:text="—" />
+                    <TextView style="@style/HomeMetricLabel" android:text="Available batches" />
                 </LinearLayout>
-            </HorizontalScrollView>
+                <LinearLayout style="@style/HomeSummaryCard" android:layout_marginStart="6dp" android:orientation="vertical">
+                    <ImageView android:layout_width="22dp" android:layout_height="22dp"
+                        android:contentDescription="@null" android:src="@drawable/icon_streamline_inventory"
+                        app:tint="@color/dragon_green" />
+                    <TextView android:id="@+id/inventoryValue" style="@style/HomeMetricFigure" android:text="—" />
+                    <TextView style="@style/HomeMetricLabel" android:text="Available pcs" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" android:orientation="horizontal">
+                <LinearLayout style="@style/HomeSummaryCard" android:layout_marginEnd="6dp" android:orientation="vertical">
+                    <ImageView android:layout_width="22dp" android:layout_height="22dp"
+                        android:contentDescription="@null" android:src="@drawable/icon_streamline_sales"
+                        app:tint="@color/dragon_magenta" />
+                    <androidx.appcompat.widget.AppCompatTextView android:id="@+id/monthlyRevenueValue"
+                        style="@style/HomeMetricFigure" android:maxLines="1" android:text="—"
+                        app:autoSizeMaxTextSize="24sp" app:autoSizeMinTextSize="13sp"
+                        app:autoSizeStepGranularity="1sp" app:autoSizeTextType="uniform" />
+                    <TextView style="@style/HomeMetricLabel" android:text="Revenue this month" />
+                </LinearLayout>
+                <LinearLayout style="@style/HomeSummaryCard" android:layout_marginStart="6dp" android:orientation="vertical">
+                    <ImageView android:layout_width="22dp" android:layout_height="22dp"
+                        android:contentDescription="@null" android:src="@drawable/icon_dataset_planting"
+                        app:tint="@color/dragon_green" />
+                    <TextView android:id="@+id/plantingValue" style="@style/HomeMetricFigure" android:text="—" />
+                    <TextView style="@style/HomeMetricLabel" android:text="Plant groups" />
+                </LinearLayout>
+            </LinearLayout>
+            <TextView android:id="@+id/gradeOverviewToggle" android:layout_width="match_parent"
+                android:layout_height="52dp" android:layout_marginTop="16dp"
+                android:background="@drawable/home_metric_background" android:clickable="true"
+                android:focusable="true" android:gravity="center_vertical" android:paddingHorizontal="16dp"
+                android:text="View Grade Overview  ▾" android:textColor="@color/ink"
+                android:textSize="15sp" android:textStyle="bold" />
+            <LinearLayout android:id="@+id/gradeOverviewContent" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                android:background="@drawable/home_metric_background" android:orientation="vertical"
+                android:padding="16dp" android:visibility="gone">
+                <TextView android:id="@+id/gradeAText" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:text="Grade A  —" android:textColor="@color/ink" />
+                <TextView android:id="@+id/gradeBText" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                    android:text="Grade B  —" android:textColor="@color/ink" />
+                <TextView android:id="@+id/gradeCText" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                    android:text="Grade C  —" android:textColor="@color/ink" />
+            </LinearLayout>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" android:text="Quick actions" android:textColor="@color/ink"
+                android:textSize="16sp" android:textStyle="bold" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:orientation="horizontal">
+                <com.google.android.material.button.MaterialButton android:id="@+id/viewInventoryAction"
+                    style="@style/Widget.DragonView.HomeQuickAction.Primary" android:layout_width="0dp"
+                    android:layout_height="52dp" android:minHeight="52dp" android:layout_marginEnd="5dp" android:layout_weight="1"
+                    android:text="View stock" android:textSize="12sp" app:icon="@drawable/icon_streamline_inventory" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/viewSalesAction"
+                    style="@style/Widget.DragonView.HomeQuickAction.PrimaryGreen" android:layout_width="0dp"
+                    android:layout_height="52dp" android:minHeight="52dp" android:layout_marginStart="5dp" android:layout_weight="1"
+                    android:text="Sales" android:textSize="12sp" app:icon="@drawable/icon_streamline_sales" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:orientation="horizontal">
+                <com.google.android.material.button.MaterialButton android:id="@+id/viewAnalyticsButton"
+                    style="@style/Widget.DragonView.HomeQuickAction.SoftPink" android:layout_width="0dp"
+                    android:layout_height="52dp" android:minHeight="52dp" android:layout_marginEnd="5dp" android:layout_weight="1"
+                    android:text="Analytics" android:textSize="12sp" app:icon="@drawable/icon_dataset_analytics" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/viewPlantGuidanceAction"
+                    style="@style/Widget.DragonView.HomeQuickAction.SoftGreen" android:layout_width="0dp"
+                    android:layout_height="52dp" android:minHeight="52dp" android:layout_marginStart="5dp" android:layout_weight="1"
+                    android:text="Guidance" android:textSize="12sp" app:icon="@drawable/icon_dataset_planting" />
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

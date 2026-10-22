@@ -8,25 +8,24 @@
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
-    android:minHeight="92dp"
+    android:minHeight="52dp"
     android:orientation="horizontal"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
 
     <ImageView
         android:id="@+id/stageImage"
-        android:layout_width="68dp"
-        android:layout_height="68dp"
-        android:background="@drawable/soft_green_panel"
-        android:contentDescription="Stage reference image pending validation"
-        android:padding="20dp"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:contentDescription="Growth stage"
+        android:padding="4dp"
         android:src="@drawable/icon_dataset_planting"
         app:tint="@color/dragon_green" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="13dp"
+        android:layout_marginStart="12dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -34,9 +33,9 @@
             android:id="@+id/stageNameText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="serif"
+            android:fontFamily="sans-serif-medium"
             android:textColor="@color/ink"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
@@ -44,16 +43,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:fontFamily="serif"
+            android:fontFamily="sans-serif"
             android:textColor="@color/muted_ink"
-            android:textSize="12sp" />
+            android:textSize="12sp" android:visibility="gone" />
 
         <TextView
             android:id="@+id/statusText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:fontFamily="serif"
+            android:fontFamily="sans-serif-medium"
             android:textColor="@color/muted_ink"
             android:textSize="12sp"
             android:textStyle="bold" />

@@ -88,6 +88,14 @@
                         android:layout_height="wrap_content"
                         android:focusable="false" />
                 </com.google.android.material.textfield.TextInputLayout>
+                <TextView
+                    android:id="@+id/reportingRangeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Loading reporting period…"
+                    android:textColor="@color/dragon_text_soft"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <ProgressBar
@@ -116,7 +124,8 @@
                         <LinearLayout style="@style/AnalyticsMetricBody">
                             <ImageView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/soft_pink_panel" android:contentDescription="@null" android:padding="7dp" android:src="@drawable/icon_dataset_analytics" app:tint="@color/dragon_magenta_dark" />
                             <TextView android:id="@+id/revenueText" style="@style/AnalyticsMetricFigure" android:contentDescription="Revenue" android:ellipsize="end" android:text="—" android:textColor="@color/dragon_magenta_dark" app:autoSizeMaxTextSize="28sp" app:autoSizeMinTextSize="17sp" app:autoSizeStepGranularity="1sp" app:autoSizeTextType="uniform" />
-                            <TextView style="@style/AnalyticsMetricLabel" android:text="Revenue" />
+                            <TextView style="@style/AnalyticsMetricLabel" android:text="Revenue earned" />
+                            <TextView android:id="@+id/revenueDetailText" style="@style/AnalyticsMetricLabel" android:text="In selected period" android:textSize="10sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
                     <com.google.android.material.card.MaterialCardView
@@ -129,6 +138,7 @@
                             <ImageView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/soft_pink_panel" android:contentDescription="@null" android:padding="7dp" android:src="@drawable/icon_dataset_user" app:tint="@color/dragon_magenta" />
                             <TextView android:id="@+id/salesText" style="@style/AnalyticsMetricFigure" android:contentDescription="Completed sales" android:text="—" />
                             <TextView style="@style/AnalyticsMetricLabel" android:text="Completed sales" />
+                            <TextView android:id="@+id/salesDetailText" style="@style/AnalyticsMetricLabel" android:text="App-recorded sales" android:textSize="10sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
@@ -145,21 +155,27 @@
                         android:layout_marginEnd="6dp"
                         android:layout_weight="1">
                         <LinearLayout style="@style/AnalyticsMetricBody">
-                            <ImageView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/soft_green_panel" android:contentDescription="@null" android:padding="7dp" android:src="@drawable/icon_dataset_add" app:tint="@color/dragon_green" />
-                            <TextView android:id="@+id/piecesText" style="@style/AnalyticsMetricFigure" android:contentDescription="Pieces sold" android:text="—" android:textColor="@color/dragon_green" />
-                            <TextView style="@style/AnalyticsMetricLabel" android:text="Pieces sold" />
+                            <ImageView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/soft_green_panel" android:contentDescription="@null" android:padding="7dp" android:src="@drawable/icon_streamline_inventory" app:tint="@color/dragon_green" />
+                            <TextView android:id="@+id/weightText" style="@style/AnalyticsMetricFigure" android:contentDescription="Total weight" android:ellipsize="end" android:text="—" app:autoSizeMaxTextSize="28sp" app:autoSizeMinTextSize="17sp" app:autoSizeStepGranularity="1sp" app:autoSizeTextType="uniform" />
+                            <TextView style="@style/AnalyticsMetricLabel" android:text="Weight sold" />
+                            <TextView android:id="@+id/weightDetailText" style="@style/AnalyticsMetricLabel" android:text="Known sold weight" android:textSize="10sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/comparisonCard"
                         style="@style/Widget.DragonView.Card"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Choose revenue comparison date">
                         <LinearLayout style="@style/AnalyticsMetricBody">
-                            <ImageView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/soft_green_panel" android:contentDescription="@null" android:padding="7dp" android:src="@drawable/icon_dataset_inventory" app:tint="@color/dragon_green" />
-                            <TextView android:id="@+id/weightText" style="@style/AnalyticsMetricFigure" android:contentDescription="Total weight" android:ellipsize="end" android:text="—" app:autoSizeMaxTextSize="28sp" app:autoSizeMinTextSize="17sp" app:autoSizeStepGranularity="1sp" app:autoSizeTextType="uniform" />
-                            <TextView style="@style/AnalyticsMetricLabel" android:text="Total weight" />
+                            <ImageView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/soft_pink_panel" android:contentDescription="@null" android:padding="7dp" android:src="@drawable/icon_dataset_analytics" app:tint="@color/dragon_magenta_dark" />
+                            <TextView android:id="@+id/comparisonValueText" style="@style/AnalyticsMetricFigure" android:contentDescription="Revenue comparison" android:text="—" android:textColor="@color/dragon_green" />
+                            <TextView android:id="@+id/comparisonCardLabel" style="@style/AnalyticsMetricLabel" android:text="Revenue vs previous period" />
+                            <TextView style="@style/AnalyticsMetricLabel" android:text="Tap to change date" android:textSize="10sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
@@ -169,10 +185,16 @@
                 android:id="@+id/comparisonText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="end"
-                android:paddingTop="4dp"
-                android:paddingEnd="6dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/home_metric_background"
+                android:gravity="start|center_vertical"
+                android:minHeight="48dp"
+                android:paddingStart="14dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="10dp"
                 android:textColor="@color/dragon_green"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
             <com.google.android.material.card.MaterialCardView
@@ -191,30 +213,66 @@
                     android:padding="18dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Revenue trend" android:textAppearance="@style/TextAppearance.DragonView.TitleLarge" android:textStyle="bold" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Sales performance for the selected period" android:textColor="@color/dragon_text_soft" android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/trendLegendText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="● Current period    ● Comparison period"
+                        android:textColor="@color/dragon_text_soft"
+                        android:textSize="12sp" />
                     <ph.dragonview.mobile.ui.analytics.RevenueTrendChartView
                         android:id="@+id/trendChart"
                         android:layout_width="match_parent"
                         android:layout_height="280dp"
                         android:layout_marginTop="14dp"
                         android:importantForAccessibility="yes" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/expandTrendButton"
+                        style="@style/Widget.DragonView.Button.Outlined"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="8dp"
+                        android:enabled="false"
+                        android:text="@string/trend_expand" />
+                    <TextView
+                        android:id="@+id/historicalHourNote"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Date-only historical sales are included in revenue totals, not assigned to an invented hour."
+                        android:textColor="@color/dragon_text_soft"
+                        android:textSize="11sp"
+                        android:visibility="gone" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/historicalMonthlyButton"
+                        style="@style/Widget.DragonView.Button.Outlined"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/historical_view_monthly_trend"
+                        android:visibility="gone" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/summaryToggle"
+                style="@style/Widget.DragonView.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
                 android:layout_marginTop="22dp"
-                android:text="Size and Grade Summary"
-                android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
-                android:textStyle="bold" />
+                android:contentDescription="Show sales by size and grade"
+                android:text="Sales by size and grade · Show" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Sales totals grouped by fruit size and grade"
+                android:id="@+id/summaryDescriptionText"
+                android:text="App sales show size and grade; historical paper sales show size only because grade and weight were not recorded."
                 android:textColor="@color/dragon_text_soft"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/summaryEmptyText"
@@ -235,7 +293,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false" />
+                android:nestedScrollingEnabled="false"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/historicalRecordsButton"
+                style="@style/Widget.DragonView.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="18dp"
+                android:text="Input historical records"
+                app:icon="@drawable/icon_dataset_add" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

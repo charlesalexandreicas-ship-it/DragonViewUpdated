@@ -103,6 +103,22 @@ public final class MobileNetV2ClassifierTest {
     }
 
     @Test
+    public void prototypeGateUsesClassCOnlyAboveValidationThreshold() {
+        float[] baseline = {0.70f, 0.25f, 0.05f};
+        assertEquals(0, MobileNetV2Classifier.chooseWithClassCGate(
+                baseline, new float[]{0.40f, 0.31f, 0.29f}, 0, 1, 2));
+        assertEquals(2, MobileNetV2Classifier.chooseWithClassCGate(
+                baseline, new float[]{0.35f, 0.35f, 0.30f}, 0, 1, 2));
+    }
+
+    @Test
+    public void prototypeGatePreservesBaselineClassBDecision() {
+        assertEquals(1, MobileNetV2Classifier.chooseWithClassCGate(
+                new float[]{0.05f, 0.90f, 0.05f},
+                new float[]{0.15f, 0.60f, 0.25f}, 0, 1, 2));
+    }
+
+    @Test
     public void channelEndpointsUseMobileNetV2NegativeOneToOneRange() {
         assertEquals(-1.0f, MobileNetV2Classifier.normalizeChannel(0), 0.0f);
         assertEquals(1.0f, MobileNetV2Classifier.normalizeChannel(255), 0.0f);

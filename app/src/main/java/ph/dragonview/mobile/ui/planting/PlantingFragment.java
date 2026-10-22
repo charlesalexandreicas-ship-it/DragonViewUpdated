@@ -1,6 +1,5 @@
 package ph.dragonview.mobile.ui.planting;
 
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,7 +43,10 @@ import ph.dragonview.mobile.databinding.DialogGraftingBinding;
 import ph.dragonview.mobile.databinding.DialogPlantingBinding;
 import ph.dragonview.mobile.databinding.FragmentPlantingBinding;
 import ph.dragonview.mobile.ui.archive.ArchiveDialog;
+import ph.dragonview.mobile.ui.date.RecordDate;
+import ph.dragonview.mobile.ui.date.RecordDateInput;
 
+/** Coordinates planting groups, planting/grafting forms, and stage-guidance sheets. */
 public final class PlantingFragment extends Fragment {
     private FragmentPlantingBinding binding;
     private PlantingAdapter adapter;
@@ -83,6 +85,7 @@ public final class PlantingFragment extends Fragment {
         }, new SessionManager(requireContext()).isWorkspaceOwner());
         binding.plantingList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.plantingList.setAdapter(adapter);
+        binding.plantingList.setNestedScrollingEnabled(false);
         binding.swipeRefresh.setOnRefreshListener(this::load);
         binding.addButton.setOnClickListener(v -> showCreateDialog());
         binding.graftButton.setOnClickListener(v -> showGraftingDialog());
@@ -90,6 +93,7 @@ public final class PlantingFragment extends Fragment {
         load();
     }
 
+    /** Reloads planting groups and updates their summary and empty-state actions. */
     private void load() {
         binding.swipeRefresh.setRefreshing(true);
         LocalRepository.get(requireContext()).planting(
@@ -104,8 +108,8 @@ public final class PlantingFragment extends Fragment {
                         for (PlantingGroup row : rows) {
                             if (row.isReadyForHarvest()) ready++;
                         }
-                        binding.summaryText.setText(rows.size() + " planting groups • "
-                                + ready + " ready for harvest");
+                        binding.summaryText.setText(rows.size() + " groups");
+                        binding.readyText.setText(ready + " ready");
                         binding.messageText.setText("");
                         binding.emptyState.setVisibility(
                                 rows.isEmpty() ? View.VISIBLE : View.GONE);
@@ -120,6 +124,7 @@ public final class PlantingFragment extends Fragment {
                 });
     }
 
+    /** Builds the record-planting form and adapts fields to the propagation method. */
     private void showCreateDialog() {
         DialogPlantingBinding dialogBinding = DialogPlantingBinding.inflate(getLayoutInflater());
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
@@ -150,13 +155,7 @@ public final class PlantingFragment extends Fragment {
 
                     @Override public void onNothingSelected(AdapterView<?> parent) { }
                 });
-        dialogBinding.dateInput.setOnClickListener(v -> {
-            Calendar now = Calendar.getInstance();
-            new DatePickerDialog(requireContext(), (picker, year, month, day) ->
-                    dialogBinding.dateInput.setText(String.format(Locale.US, "%04d-%02d-%02d",
-                            year, month + 1, day)), now.get(Calendar.YEAR),
-                    now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show();
-        });
+        RecordDateInput.attach(dialogBinding.dateInput);
         dialog.setOnShowListener(ignored -> {
             // Keep these dialog actions flat, including the pressed elevation state.
             for (int which : new int[]{AlertDialog.BUTTON_NEGATIVE, AlertDialog.BUTTON_POSITIVE}) {
@@ -171,9 +170,10 @@ public final class PlantingFragment extends Fragment {
         dialog.show();
     }
 
+    /** Validates form values and submits a new planting group. */
     private void create(AlertDialog dialog, DialogPlantingBinding form) {
         String number = text(form.recordInput.getText());
-        String date = text(form.dateInput.getText());
+        String date = RecordDate.toIso(text(form.dateInput.getText()));
         String variety = text(form.varietyInput.getText());
         String location = text(form.locationInput.getText());
         PropagationMethod method = form.propagationInput.getSelectedItemPosition() == 1
@@ -185,7 +185,11 @@ public final class PlantingFragment extends Fragment {
         int plants;
         try { plants = Integer.parseInt(text(form.plantsInput.getText())); }
         catch (NumberFormatException ignored) { plants = 0; }
-        if (number.isEmpty() || date.isEmpty() || location.isEmpty() || plants < 1) {
+        if (date == null) {
+            form.errorText.setText("Enter a real planting date as MM/DD/YYYY.");
+            return;
+        }
+        if (number.isEmpty() || location.isEmpty() || plants < 1) {
             form.errorText.setText(
                     "Enter a farm section, planting date, location, and at least one "
                             + method.getQuantityLabel().substring(
@@ -211,6 +215,7 @@ public final class PlantingFragment extends Fragment {
                 });
     }
 
+    /** Collects and submits a grafting activity for an existing plant group. */
     private void showGraftingDialog() {
         List<PlantingGroup> seedRows = new ArrayList<>();
         for (PlantingGroup row : currentRows) {
@@ -243,7 +248,7 @@ public final class PlantingFragment extends Fragment {
         }
         form.sourceRecordInput.setAdapter(new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_dropdown_item, labels));
-        form.dateInput.setOnClickListener(v -> showDatePicker(form.dateInput));
+        RecordDateInput.attach(form.dateInput);
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle("Record Grafting")
                 .setView(form.getRoot())
@@ -252,10 +257,10 @@ public final class PlantingFragment extends Fragment {
                 .create();
         dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 .setOnClickListener(v -> {
-                    String date = text(form.dateInput.getText());
+                    String date = RecordDate.toIso(text(form.dateInput.getText()));
                     String variety = text(form.scionVarietyInput.getText());
-                    if (date.isEmpty() || variety.isEmpty()) {
-                        form.errorText.setText("Enter the grafting date and scion variety.");
+                    if (date == null || variety.isEmpty()) {
+                        form.errorText.setText("Enter a real grafting date (MM/DD/YYYY) and scion variety.");
                         return;
                     }
                     int selected = form.sourceRecordInput.getSelectedItemPosition();
@@ -294,6 +299,7 @@ public final class PlantingFragment extends Fragment {
                         }));
     }
 
+    /** Renders stage-specific guidance and prepares optional photo attachment. */
     private void showGuidanceSheet(PlantingGroup group, PlantingStage stage) {
         BottomSheetStageGuidanceBinding sheet =
                 BottomSheetStageGuidanceBinding.inflate(getLayoutInflater());
@@ -350,6 +356,7 @@ public final class PlantingFragment extends Fragment {
         dialog.show();
     }
 
+    /** Persists photo access and records its URI against the selected planting stage. */
     private void saveSelectedPhoto(Uri uri) {
         if (uri == null || pendingPhotoGroup == null || pendingPhotoStage == null) return;
         try {
@@ -379,14 +386,6 @@ public final class PlantingFragment extends Fragment {
                         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
                     }
                 });
-    }
-
-    private void showDatePicker(android.widget.TextView target) {
-        Calendar now = Calendar.getInstance();
-        new DatePickerDialog(requireContext(), (picker, year, month, day) ->
-                target.setText(String.format(Locale.US, "%04d-%02d-%02d",
-                        year, month + 1, day)), now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show();
     }
 
     private static String text(CharSequence value) {

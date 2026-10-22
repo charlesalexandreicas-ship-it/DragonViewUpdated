@@ -6,7 +6,7 @@
     android:gravity="center"
     android:orientation="vertical"
     android:padding="32dp">
-    <ImageView android:layout_width="72dp" android:layout_height="72dp" android:contentDescription="@string/app_name" android:src="@drawable/ic_dragon_fruit" />
+    <ImageView android:layout_width="72dp" android:layout_height="72dp" android:contentDescription="@string/app_name" android:src="@drawable/dragonview_logo" />
     <TextView android:id="@+id/moduleTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall" android:textStyle="bold" />
     <TextView android:id="@+id/moduleMessage" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:gravity="center" android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
 </LinearLayout>

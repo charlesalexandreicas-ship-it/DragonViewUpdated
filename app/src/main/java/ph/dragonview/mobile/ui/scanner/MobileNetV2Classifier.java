@@ -34,9 +34,13 @@ import java.util.List;
  */
 final class MobileNetV2Classifier implements AutoCloseable {
     static final String MODEL_ASSET = "ml/mobilenet_v2.tflite";
+    static final String CLASS_C_MODEL_ASSET = "ml/mobilenet_v2_class_c_prototype.tflite";
     static final String LABELS_ASSET = "ml/labels.txt";
     private static final String CLASS_A_LABEL = "Class A";
     private static final String CLASS_B_LABEL = "Class B";
+    private static final String CLASS_C_LABEL = "Class C";
+    // Preliminary validation-set gate. Retain the deployed model's A/B decision.
+    static final float CLASS_C_PROTOTYPE_THRESHOLD = 0.30f;
     private static final float CLASS_A_MODEL_THRESHOLD = 0.89f;
     private static final float CLASS_A_SHADE_THRESHOLD = 0.78f;
     private static final float CLASS_A_MODEL_FLOOR = 0.04f;
@@ -93,16 +97,19 @@ final class MobileNetV2Classifier implements AutoCloseable {
     }
 
     private final Interpreter interpreter;
+    @Nullable private final Interpreter classCInterpreter;
     private final List<String> labels;
     private final int inputWidth;
     private final int inputHeight;
     private boolean closed;
 
     private MobileNetV2Classifier(@NonNull Interpreter interpreter,
+                                  @Nullable Interpreter classCInterpreter,
                                   @NonNull List<String> labels,
                                   int inputWidth,
                                   int inputHeight) {
         this.interpreter = interpreter;
+        this.classCInterpreter = classCInterpreter;
         this.labels = Collections.unmodifiableList(new ArrayList<>(labels));
         this.inputWidth = inputWidth;
         this.inputHeight = inputHeight;
@@ -119,6 +126,7 @@ final class MobileNetV2Classifier implements AutoCloseable {
         }
 
         Interpreter interpreter = null;
+        Interpreter classCInterpreter = null;
         try {
             List<String> labels = readLabels(appContext);
             if (labels.size() < 2) {
@@ -129,7 +137,7 @@ final class MobileNetV2Classifier implements AutoCloseable {
             Interpreter.Options options = new Interpreter.Options();
             options.setNumThreads(Math.max(2, Math.min(4,
                     Runtime.getRuntime().availableProcessors())));
-            interpreter = new Interpreter(mapModel(appContext), options);
+            interpreter = new Interpreter(mapModel(appContext, MODEL_ASSET), options);
 
             if (interpreter.getInputTensorCount() != 1 || interpreter.getOutputTensorCount() != 1) {
                 throw new IllegalArgumentException("Exactly one input and one output tensor are required");
@@ -159,14 +167,28 @@ final class MobileNetV2Classifier implements AutoCloseable {
                                 + output.dataType() + " " + Arrays.toString(outputShape));
             }
 
+            if (labels.contains(CLASS_C_LABEL) && assetExists(appContext, CLASS_C_MODEL_ASSET)) {
+                classCInterpreter = new Interpreter(
+                        mapModel(appContext, CLASS_C_MODEL_ASSET), options);
+                if (classCInterpreter.getInputTensorCount() != 1
+                        || classCInterpreter.getOutputTensorCount() != 1
+                        || classCInterpreter.getInputTensor(0).dataType() != DataType.FLOAT32
+                        || classCInterpreter.getOutputTensor(0).dataType() != DataType.FLOAT32
+                        || !Arrays.equals(classCInterpreter.getInputTensor(0).shape(), inputShape)
+                        || !Arrays.equals(classCInterpreter.getOutputTensor(0).shape(), outputShape)) {
+                    throw new IllegalArgumentException("Prototype Class C model contract does not match classifier");
+                }
+            }
             MobileNetV2Classifier classifier = new MobileNetV2Classifier(
-                    interpreter, labels, inputShape[2], inputShape[1]);
+                    interpreter, classCInterpreter, labels, inputShape[2], inputShape[1]);
             interpreter = null;
+            classCInterpreter = null;
             return LoadResult.ready(classifier);
         } catch (IOException | RuntimeException | LinkageError exception) {
             return LoadResult.unavailable(Availability.INVALID_MODEL, exception.getMessage());
         } finally {
             if (interpreter != null) interpreter.close();
+            if (classCInterpreter != null) classCInterpreter.close();
         }
     }
 
@@ -194,11 +216,27 @@ final class MobileNetV2Classifier implements AutoCloseable {
         int bestIndex = topIndex(probabilities);
         int classAIndex = labels.indexOf(CLASS_A_LABEL);
         int classBIndex = labels.indexOf(CLASS_B_LABEL);
+        int classCIndex = labels.indexOf(CLASS_C_LABEL);
+        float confidence = probabilities[bestIndex];
+        if (classCInterpreter != null && classAIndex >= 0 && classBIndex >= 0
+                && classCIndex >= 0) {
+            float[][] cOutput = new float[1][labels.size()];
+            inputBuffer.rewind();
+            long cStartedAt = System.nanoTime();
+            classCInterpreter.run(inputBuffer, cOutput);
+            elapsedMillis += (System.nanoTime() - cStartedAt) / 1_000_000L;
+            float[] cProbabilities = toProbabilities(cOutput[0]);
+            bestIndex = chooseWithClassCGate(probabilities, cProbabilities,
+                    classAIndex, classBIndex, classCIndex);
+            confidence = bestIndex == classCIndex
+                    ? cProbabilities[classCIndex] : probabilities[bestIndex];
+        }
         if (labels.size() == 2 && classAIndex >= 0 && classBIndex >= 0) {
             bestIndex = isClassA(probabilities[classAIndex], redMagentaRatio)
                     ? classAIndex : classBIndex;
+            confidence = probabilities[bestIndex];
         }
-        return new Classification(labels.get(bestIndex), probabilities[bestIndex],
+        return new Classification(labels.get(bestIndex), confidence,
                 redMagentaRatio, elapsedMillis);
     }
 
@@ -207,6 +245,14 @@ final class MobileNetV2Classifier implements AutoCloseable {
         if (closed) return;
         closed = true;
         interpreter.close();
+        if (classCInterpreter != null) classCInterpreter.close();
+    }
+
+    static int chooseWithClassCGate(@NonNull float[] baseline,
+                                    @NonNull float[] candidate,
+                                    int classAIndex, int classBIndex, int classCIndex) {
+        if (candidate[classCIndex] >= CLASS_C_PROTOTYPE_THRESHOLD) return classCIndex;
+        return baseline[classAIndex] >= baseline[classBIndex] ? classAIndex : classBIndex;
     }
 
     @NonNull
@@ -358,8 +404,9 @@ final class MobileNetV2Classifier implements AutoCloseable {
     }
 
     @NonNull
-    private static MappedByteBuffer mapModel(@NonNull Context context) throws IOException {
-        try (AssetFileDescriptor descriptor = context.getAssets().openFd(MODEL_ASSET);
+    private static MappedByteBuffer mapModel(@NonNull Context context,
+                                             @NonNull String modelAsset) throws IOException {
+        try (AssetFileDescriptor descriptor = context.getAssets().openFd(modelAsset);
              FileInputStream stream = new FileInputStream(descriptor.getFileDescriptor())) {
             return stream.getChannel().map(
                     FileChannel.MapMode.READ_ONLY,

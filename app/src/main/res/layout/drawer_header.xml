@@ -16,8 +16,7 @@
         android:background="@drawable/drawer_logo_background"
         android:contentDescription="Dragon View"
         android:padding="12dp"
-        android:src="@drawable/ic_dragon_fruit"
-        app:tint="@color/white" />
+        android:src="@drawable/dragonview_logo" />
 
     <TextView
         android:layout_width="wrap_content"

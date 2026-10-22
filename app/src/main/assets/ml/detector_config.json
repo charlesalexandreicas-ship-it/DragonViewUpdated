@@ -1,7 +1,7 @@
 {
   "model": "YOLO26n",
   "input_size": 320,
-  "confidence_threshold": 0.05,
+  "confidence_threshold": 0.15,
   "nms_iou_threshold": 0.45,
   "max_scanner_fruit_count": 8,
   "class_names": [

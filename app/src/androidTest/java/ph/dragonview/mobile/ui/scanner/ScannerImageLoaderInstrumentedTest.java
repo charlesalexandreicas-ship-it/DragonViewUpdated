@@ -37,7 +37,7 @@ public final class ScannerImageLoaderInstrumentedTest {
     private final List<File> createdFiles = new ArrayList<>();
     private final List<Bitmap> loadedBitmaps = new ArrayList<>();
     private Context context;
-
+ //THE RIGHTFUL PROPERTY OF CHARLES ALEXANDRE P. CAS OF 2024 BS INFORMATION TECHNOLOGY
     @Before
     public void setUp() {
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
@@ -64,6 +64,8 @@ public final class ScannerImageLoaderInstrumentedTest {
         assertEquals(FIXTURE_WIDTH, decoded.getWidth());
         assertEquals(FIXTURE_HEIGHT, decoded.getHeight());
         assertQuadrants(decoded, Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, 0);
+
+       
     }
 
     @Test
@@ -210,3 +212,5 @@ public final class ScannerImageLoaderInstrumentedTest {
         assertEquals(quadrant + " blue", Color.blue(expected), Color.blue(actual), tolerance);
     }
 }
+
+// CHARLES WAS HERE

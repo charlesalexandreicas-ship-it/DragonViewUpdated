@@ -25,6 +25,10 @@ import ph.dragonview.mobile.data.model.SessionUser;
 import ph.dragonview.mobile.data.remote.SupabaseClient;
 import ph.dragonview.mobile.data.remote.SupabaseException;
 
+/**
+ * Replays offline outbox mutations after WorkManager detects connectivity.
+ * Original operation IDs are reused so backend retries stay idempotent.
+ */
 public final class SyncWorker extends Worker {
     private static final String UNIQUE_WORK = "dragonview-cloud-sync";
 
@@ -32,6 +36,7 @@ public final class SyncWorker extends Worker {
         super(context, parameters);
     }
 
+    /** Schedules one network-constrained job while keeping duplicate jobs out of the queue. */
     public static void enqueue(Context context) {
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED).build();
@@ -44,6 +49,7 @@ public final class SyncWorker extends Worker {
 
     @NonNull
     @Override
+    /** Replays queued work in order and retries only failures marked as temporary. */
     public Result doWork() {
         SessionManager session = new SessionManager(getApplicationContext());
         SessionUser user = session.getUser();

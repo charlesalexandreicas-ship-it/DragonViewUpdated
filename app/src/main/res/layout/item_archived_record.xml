@@ -8,8 +8,8 @@
     android:layout_marginBottom="6dp"
     app:cardBackgroundColor="@color/neo_surface_high"
     app:cardCornerRadius="16dp"
-    app:cardElevation="1dp"
-    app:strokeColor="@color/dragon_outline"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/neo_highlight"
     app:strokeWidth="1dp">
 
     <LinearLayout

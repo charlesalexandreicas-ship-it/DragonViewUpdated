@@ -13,6 +13,12 @@ import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.data.model.SessionUser;
 import ph.dragonview.mobile.databinding.ActivityLoginBinding;
 
+/**
+ * Entry screen for sign-in, registration, and password-recovery requests.
+ *
+ * <p>Learning note: this Activity owns only form state and navigation. Network and
+ * persistence work is delegated to {@link LocalRepository} and {@link SessionManager}.</p>
+ */
 public final class LoginActivity extends AppCompatActivity {
     public static final String EXTRA_AUTH_MESSAGE = "auth_message";
     private ActivityLoginBinding binding; //LogIn
@@ -20,6 +26,7 @@ public final class LoginActivity extends AppCompatActivity {
     private boolean registrationMode; //registrationmode
 
     @Override
+    /** Creates the form, restores the current session, and connects click listeners. */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sessionManager = new SessionManager(this);
@@ -39,6 +46,7 @@ public final class LoginActivity extends AppCompatActivity {
                 view -> setRegistrationMode(!registrationMode));
     }
 
+    /** Validates the visible form and starts either registration or sign-in. */
     private void submit() {
         String displayName = text(binding.displayNameInput.getText());
         String email = text(binding.emailInput.getText());
@@ -87,6 +95,7 @@ public final class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /** Switches which fields and labels are shown for sign-in versus registration. */
     private void setRegistrationMode(boolean enabled) {
         registrationMode = enabled;
         binding.displayNameLayout.setVisibility(
@@ -102,6 +111,7 @@ public final class LoginActivity extends AppCompatActivity {
         clearErrors();
     }
 
+    /** Validates the email field before asking Supabase to send a recovery link. */
     private void requestPasswordReset() {
         String email = text(binding.emailInput.getText());
         clearErrors();
@@ -130,6 +140,7 @@ public final class LoginActivity extends AppCompatActivity {
         });
     }
 
+    /** Removes previous validation and server messages before a new submission. */
     private void clearErrors() {
         binding.displayNameLayout.setError(null);
         binding.emailLayout.setError(null);
@@ -138,6 +149,7 @@ public final class LoginActivity extends AppCompatActivity {
         binding.errorText.setVisibility(View.GONE);
     }
 
+    /** Prevents duplicate requests and exposes progress while authentication runs. */
     private void setLoading(boolean loading) {
         binding.signInButton.setEnabled(!loading);
         binding.modeSwitch.setEnabled(!loading);
@@ -152,17 +164,20 @@ public final class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /** Displays a user-readable authentication or validation failure. */
     private void showError(String message) {
         binding.errorText.setTextColor(getColor(R.color.dragon_error));
         binding.errorText.setText(message);
         binding.errorText.setVisibility(View.VISIBLE);
     }
 
+    /** Opens the authenticated application and removes this screen from the stack. */
     private void openApplication() {
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }
 
+    /** Converts editable input to a safe trimmed value for validation and requests. */
     private static String text(CharSequence value) {
         return value == null ? "" : value.toString().trim();
     }

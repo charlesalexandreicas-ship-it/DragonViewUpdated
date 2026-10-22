@@ -87,6 +87,7 @@ public final class ScannerViewModel extends AndroidViewModel {
     @Nullable private MobileNetV2Classifier classifier;
     private volatile boolean cleared;
 
+    /** Initializes detector and quality models once for the ViewModel lifetime. */
     public ScannerViewModel(@NonNull Application application) {
         super(application);
         worker.execute(() -> {
@@ -130,6 +131,7 @@ public final class ScannerViewModel extends AndroidViewModel {
         worker.execute(() -> runScan(uri, temporaryCapture, version));
     }
 
+    /** Decodes, detects, and grades away from the UI thread, then publishes one state. */
     private void runScan(Uri uri, @Nullable File temporaryCapture, int version) {
         Bitmap image = null;
         ScanResult result = null;

@@ -36,7 +36,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="@string/scanner_subtitle"
+                    android:text="Scan or upload a photo"
                     android:textColor="@color/muted_ink"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -55,22 +55,16 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_lg">
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/scannerPreviewCard"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:layout_marginTop="12dp"
             app:cardBackgroundColor="@color/dragon_scanner"
             app:cardCornerRadius="@dimen/corner_card"
-            app:cardElevation="2dp"
-            app:strokeWidth="0dp">
+            app:cardElevation="0dp"
+            app:strokeColor="@color/neo_highlight"
+            app:strokeWidth="1dp">
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -84,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/scanner_image_description"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     android:visibility="gone" />
                 <ph.dragonview.mobile.ui.scanner.DetectionOverlayView
                     android:id="@+id/detectionOverlay"
@@ -98,7 +92,7 @@
                     android:layout_gravity="center"
                     android:alpha="0.72"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/ic_dragon_fruit" />
+                    android:src="@drawable/dragonview_logo" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -126,7 +120,6 @@
                     android:textSize="12sp" />
             </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -167,8 +160,9 @@
             android:layout_marginTop="@dimen/space_lg"
             app:cardBackgroundColor="@color/neo_surface_high"
             app:cardCornerRadius="@dimen/corner_card"
-            app:cardElevation="2dp"
-            app:strokeWidth="0dp">
+            app:cardElevation="0dp"
+            app:strokeColor="@color/neo_highlight"
+            app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

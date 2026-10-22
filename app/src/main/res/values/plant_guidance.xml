@@ -1,131 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="guidance_1_en">
-        <item>Plant setup and establishment</item>
-        <item>The plant is being added to the farm, or a cutting has just been planted and does not yet have firm roots or active new growth.</item>
-        <item>Record the variety and source. Use a healthy mature cutting when true-to-type plants and faster establishment are important. Let a fresh cut cure in clean, dry shade according to the farm protocol. Plant in well-drained media beside a strong support, water lightly, and acclimate tender cuttings to sun. Begin the normal fertilizer program only after rooting or new growth is evident.</item>
-        <item>Variety, source, propagation type, parent plant ID when known, cutting length, cut date, curing period, planting date, plot or post ID, container or bed, trellis type, number of cuttings per post, first root or shoot date, watering, and a starting photo.</item>
-        <item>An unknown variety or pollination type, an unhealthy or unhealed cutting, soft or water-soaked tissue, base rot, standing water, an unstable support, or yellow-brown mushy sunburn. Seek help if soft rot spreads quickly.</item>
+        <item>Plant Setup and Establishment</item>
+        <item>A newly planted cutting has no clear new growth yet.</item>
+        <item>Plant a healthy, healed cutting in well-drained soil beside a sturdy support. Water lightly and introduce direct sun gradually.</item>
+        <item>Variety, cutting source, planting date, plot or post, watering, and first new shoot.</item>
+        <item>Soft or rotting tissue, standing water, unstable support, or sunburn.</item>
         <item>Epic Gardening propagation sequence; UF IFAS Extension; University of Guam Extension.</item>
     </string-array>
     <string-array name="guidance_1_fil">
-        <item>Paghahanda at pagtatatag ng halaman</item>
-        <item>Idinadagdag pa lamang ang halaman sa bukid, o bagong tanim ang pinagputulan at wala pa itong matatag na ugat o aktibong bagong tubo.</item>
-        <item>Itala ang barayti at pinagmulan. Gumamit ng malusog at magulang na pinagputulan kung mahalaga ang kaparehong katangian ng inang halaman at mas mabilis na pagtatatag. Patuyuin at paghilumin ang bagong hiwa sa malinis at tuyong lilim ayon sa pamamaraan ng bukid. Itanim sa lupang mabilis magpaagos ng tubig sa tabi ng matibay na suporta, bahagyang diligan, at unti-unting ilantad sa araw. Simulan lamang ang karaniwang pataba kapag may ugat o malinaw na bagong tubo.</item>
-        <item>Barayti, pinagmulan, paraan ng pagpaparami, ID ng inang halaman kung alam, haba ng pinagputulan, petsa ng pagputol, tagal ng pagpapatuyo, petsa ng pagtatanim, ID ng plot o poste, paso o taniman, uri ng balag, bilang ng pinagputulan bawat poste, petsa ng unang ugat o usbong, pagdidilig, at unang larawan.</item>
-        <item>Hindi kilalang barayti o uri ng polinasyon, may sakit o hindi pa naghihilom na pinagputulan, malambot o parang basang bahagi, pagkabulok sa puno, naipong tubig, hindi matatag na suporta, o naninilaw at lumalambot na paso sa araw. Humingi agad ng tulong kung mabilis kumakalat ang malambot na pagkabulok.</item>
+        <item>Pagtatanim at pagtatatag</item>
+        <item>Bagong tanim ang pinagputulan at wala pang malinaw na bagong tubo.</item>
+        <item>Itanim ang malusog at naghilom na pinagputulan sa lupang madaling magpaagos ng tubig, sa tabi ng matibay na suporta. Bahagyang diligan at unti-unting ilantad sa araw.</item>
+        <item>Barayti, pinagmulan, petsa ng pagtatanim, plot o poste, pagdidilig, at unang bagong sanga.</item>
+        <item>Malambot o nabubulok na bahagi, naipong tubig, mahinang suporta, o paso sa araw.</item>
         <item>Epic Gardening propagation sequence; UF IFAS Extension; University of Guam Extension.</item>
     </string-array>
     <string-array name="guidance_2_en">
-        <item>Shoot development and vertical training</item>
-        <item>One or more green shoots are actively lengthening but have not yet formed the hanging canopy at the top of the support.</item>
-        <item>Guide the selected main shoot upward and tie it loosely so the tie does not cut the stem. Remove competing side shoots below the trellis when required by the farm\'s training system. Use clean tools. Follow the farm\'s reviewed irrigation and fertilizer program instead of a universal weekly schedule.</item>
-        <item>Shoot length, number of shoots, selected main shoot, tie or training date, pruning date and reason, branches removed, tool cleaning, watering or rain, fertilizer actually applied, and before and after photos.</item>
-        <item>Ties cutting into the stem, broken growth, wilting, severe yellowing, waterlogging, orange lesions, raised black dots, black dead areas, or soft rot. These signs do not confirm a disease.</item>
+        <item>Shoot Development and Vertical Training</item>
+        <item>Green shoots are growing upward but have not reached the support\'s top.</item>
+        <item>Guide a healthy main shoot upward and tie it loosely. Follow the farm\'s watering and fertilizer plan.</item>
+        <item>Shoot growth, tying and pruning dates, watering, and fertilizer used.</item>
+        <item>Ties cutting into stems, broken shoots, wilting, yellowing, or spreading lesions.</item>
         <item>Epic Gardening training steps; Philippine ATI guide; UF IFAS Extension; University of Guam Extension; Philippine stem canker studies.</item>
     </string-array>
     <string-array name="guidance_2_fil">
-        <item>Paglaki ng sanga at patayong paggabay</item>
-        <item>Aktibong humahaba ang isa o higit pang luntiang sanga ngunit hindi pa nabubuo ang mga nakalaylay na sanga sa tuktok ng suporta.</item>
-        <item>Igabay paitaas ang piniling pangunahing sanga at itali nang maluwag upang hindi masugatan ng tali ang tangkay. Alisin ang mga kakumpitensiyang sanga sa ibaba ng balag kung kailangan sa paraan ng pagsasanay ng bukid. Gumamit ng malinis na kagamitan. Sundin ang sinuring programa ng bukid sa pagdidilig at pagpapataba sa halip na iisang lingguhang iskedyul para sa lahat.</item>
-        <item>Haba at bilang ng mga sanga, piniling pangunahing sanga, petsa ng pagtali o paggabay, petsa at dahilan ng pagputol, mga inalis na sanga, paglilinis ng kagamitan, pagdidilig o ulan, aktuwal na inilagay na pataba, at mga larawan bago at pagkatapos.</item>
-        <item>Taling humihiwa sa tangkay, nabaling tubo, pagkalanta, matinding paninilaw, pagbabara ng tubig, kulay kahel na sugat, nakaumbok na maiitim na tuldok, nangingitim at patay na bahagi, o malambot na pagkabulok. Hindi pa kumpirmadong sakit ang mga palatandaang ito.</item>
+        <item>Paglaki at patayong paggabay</item>
+        <item>Humahaba ang luntiang sanga ngunit hindi pa naaabot ang tuktok ng suporta.</item>
+        <item>Igabay paitaas ang malusog na pangunahing sanga at itali nang maluwag. Sundin ang plano ng bukid sa tubig at pataba.</item>
+        <item>Paglaki ng sanga, petsa ng pagtali at pagputol, pagdidilig, at patabang ginamit.</item>
+        <item>Taling humihiwa sa tangkay, nabaling sanga, pagkalanta, paninilaw, o kumakalat na sugat.</item>
         <item>Epic Gardening training steps; Philippine ATI guide; UF IFAS Extension; University of Guam Extension; Philippine stem canker studies.</item>
     </string-array>
     <string-array name="guidance_3_en">
-        <item>Canopy formation and maintenance</item>
-        <item>The main shoot has reached the trellis top and new branches are beginning to spread or hang from the support.</item>
-        <item>Tip the main shoot after it reaches the support top if this is part of the farm\'s training system, then select healthy hanging branches. Keep the canopy open and manageable. Remove dead, damaged, diseased, soil touching, or severely crowded stems with clean tools. Treat repeated tip pruning as an optional local protocol, not a guaranteed way to force fruit.</item>
-        <item>Date the shoot reached the trellis top, tipping date, branches selected or removed, reason, tool sanitation, canopy density, sun exposure, and before and after photos.</item>
-        <item>A weak or leaning trellis, stem breakage, dense growth that stays wet after rain, sunburn, orange lesions, raised black dots, black cankers, or rotting tissue. Record the spread and request expert review when several stems or plants are affected.</item>
+        <item>Canopy Formation and Maintenance</item>
+        <item>The main shoot has reached the top and new branches are spreading or hanging down.</item>
+        <item>Keep healthy hanging branches. Remove dead, damaged, diseased, or crowded growth with clean tools. Tip the main shoot only if this is farm practice.</item>
+        <item>Pruning date, branches kept or removed, reason, and photos.</item>
+        <item>Weak support, broken branches, persistent wet crowding, sunburn, or spreading lesions.</item>
         <item>Epic Gardening pruning sequence; Philippine ATI guide; UF IFAS Extension; University of Guam Extension; 2024 strategic pruning study; Philippine disease literature.</item>
     </string-array>
     <string-array name="guidance_3_fil">
         <item>Pagbuo at pangangalaga ng mga sanga</item>
-        <item>Naabot na ng pangunahing sanga ang tuktok ng balag at nagsisimulang kumalat o lumaylay ang mga bagong sanga mula sa suporta.</item>
-        <item>Putulin ang dulo ng pangunahing sanga pagdating nito sa tuktok ng suporta kung bahagi ito ng paraan ng bukid, pagkatapos ay pumili ng malulusog na nakalaylay na sanga. Panatilihing bukas at madaling alagaan ang mga sanga. Alisin gamit ang malinis na kagamitan ang patay, napinsala, may sakit, sumasayad sa lupa, o sobrang siksik na sanga. Ituring ang paulit-ulit na pagputol sa dulo bilang opsiyonal na pamamaraan ng bukid at hindi tiyak na paraan upang piliting mamunga.</item>
-        <item>Petsa ng pag-abot ng sanga sa tuktok ng balag, petsa ng pagputol sa dulo, mga pinili o inalis na sanga, dahilan, paglilinis ng kagamitan, siksik ng mga sanga, pagkabilad sa araw, at mga larawan bago at pagkatapos.</item>
-        <item>Mahina o nakatagilid na balag, nabaling sanga, siksik na halamang nananatiling basa matapos umulan, pagkapaso sa araw, kulay kahel na sugat, nakaumbok na maiitim na tuldok, maitim na canker, o nabubulok na laman. Itala ang pagkalat at humingi ng pagsusuri ng eksperto kapag maraming sanga o halaman ang apektado.</item>
+        <item>Naabot ng pangunahing sanga ang tuktok at may kumakalat o nakalaylay nang mga sanga.</item>
+        <item>Panatilihin ang malusog na nakalaylay na sanga. Alisin ang patay, napinsala, may sakit, o sobrang siksik na bahagi gamit ang malinis na kagamitan. Putulin lamang ang dulo kung pamamaraan ito ng bukid.</item>
+        <item>Petsa ng pagputol, mga sangang pinili o inalis, dahilan, at larawan.</item>
+        <item>Mahinang suporta, nabaling sanga, basang siksikan, paso sa araw, o kumakalat na sugat.</item>
         <item>Epic Gardening pruning sequence; Philippine ATI guide; UF IFAS Extension; University of Guam Extension; 2024 strategic pruning study; Philippine disease literature.</item>
     </string-array>
     <string-array name="guidance_4_en">
-        <item>Flower bud development</item>
-        <item>A swelling structure at an areole is developing into a flower bud rather than a new shoot.</item>
-        <item>Count and tag new flower buds and schedule the next inspection. Use the article\'s roughly one month from visible bud to flower only as a planning clue; the actual interval varies with cultivar and conditions. Confirm the variety and prepare a pollination plan before flowers open.</item>
-        <item>First bud date, bud count by plant or post, tagged bud ID, bud condition, expected inspection date, dropped buds, variety, weather, and photo.</item>
-        <item>Bud drop, damaged or rotting buds, sudden changes after heavy rain, insects feeding on buds, and spreading lesions near the bud.</item>
+        <item>Flower Bud Development</item>
+        <item>A swelling on a stem is becoming a flower bud.</item>
+        <item>Count and mark buds, set the next check, and prepare the variety\'s pollination plan.</item>
+        <item>First bud date, bud count, plant or post, variety, weather, and photo.</item>
+        <item>Bud drop, insect damage, rot, or lesions near buds.</item>
         <item>Epic Gardening bud tracking; dragon fruit BBCH phenology study.</item>
     </string-array>
     <string-array name="guidance_4_fil">
         <item>Paglabas ng usbong ng bulaklak</item>
-        <item>Ang namamagang bahagi sa areole ay nagiging usbong ng bulaklak at hindi bagong sanga.</item>
-        <item>Bilangin at markahan ang mga bagong usbong ng bulaklak at itakda ang susunod na pagsusuri. Gamitin lamang bilang paunang tantiya ang humigit-kumulang isang buwan mula sa nakikitang usbong hanggang sa pamumulaklak dahil nag-iiba ito ayon sa barayti at kondisyon. Tiyakin ang barayti at maghanda ng plano sa polinasyon bago bumuka ang mga bulaklak.</item>
-        <item>Petsa ng unang usbong, bilang ng usbong bawat halaman o poste, ID ng minarkahang usbong, kalagayan nito, inaasahang petsa ng pagsusuri, mga nalaglag na usbong, barayti, panahon, at larawan.</item>
-        <item>Pagkalaglag ng usbong, napinsala o nabubulok na usbong, biglang pagbabago matapos ang malakas na ulan, insektong kumakain sa usbong, at kumakalat na sugat malapit sa usbong.</item>
+        <item>Ang namamagang bahagi sa sanga ay nagiging usbong ng bulaklak.</item>
+        <item>Bilangin at markahan ang mga usbong, itakda ang susunod na pagsusuri, at ihanda ang plano sa polinasyon ng barayti.</item>
+        <item>Petsa ng unang usbong, bilang, halaman o poste, barayti, panahon, at larawan.</item>
+        <item>Pagkalaglag ng usbong, pinsala ng insekto, pagkabulok, o sugat malapit sa usbong.</item>
         <item>Epic Gardening bud tracking; dragon fruit BBCH phenology study.</item>
     </string-array>
     <string-array name="guidance_5_en">
-        <item>Flowering and pollination</item>
-        <item>The flower begins opening in the evening or is fully open during the night or early morning.</item>
-        <item>Inspect the flower while it is open. Check the verified compatibility setting for the variety. When the plant is self-incompatible, compatibility is unknown, or the farm protocol requires it, perform manual or cross-pollination during the receptive period and tag the flower for follow-up. Do not infer pollination needs from a variety name alone.</item>
-        <item>Flower opening date and time, variety, compatibility status, pollination method, pollen source, worker, rain or weather, number of flowers treated, tagged flower ID, and photo.</item>
-        <item>Rain during the pollination period, no compatible pollen source, poor pollen transfer, insect or physical damage to the flower, or no swelling at the flower base during follow-up.</item>
+        <item>Flowering and Pollination</item>
+        <item>A flower opens at night or is still open at dawn.</item>
+        <item>Check the flower while open. Follow verified variety-specific pollination needs; hand- or cross-pollinate when needed.</item>
+        <item>Opening date and time, method, pollen source, flowers pollinated, weather, and photo.</item>
+        <item>Rain during pollination, unsuitable pollen, flower damage, or no fruit growth afterward.</item>
         <item>Epic Gardening flower reminder; UF IFAS Extension; University of Guam Extension; 2025 pollination biology study.</item>
     </string-array>
     <string-array name="guidance_5_fil">
         <item>Pamumulaklak at polinasyon</item>
-        <item>Nagsisimulang bumuka ang bulaklak sa gabi o ganap itong nakabuka sa gabi o madaling araw.</item>
-        <item>Suriin ang bulaklak habang nakabuka. Tingnan ang beripikadong tala ng pagiging magkatugma ng barayti. Kung hindi nito kayang polinahan ang sarili, hindi alam ang pagiging magkatugma, o kailangan ayon sa pamamaraan ng bukid, magsagawa ng manwal o cross-pollination habang tumatanggap pa ng pollen ang bulaklak at markahan ito para sa susunod na pagsusuri. Huwag ibatay sa pangalan lamang ng barayti ang pangangailangan sa polinasyon.</item>
-        <item>Petsa at oras ng pagbuka ng bulaklak, barayti, kalagayan ng pagiging magkatugma, paraan ng polinasyon, pinagmulan ng pollen, nagsagawa ng gawain, ulan o panahon, bilang ng bulaklak na napolinahan, ID ng minarkahang bulaklak, at larawan.</item>
-        <item>Ulan habang nagsasagawa ng polinasyon, kawalan ng angkop na pollen, kulang na paglipat ng pollen, pinsala ng insekto o pisikal na pinsala sa bulaklak, o walang paglaki sa puno ng bulaklak sa susunod na pagsusuri.</item>
+        <item>Bumubuka ang bulaklak sa gabi o nakabuka pa ito sa madaling araw.</item>
+        <item>Suriin ang bulaklak habang nakabuka. Sundin ang beripikadong pangangailangan sa polinasyon ng barayti; magsagawa ng manwal o cross-pollination kung kailangan.</item>
+        <item>Petsa at oras ng pagbuka, paraan, pinagmulan ng pollen, bilang ng napolinahan, panahon, at larawan.</item>
+        <item>Ulan habang nagpopolinasyon, hindi angkop na pollen, pinsala sa bulaklak, o hindi paglaki ng bunga pagkatapos.</item>
         <item>Epic Gardening flower reminder; UF IFAS Extension; University of Guam Extension; 2025 pollination biology study.</item>
     </string-array>
     <string-array name="guidance_6_en">
-        <item>Fruit set and development</item>
-        <item>The flower has withered and the ovary at its base remains green and begins to enlarge.</item>
-        <item>Confirm fruit set during an early follow-up, then count and tag developing fruit. Maintain reasonably even moisture without waterlogging and keep the fruit area clean. Use only the farm\'s approved bird, rat, or ant protection. Set another inspection instead of relying on one universal watering interval.</item>
-        <item>Fruit set date, tagged flower ID, fruit count, watering or rain, protection used, fruit loss, visible defects, estimated next check, and progress photos.</item>
-        <item>Fruit drop, splitting after moisture swings, bird, rat, or ant damage, sunburn, water-soaked rot, anthracnose-like lesions, canker signs, or several affected fruits on one plant.</item>
+        <item>Fruit Set and Development</item>
+        <item>The flower has wilted and a green fruit is starting to enlarge.</item>
+        <item>Confirm fruit set, count and mark developing fruit, and keep soil evenly moist without waterlogging.</item>
+        <item>Fruit-set date, fruit count, watering or rain, damage, next check, and photos.</item>
+        <item>Fruit drop, cracking, pest damage, sunburn, or soft rot.</item>
         <item>Epic Gardening fruit set sequence; Philippine ATI guide; University of Guam Extension; Philippine disease literature.</item>
     </string-array>
     <string-array name="guidance_6_fil">
         <item>Pagbuo at paglaki ng bunga</item>
-        <item>Nalanta na ang bulaklak ngunit nananatiling luntian at nagsisimulang lumaki ang obaryo sa puno nito.</item>
-        <item>Tiyakin sa maagang pagsusuri na nabuo ang bunga, pagkatapos ay bilangin at markahan ang mga lumalaking bunga. Panatilihing pantay ang halumigmig nang walang pagbabara ng tubig at linisin ang paligid ng bunga. Gamitin lamang ang aprubadong proteksiyon ng bukid laban sa ibon, daga, o langgam. Magtakda ng susunod na pagsusuri sa halip na umasa sa iisang agwat ng pagdidilig para sa lahat.</item>
-        <item>Petsa ng pagbuo ng bunga, ID ng minarkahang bulaklak, bilang ng bunga, pagdidilig o ulan, ginamit na proteksiyon, nalaglag o nasirang bunga, nakikitang depekto, tinatayang susunod na pagsusuri, at mga larawan ng paglaki.</item>
-        <item>Pagkalaglag ng bunga, pagbibitak matapos ang pabago-bagong halumigmig, pinsala ng ibon, daga, o langgam, pagkapaso sa araw, parang basang pagkabulok, sugat na kahawig ng anthracnose, palatandaan ng canker, o maraming apektadong bunga sa isang halaman.</item>
+        <item>Nalanta ang bulaklak at lumalaki ang luntiang bunga.</item>
+        <item>Tiyaking nabuo ang bunga, bilangin at markahan ito, at panatilihing pantay ang halumigmig nang walang pagbabara ng tubig.</item>
+        <item>Petsa ng pagbuo, bilang ng bunga, pagdidilig o ulan, pinsala, susunod na pagsusuri, at larawan.</item>
+        <item>Pagkalaglag, bitak, pinsala ng peste, paso sa araw, o malambot na pagkabulok.</item>
         <item>Epic Gardening fruit set sequence; Philippine ATI guide; University of Guam Extension; Philippine disease literature.</item>
     </string-array>
     <string-array name="guidance_7_en">
-        <item>Maturity and harvest</item>
-        <item>The skin begins changing to the mature color and the fruit is approaching the cultivar specific harvest window.</item>
-        <item>Check both days after flower opening and the cultivar-appropriate skin color and external condition. Inspect more often after the first color change. Harvest only when the fruit meets the farm\'s standard for its intended market. Use the article\'s broad 35 to 70 day range only as a reminder to configure the plant profile; research under specific conditions found narrower windows near 34 to 38 days.</item>
-        <item>Flower opening date, first color change, harvest date and time, days after flower opening, skin color, external condition, weight, grade, defects, intended destination, and photo.</item>
-        <item>Harvesting too early, delayed harvest with scale or skin wilting, loss of normal color, cracks, soft rot, sunburn, pest damage, or a maturity estimate copied from another cultivar.</item>
+        <item>Maturity and Harvest</item>
+        <item>The skin is changing toward the ripe color for its variety.</item>
+        <item>Check color and condition together with days since flowering. Harvest only when fruit meets the farm\'s market standard.</item>
+        <item>Flowering and harvest dates, color, weight, grade, defects, destination, and photo.</item>
+        <item>Early or delayed harvest, shriveling, cracks, pests, or rot.</item>
         <item>Epic Gardening harvest sequence; UF IFAS Extension; red and white fleshed dragon fruit maturity studies.</item>
     </string-array>
     <string-array name="guidance_7_fil">
         <item>Paghinog at pag-aani</item>
-        <item>Nagsisimulang magbago ang balat tungo sa hinog na kulay at papalapit ang bunga sa takdang panahon ng pag-aani para sa barayti.</item>
-        <item>Suriin ang bilang ng araw mula sa pagbuka ng bulaklak kasama ang tamang kulay at panlabas na kalagayan para sa barayti. Mas dalasan ang pagsusuri matapos ang unang pagbabago ng kulay. Anihin lamang kapag pasado ang bunga sa pamantayan ng bukid para sa pupuntahang merkado. Gamitin lamang ang malawak na 35 hanggang 70 araw sa artikulo bilang paalala na isaayos ang profile ng pananim; may mga pag-aaral sa tiyak na kondisyon na nakakita ng mas makitid na pagitan na humigit-kumulang 34 hanggang 38 araw.</item>
-        <item>Petsa ng pagbuka ng bulaklak, unang pagbabago ng kulay, petsa at oras ng pag-aani, bilang ng araw mula sa pagbuka, kulay at panlabas na kalagayan ng balat, timbang, grado, mga depekto, destinasyon, at larawan.</item>
-        <item>Masyadong maagang pag-aani, naantalang ani na may pagkalanta ng kaliskis o balat, pagkawala ng normal na kulay, bitak, malambot na pagkabulok, pagkapaso sa araw, pinsala ng peste, o tantiya ng paghinog na kinopya mula sa ibang barayti.</item>
+        <item>Nagbabago ang balat tungo sa hinog na kulay ng barayti.</item>
+        <item>Suriin ang kulay at kalagayan kasama ang araw mula sa pamumulaklak. Anihin lamang kung pasado sa pamantayan ng bukid at pamilihan.</item>
+        <item>Petsa ng pamumulaklak at ani, kulay, timbang, grado, depekto, patutunguhan, at larawan.</item>
+        <item>Masyadong maaga o huling ani, pagkalanta, bitak, peste, o pagkabulok.</item>
         <item>Epic Gardening harvest sequence; UF IFAS Extension; red and white fleshed dragon fruit maturity studies.</item>
     </string-array>
     <string-array name="guidance_8_en">
-        <item>Post harvest and cycle review</item>
-        <item>Harvest for the fruiting cycle is complete and the plant, records, and canopy need review before the next cycle.</item>
-        <item>Record yield and rejected fruit. Prune and clean according to the farm protocol, remove or isolate suspect diseased material safely, sanitize tools between affected plants, and plan the next cycle. Do not show a pesticide product, rate, or pre-harvest interval unless it comes from a current approved local label.</item>
-        <item>Total fruit count and weight, grade distribution, rejected fruit and reason, labor, inputs, pruning, tool sanitation, disease incidence by plant or post, and notes for the next cycle.</item>
-        <item>Diseased material left in the canopy, unclean tools, repeated losses on the same plant or post, declining yield, a damaged support, or missing records that prevent comparison with the next cycle.</item>
+        <item>Postharvest and Cycle Review</item>
+        <item>Harvest for this cycle is complete.</item>
+        <item>Record the harvest, clean tools, safely remove or isolate suspect diseased material, and plan the next cycle.</item>
+        <item>Total count and weight, grades, rejected fruit and reasons, pruning, and next-cycle notes.</item>
+        <item>Disease left on plants, dirty tools, damaged supports, repeat losses, or missing records.</item>
         <item>Philippine ATI guide; UF IFAS Extension; 2024 pruning study; digital farm recordkeeping review; FAO integrated pest management guidance.</item>
     </string-array>
     <string-array name="guidance_8_fil">
         <item>Pagkatapos ng ani at pagsusuri ng siklo</item>
-        <item>Tapos na ang pag-aani para sa siklo at kailangang suriin ang halaman, mga tala, at mga sanga bago ang susunod na siklo.</item>
-        <item>Itala ang ani at mga hindi tinanggap na bunga. Magputol at maglinis ayon sa pamamaraan ng bukid, ligtas na alisin o ihiwalay ang pinaghihinalaang may sakit na bahagi, linisin ang kagamitan bago lumipat sa ibang apektadong halaman, at planuhin ang susunod na siklo. Huwag magpakita ng pestisidyo, dami ng paggamit, o pagitan bago mag-ani maliban kung mula ito sa kasalukuyang aprubadong lokal na label.</item>
-        <item>Kabuuang bilang at timbang ng bunga, dami sa bawat grado, hindi tinanggap na bunga at dahilan, paggawa, mga input, pagputol, paglilinis ng kagamitan, dami ng may palatandaan ng sakit bawat halaman o poste, at tala para sa susunod na siklo.</item>
-        <item>Bahaging may sakit na naiwan sa halaman, maruming kagamitan, paulit-ulit na pagkawala sa parehong halaman o poste, bumababang ani, sirang suporta, o kulang na tala na hahadlang sa paghahambing sa susunod na siklo.</item>
+        <item>Tapos na ang pag-aani para sa siklong ito.</item>
+        <item>Itala ang ani, linisin ang kagamitan, ligtas na alisin o ihiwalay ang pinaghihinalaang may sakit na bahagi, at planuhin ang susunod na siklo.</item>
+        <item>Kabuuang bilang at timbang, mga grado, hindi tinanggap na bunga at dahilan, pagputol, at tala para sa susunod na siklo.</item>
+        <item>Naiwang may sakit na bahagi, maruming kagamitan, sirang suporta, paulit-ulit na pagkawala, o kulang na tala.</item>
         <item>Philippine ATI guide; UF IFAS Extension; 2024 pruning study; digital farm recordkeeping review; FAO integrated pest management guidance.</item>
     </string-array>
 </resources>

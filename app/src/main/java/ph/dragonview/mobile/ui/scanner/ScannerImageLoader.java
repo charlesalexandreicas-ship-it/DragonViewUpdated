@@ -13,12 +13,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /** Decodes a bounded, correctly oriented bitmap from a camera or document URI. */
-final class ScannerImageLoader {
+public final class ScannerImageLoader {
     private ScannerImageLoader() {
     }
 
     @NonNull
-    static Bitmap load(@NonNull Context context, @NonNull Uri uri, int maximumEdge)
+    public static Bitmap load(@NonNull Context context, @NonNull Uri uri, int maximumEdge)
             throws IOException {
         if (maximumEdge <= 0) throw new IllegalArgumentException("maximumEdge must be positive");
 

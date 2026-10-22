@@ -11,10 +11,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import ph.dragonview.mobile.R;
 import ph.dragonview.mobile.data.model.PlantingGroup;
 import ph.dragonview.mobile.data.model.PlantingStage;
+import ph.dragonview.mobile.data.model.PropagationMethod;
 import ph.dragonview.mobile.databinding.ItemGuidanceStageBinding;
 import ph.dragonview.mobile.databinding.ItemPlantingBinding;
 
@@ -38,6 +42,7 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
     void submit(List<PlantingGroup> values) {
         rows.clear();
         rows.addAll(values);
+        // Start with compact rows; an existing user-expanded row stays open after refresh.
         if (positionOf(expandedId) < 0) expandedId = -1L;
         notifyDataSetChanged();
     }
@@ -95,14 +100,15 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
                 record = "Farm Section " + record;
             }
             binding.recordText.setText(record);
-            binding.detailsText.setText(row.getPropagationMethod().getDisplayName()
-                    + " • " + row.getVariety() + " • "
-                    + row.getNumberOfPlants() + " "
-                    + row.getPropagationMethod().getQuantityLabel());
-            binding.stageText.setText("Current: "
-                    + row.getCurrentStage().getDisplayName() + " • Day "
-                    + row.getElapsedDays());
+            boolean grafted = row.getPropagationMethod() == PropagationMethod.GRAFTED;
+            binding.detailsText.setText(row.getNumberOfPlants() + " "
+                    + row.getPropagationMethod().getQuantityLabel() + " · "
+                    + (grafted ? "Grafted " : "Planted ") + shortDate(row.getPlantingDate()));
+            binding.stageText.setText(row.getCurrentStage().getDisplayName());
             binding.expandedContent.setVisibility(expanded ? View.VISIBLE : View.GONE);
+            binding.compactGuidanceButton.setVisibility(expanded ? View.GONE : View.VISIBLE);
+            binding.compactGuidanceButton.setOnClickListener(
+                    v -> listener.showGuidance(row, row.getCurrentStage()));
             binding.expandIcon.setRotation(expanded ? 180f : 0f);
             binding.accordionHeader.setContentDescription(
                     (expanded ? "Collapse " : "Expand ") + record + " guidance");
@@ -118,13 +124,16 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
                     row.getPropagationMethod());
             int currentIndex = stages.indexOf(row.getCurrentStage());
             if (currentIndex < 0) currentIndex = 0;
+            // The real method-specific sequence remains available; its length varies by record.
+            binding.stageProgressText.setText("Growth stages");
+            binding.viewGuidanceButton.setOnClickListener(
+                    v -> listener.showGuidance(row, row.getCurrentStage()));
             LayoutInflater inflater = LayoutInflater.from(binding.getRoot().getContext());
             for (int index = 0; index < stages.size(); index++) {
                 PlantingStage stage = stages.get(index);
                 ItemGuidanceStageBinding stageBinding = ItemGuidanceStageBinding.inflate(
                         inflater, binding.stageContainer, false);
-                stageBinding.stageNameText.setText((index + 1) + ". "
-                        + stage.getDisplayName());
+                stageBinding.stageNameText.setText(stage.getDisplayName());
                 stageBinding.timingText.setText(stage.getEstimatedTiming());
                 bindStatus(stageBinding, index, currentIndex);
                 stageBinding.stageRow.setOnClickListener(
@@ -139,10 +148,10 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
             String status;
             if (index < currentIndex) {
                 status = "Completed";
-                color = R.color.dragon_green;
+                color = R.color.muted_ink;
             } else if (index == currentIndex) {
-                status = "Current stage";
-                color = R.color.dragon_magenta;
+                status = "Current";
+                color = R.color.botanical_green;
             } else {
                 status = "Upcoming";
                 color = R.color.muted_ink;
@@ -152,6 +161,16 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
             stageBinding.statusText.setText(status);
             stageBinding.statusText.setTextColor(resolvedColor);
             stageBinding.stageImage.setColorFilter(resolvedColor);
+        }
+
+        private static String shortDate(String value) {
+            if (value == null || value.length() < 10) return "Date unavailable";
+            try {
+                Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(value.substring(0, 10));
+                return new SimpleDateFormat("MMM d", Locale.US).format(date);
+            } catch (ParseException ignored) {
+                return value.substring(0, 10);
+            }
         }
     }
 }

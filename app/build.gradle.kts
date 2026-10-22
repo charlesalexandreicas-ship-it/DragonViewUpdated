@@ -78,6 +78,8 @@ dependencies {
     implementation("androidx.exifinterface:exifinterface:1.4.2")
     implementation("com.google.android.material:material:1.13.0")
     implementation("com.google.ai.edge.litert:litert:2.1.5")
+    // Bundled, on-device OCR: paper photos are never sent to a text-recognition service.
+    implementation("com.google.mlkit:text-recognition:16.0.1")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.room:room-testing:2.8.4")

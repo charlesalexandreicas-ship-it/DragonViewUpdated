@@ -25,7 +25,7 @@
     <color name="dragon_magenta_dark">#C50E55</color>
     <color name="dragon_violet_red">@color/obsidian_plum_700</color>
     <color name="dragon_deep_pink">#B93B6B</color>
-    <color name="dragon_green">#159C50</color>
+    <color name="dragon_green">#0D7F40</color>
     <color name="dragon_surface">@color/warm_ivory</color>
     <color name="dragon_surface_variant">@color/plum_mist_100</color>
     <color name="dragon_outline">#8C7F86</color>
@@ -47,7 +47,7 @@
     <color name="black">@color/ink</color>
     <color name="action_primary">#E51564</color>
     <color name="action_primary_pressed">#C50E55</color>
-    <color name="action_success">#159C50</color>
+    <color name="action_success">#0D7F40</color>
     <color name="brand_pink_start">#B4164F</color>
     <color name="brand_pink_end">#C42660</color>
     <color name="on_accent">#FFFFFF</color>
@@ -56,4 +56,11 @@
     <color name="chart_fill">#DCEBE6</color>
     <color name="focus_ripple">#207D1F43</color>
     <color name="auth_header">#8F234D</color>
+    <color name="botanical_header">#87264A</color>
+    <color name="botanical_accent">#94254E</color>
+    <color name="botanical_canvas">#F3F6F3</color>
+    <color name="botanical_ink">#17251E</color>
+    <color name="botanical_green">#246346</color>
+    <color name="botanical_rose">#FBF1F4</color>
+    <color name="botanical_border">#D9E3DD</color>
 </resources>

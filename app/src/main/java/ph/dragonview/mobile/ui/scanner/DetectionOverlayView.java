@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-/** Draws detector boxes over the center-cropped selected image. */
+/** Draws detector boxes over the fully contained selected image. */
 public final class DetectionOverlayView extends View {
     private final Paint boxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -47,7 +47,8 @@ public final class DetectionOverlayView extends View {
     @Override protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
         if (sourceWidth <= 0 || sourceHeight <= 0 || detections.isEmpty()) return;
-        float scale = Math.max(getWidth() / (float) sourceWidth, getHeight() / (float) sourceHeight);
+        // Match ImageView FIT_CENTER so boxes include the same letterbox offsets as the photo.
+        float scale = Math.min(getWidth() / (float) sourceWidth, getHeight() / (float) sourceHeight);
         float offsetX = (getWidth() - sourceWidth * scale) / 2f;
         float offsetY = (getHeight() - sourceHeight * scale) / 2f;
         int number = 1;

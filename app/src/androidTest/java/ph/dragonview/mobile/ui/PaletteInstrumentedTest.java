@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -42,8 +43,11 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import ph.dragonview.mobile.R;
+import ph.dragonview.mobile.data.model.SalesAnalytics;
+import ph.dragonview.mobile.ui.analytics.RevenueTrendChartView;
 
 /**
  * Session-free color regression checks. Inflates layouts without starting an Activity,
@@ -101,6 +105,13 @@ public final class PaletteInstrumentedTest {
                     R.layout.fragment_inventory,
                     R.layout.fragment_planting,
                     R.layout.fragment_analytics,
+                    R.layout.fragment_historical_records,
+                    R.layout.fragment_historical_capture,
+                    R.layout.fragment_historical_editor,
+                    R.layout.item_historical_record,
+                    R.layout.item_historical_row,
+                    R.layout.item_inventory_lot,
+                    R.layout.item_planting,
                     R.layout.fragment_settings,
                     R.layout.dialog_planting,
                     R.layout.fragment_scanner,
@@ -119,9 +130,71 @@ public final class PaletteInstrumentedTest {
                     if (layout == R.layout.fragment_dashboard) {
                         // Visual fixtures only: never stored as farm records or sent to Supabase.
                         setPreviewText(view, R.id.inventoryValue, "12500");
-                        setPreviewText(view, R.id.todayRevenueValue, "₱125,000.00");
+                        setPreviewText(view, R.id.batchesValue, "12");
+                        setPreviewText(view, R.id.monthlyRevenueValue, "₱125,000.00");
                         setPreviewText(view, R.id.plantingValue, "16");
-                        setPreviewText(view, R.id.classificationValue, "42");
+                    }
+                    if (layout == R.layout.fragment_analytics) {
+                        setPreviewText(view, R.id.reportingRangeText,
+                                "Reporting period: Aug 1–31, 2026");
+                        setPreviewText(view, R.id.revenueText, "₱12,000");
+                        setPreviewText(view, R.id.salesText, "24");
+                        setPreviewText(view, R.id.weightText, "185 kg");
+                        setPreviewText(view, R.id.comparisonValueText, "+33.3%");
+                        setPreviewText(view, R.id.comparisonCardLabel,
+                                "Revenue vs Jul 1–31, 2026");
+                        setPreviewText(view, R.id.comparisonText,
+                                "+33.3% vs Jul 1–31, 2026");
+                        setPreviewText(view, R.id.trendLegendText,
+                                "● Aug 2026     ● Jul 2026\nPink: selected · Green: comparison");
+                        RevenueTrendChartView chart = view.findViewById(R.id.trendChart);
+                        chart.setData(Arrays.asList(
+                                new SalesAnalytics.Trend("1", 2000, 0),
+                                new SalesAnalytics.Trend("8", 5000, 0),
+                                new SalesAnalytics.Trend("15", 3000, 0),
+                                new SalesAnalytics.Trend("22", 0, 0),
+                                new SalesAnalytics.Trend("29", 4000, 0)),
+                                Arrays.asList(
+                                        new SalesAnalytics.Trend("1", 800, 0),
+                                        new SalesAnalytics.Trend("8", 2000, 0),
+                                        new SalesAnalytics.Trend("15", 1800, 0),
+                                        new SalesAnalytics.Trend("22", 0, 0),
+                                        new SalesAnalytics.Trend("29", 1500, 0)), "monthly");
+                    }
+                    if (layout == R.layout.fragment_historical_editor) {
+                        setPreviewText(view, R.id.dateInput, "08/12/2026");
+                        LinearLayout container = view.findViewById(R.id.rowsContainer);
+                        View saleRow = inflater(context).inflate(R.layout.item_historical_row,
+                                container, false);
+                        setPreviewText(saleRow, R.id.rowTitle, "Large");
+                        setPreviewText(saleRow, R.id.sizeInput, "Large");
+                        setPreviewText(saleRow, R.id.weightInput, "140");
+                        setPreviewText(saleRow, R.id.priceInput, "100");
+                        setPreviewText(saleRow, R.id.calculatedSubtotalText, "Subtotal ₱14,000.00");
+                        setPreviewText(saleRow, R.id.paperSubtotalInput, "14000");
+                        setPreviewText(saleRow, R.id.recordTypeInput, "Actual sale");
+                        container.addView(saleRow);
+                        setPreviewText(view, R.id.subtotalSumText,
+                                "Total from completed rows: ₱14,000.00");
+                        setPreviewText(view, R.id.grandTotalInput, "14000");
+                        view.findViewById(R.id.grandTotalLayout).setVisibility(View.VISIBLE);
+                    }
+                    if (layout == R.layout.item_inventory_lot) {
+                        // Fixture values expose the expanded row layout without touching farm data.
+                        setPreviewText(view, R.id.batchText, "#1042");
+                        setPreviewText(view, R.id.piecesText, "72 pcs");
+                        setPreviewText(view, R.id.compositionText, "2 sizes · 2 grades");
+                        setPreviewText(view, R.id.dateText, "Oct 7, 2026");
+                        setPreviewText(view, R.id.breakdownText,
+                                "AVAILABLE BY SIZE & GRADE\nLarge · A  ·  48 pcs\nMedium · B  ·  24 pcs");
+                        view.findViewById(R.id.expandedContent).setVisibility(View.VISIBLE);
+                    }
+                    if (layout == R.layout.item_planting) {
+                        setPreviewText(view, R.id.recordText, "Farm Section A-01");
+                        setPreviewText(view, R.id.detailsText, "63 cuttings · Planted Aug 12");
+                        setPreviewText(view, R.id.stageText, "Flowering");
+                        view.findViewById(R.id.compactGuidanceButton).setVisibility(View.GONE);
+                        view.findViewById(R.id.expandedContent).setVisibility(View.VISIBLE);
                     }
                     measure(view);
                     assertTrue(view.getWidth() > 0);
@@ -175,9 +248,9 @@ public final class PaletteInstrumentedTest {
                 MaterialButton[] buttons = {
                         login.findViewById(R.id.signInButton),
                         home.findViewById(R.id.viewInventoryAction),
-                        home.findViewById(R.id.recordHarvestAction),
+                        home.findViewById(R.id.viewSalesAction),
                         home.findViewById(R.id.viewAnalyticsButton),
-                        home.findViewById(R.id.recordPlantingAction),
+                        home.findViewById(R.id.viewPlantGuidanceAction),
                         planting.findViewById(R.id.addButton),
                         planting.findViewById(R.id.graftButton)
                 };

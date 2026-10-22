@@ -1,6 +1,5 @@
 package ph.dragonview.mobile.ui.planting;
 
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,8 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,6 +29,8 @@ import ph.dragonview.mobile.data.model.PlantingUpdateRequest;
 import ph.dragonview.mobile.databinding.DialogPlantingStageBinding;
 import ph.dragonview.mobile.databinding.DialogPlantingUpdateBinding;
 import ph.dragonview.mobile.databinding.FragmentPlantingDetailsBinding;
+import ph.dragonview.mobile.ui.date.RecordDate;
+import ph.dragonview.mobile.ui.date.RecordDateInput;
 
 public final class PlantingDetailsFragment extends Fragment {
     private FragmentPlantingDetailsBinding binding;
@@ -188,8 +187,8 @@ public final class PlantingDetailsFragment extends Fragment {
                 android.R.layout.simple_dropdown_item_1line, labels));
         form.stageInput.setText(
                 details.getGroup().getSuggestedStage().getDisplayName(), false);
-        form.dateInput.setText(today());
-        form.dateInput.setOnClickListener(v -> chooseDate(form.dateInput));
+        form.dateInput.setText(RecordDate.todayDisplay());
+        RecordDateInput.attach(form.dateInput);
 
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle("Confirm Growth Milestone")
@@ -201,9 +200,9 @@ public final class PlantingDetailsFragment extends Fragment {
                 .setOnClickListener(v -> {
                     PlantingStage stage = stageForLabel(
                             text(form.stageInput.getText()), stages);
-                    String date = text(form.dateInput.getText());
-                    if (stage == null || date.isEmpty()) {
-                        form.errorText.setText("Select a stage and event date.");
+                    String date = RecordDate.toIso(text(form.dateInput.getText()));
+                    if (stage == null || date == null) {
+                        form.errorText.setText("Select a stage and enter a real date (MM/DD/YYYY).");
                         return;
                     }
                     dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
@@ -217,8 +216,8 @@ public final class PlantingDetailsFragment extends Fragment {
     private void showObservationDialog(String photoUri) {
         DialogPlantingUpdateBinding form = DialogPlantingUpdateBinding.inflate(
                 getLayoutInflater());
-        form.dateInput.setText(today());
-        form.dateInput.setOnClickListener(v -> chooseDate(form.dateInput));
+        form.dateInput.setText(RecordDate.todayDisplay());
+        RecordDateInput.attach(form.dateInput);
         form.photoLabel.setVisibility(photoUri == null ? View.GONE : View.VISIBLE);
         form.photoPreview.setVisibility(photoUri == null ? View.GONE : View.VISIBLE);
         if (photoUri != null) form.photoPreview.setImageURI(Uri.parse(photoUri));
@@ -242,11 +241,11 @@ public final class PlantingDetailsFragment extends Fragment {
                         }
                     }
                     String note = text(form.noteInput.getText());
-                    String date = text(form.dateInput.getText());
-                    if (date.isEmpty() || (note.isEmpty()
+                    String date = RecordDate.toIso(text(form.dateInput.getText()));
+                    if (date == null || (note.isEmpty()
                             && measurement == null && photoUri == null)) {
                         form.errorText.setText(
-                                "Add a date and at least one note, measurement, or photo.");
+                                "Enter a real date (MM/DD/YYYY) and add a note, measurement, or photo.");
                         return;
                     }
                     dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
@@ -274,26 +273,12 @@ public final class PlantingDetailsFragment extends Fragment {
         };
     }
 
-    private void chooseDate(TextView target) {
-        Calendar now = Calendar.getInstance();
-        new DatePickerDialog(requireContext(), (picker, year, month, day) ->
-                target.setText(String.format(Locale.US, "%04d-%02d-%02d",
-                        year, month + 1, day)),
-                now.get(Calendar.YEAR), now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)).show();
-    }
-
     private static PlantingStage stageForLabel(
             String label, List<PlantingStage> stages) {
         for (PlantingStage stage : stages) {
             if (stage.getDisplayName().equals(label)) return stage;
         }
         return null;
-    }
-
-    private static String today() {
-        return new SimpleDateFormat("yyyy-MM-dd", Locale.US)
-                .format(Calendar.getInstance().getTime());
     }
 
     private static String text(CharSequence value) {

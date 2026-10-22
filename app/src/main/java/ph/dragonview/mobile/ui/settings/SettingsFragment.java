@@ -18,6 +18,7 @@ import ph.dragonview.mobile.data.model.SessionUser;
 import ph.dragonview.mobile.databinding.FragmentSettingsBinding;
 import ph.dragonview.mobile.ui.MainActivity;
 
+/** Shows account, workspace, synchronization, version, and sign-out information. */
 public final class SettingsFragment extends Fragment {
     private FragmentSettingsBinding binding;
 
@@ -64,6 +65,7 @@ public final class SettingsFragment extends Fragment {
         });
     }
 
+    /** Reads the installed version name while keeping a safe fallback for test builds. */
     private String versionLabel() {
         try {
             String version = requireContext().getPackageManager()

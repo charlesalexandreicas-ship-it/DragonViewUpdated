@@ -25,6 +25,7 @@ public final class AnalyticsComparisonMessageTest {
 
             assertEquals("New revenue: ₱1,250.00 (no percentage baseline).",
                     AnalyticsFragment.formatComparisonMessage(report));
+            assertEquals("New", AnalyticsFragment.formatComparisonValue(report));
         }
     }
 
@@ -35,6 +36,7 @@ public final class AnalyticsComparisonMessageTest {
 
             assertEquals("No sales in either period.",
                     AnalyticsFragment.formatComparisonMessage(report));
+            assertEquals("—", AnalyticsFragment.formatComparisonValue(report));
         }
     }
 
@@ -44,6 +46,14 @@ public final class AnalyticsComparisonMessageTest {
 
         assertEquals("-12.5% vs previous period",
                 AnalyticsFragment.formatComparisonMessage(report));
+        assertEquals("-12.5%", AnalyticsFragment.formatComparisonValue(report));
+    }
+
+    @Test
+    public void customComparisonNamesTheChosenPeriod() {
+        SalesAnalytics report = report("monthly", 1250.0, 1000.0, 25.0);
+        assertEquals("+25.0% vs Aug 1–31, 2025",
+                AnalyticsFragment.formatComparisonMessage(report, "Aug 1–31, 2025"));
     }
 
     private static SalesAnalytics report(String period, double currentRevenue,

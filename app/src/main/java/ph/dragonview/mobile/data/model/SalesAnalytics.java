@@ -9,6 +9,9 @@ public final class SalesAnalytics {
     private Double comparisonPercent;
     private Totals totals;
     private List<Trend> trend;
+    private List<Trend> comparisonTrend;
+    private double historicalRevenue;
+    private double comparisonHistoricalRevenue;
     private List<Summary> summary;
     public SalesAnalytics(String period, String selectedDate, double previousRevenue,
                           Double comparisonPercent, Totals totals, List<Trend> trend,
@@ -24,6 +27,9 @@ public final class SalesAnalytics {
     public Double getComparisonPercent() { return comparisonPercent; }
     public Totals getTotals() { return totals; }
     public List<Trend> getTrend() { return trend; }
+    public List<Trend> getComparisonTrend() { return comparisonTrend; }
+    public double getHistoricalRevenue() { return historicalRevenue; }
+    public double getComparisonHistoricalRevenue() { return comparisonHistoricalRevenue; }
     public List<Summary> getSummary() { return summary; }
 
     public static final class Trend {

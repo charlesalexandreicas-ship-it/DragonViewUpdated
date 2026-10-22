@@ -15,6 +15,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
+import matplotlib
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -299,9 +302,15 @@ def predict(
     return probabilities
 
 
-def compute_metrics(y_true: list[str], y_pred: list[str]) -> tuple[np.ndarray, pd.DataFrame, dict[str, float]]:
-    labels = list(EXPECTED_CLASSES)
-    matrix = confusion_matrix(y_true, y_pred, labels=labels)
+def compute_metrics(
+    y_true: list[str],
+    y_pred: list[str],
+    metric_labels: Iterable[str] = EXPECTED_CLASSES,
+    matrix_labels: Iterable[str] | None = None,
+) -> tuple[np.ndarray, pd.DataFrame, dict[str, float]]:
+    labels = list(metric_labels)
+    displayed_labels = list(matrix_labels) if matrix_labels is not None else labels
+    matrix = confusion_matrix(y_true, y_pred, labels=displayed_labels)
     report = classification_report(
         y_true,
         y_pred,
@@ -330,8 +339,13 @@ def compute_metrics(y_true: list[str], y_pred: list[str]) -> tuple[np.ndarray, p
     return matrix, pd.DataFrame(rows), summary
 
 
-def save_confusion_matrix(matrix: np.ndarray, output_path: Path) -> None:
-    labels = list(EXPECTED_CLASSES)
+def save_confusion_matrix(
+    matrix: np.ndarray,
+    output_path: Path,
+    labels: Iterable[str] = EXPECTED_CLASSES,
+    title: str = "DragonView per-fruit confusion matrix",
+) -> None:
+    labels = list(labels)
     figure, axis = plt.subplots(figsize=(7, 6))
     image = axis.imshow(matrix, interpolation="nearest", cmap="Blues")
     figure.colorbar(image, ax=axis)
@@ -342,7 +356,7 @@ def save_confusion_matrix(matrix: np.ndarray, output_path: Path) -> None:
         yticklabels=labels,
         xlabel="Predicted label",
         ylabel="True label",
-        title="DragonView per-fruit confusion matrix",
+        title=title,
     )
     threshold = matrix.max() / 2.0 if matrix.size else 0
     for row in range(matrix.shape[0]):
@@ -356,6 +370,79 @@ def save_confusion_matrix(matrix: np.ndarray, output_path: Path) -> None:
                 color="white" if matrix[row, column] > threshold else "black",
             )
     figure.tight_layout()
+    figure.savefig(output_path, dpi=180, bbox_inches="tight")
+    plt.close(figure)
+
+
+def save_test_support(support: dict[str, int], output_path: Path) -> None:
+    """Visualize held-out instance support, even when final evaluation is blocked."""
+    labels = list(EXPECTED_CLASSES)
+    counts = [support[label] for label in labels]
+    colors = ["#C2185B", "#2E7D32", "#C62828" if support["Class C"] == 0 else "#F9A825"]
+    figure, axis = plt.subplots(figsize=(7, 5))
+    bars = axis.bar(labels, counts, color=colors, width=0.62)
+    axis.set(
+        ylabel="Annotated fruit instances",
+        title="DragonView held-out test support",
+    )
+    axis.set_ylim(0, max(counts + [1]) * 1.18)
+    axis.bar_label(bars, padding=4, fontsize=11)
+    missing = [label for label in labels if support[label] == 0]
+    if missing:
+        figure.text(
+            0.5,
+            0.01,
+            "Final three-class metrics blocked: no held-out support for " + ", ".join(missing),
+            ha="center",
+            color="#C62828",
+            fontsize=10,
+        )
+    figure.tight_layout(rect=(0, 0.05, 1, 1))
+    figure.savefig(output_path, dpi=180, bbox_inches="tight")
+    plt.close(figure)
+
+
+def save_metrics_chart(
+    metrics: pd.DataFrame,
+    summary: dict[str, float],
+    output_path: Path,
+    title: str = "DragonView per-fruit classification metrics",
+    macro_label: str = "Macro",
+) -> None:
+    """Save per-class precision, recall, and F1 with overall summary metrics."""
+    labels = metrics["Class"].tolist()
+    x_positions = np.arange(len(labels))
+    width = 0.24
+    figure, axis = plt.subplots(figsize=(9, 6))
+    for offset, column, color in (
+        (-width, "Precision", "#C2185B"),
+        (0.0, "Recall", "#2E7D32"),
+        (width, "F1-Score", "#F9A825"),
+    ):
+        bars = axis.bar(x_positions + offset, metrics[column], width, label=column, color=color)
+        axis.bar_label(bars, labels=[f"{value:.1%}" for value in metrics[column]], padding=3, fontsize=8)
+    axis.set(
+        xticks=x_positions,
+        xticklabels=labels,
+        ylim=(0.0, 1.12),
+        ylabel="Score",
+        title=title,
+    )
+    axis.yaxis.set_major_formatter(lambda value, _: f"{value:.0%}")
+    axis.legend(loc="upper center", ncols=3)
+    figure.text(
+        0.5,
+        0.01,
+        (
+            f"Accuracy {summary['overall_accuracy']:.2%}  |  "
+            f"{macro_label} Precision {summary['macro_precision']:.2%}  |  "
+            f"{macro_label} Recall {summary['macro_recall']:.2%}  |  "
+            f"{macro_label} F1 {summary['macro_f1']:.2%}"
+        ),
+        ha="center",
+        fontsize=10,
+    )
+    figure.tight_layout(rect=(0, 0.05, 1, 1))
     figure.savefig(output_path, dpi=180, bbox_inches="tight")
     plt.close(figure)
 
@@ -389,6 +476,14 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Validate split isolation and report test support without running inference.",
     )
+    parser.add_argument(
+        "--preliminary-ab",
+        action="store_true",
+        help=(
+            "Evaluate genuine held-out Class A/B instances while Class C has no test support. "
+            "Outputs are explicitly marked preliminary and must not be reported as three-class metrics."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -407,7 +502,28 @@ def main() -> int:
     print(f"Matched annotated fruit instances: {len(records)}")
     print("Test support: " + ", ".join(f"{label}={support[label]}" for label in EXPECTED_CLASSES))
     print(f"Model labels: {labels}")
-    preflight(labels, support, records)
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(
+        [{"Class": label, "Support": support[label]} for label in EXPECTED_CLASSES]
+    ).to_csv(args.output_dir / "test_support.csv", index=False)
+    save_test_support(support, args.output_dir / "test_support.png")
+    try:
+        preflight(labels, support, records)
+    except EvaluationError:
+        if not args.preliminary_ab:
+            raise
+        if labels != list(EXPECTED_CLASSES):
+            raise
+        if support["Class A"] == 0 or support["Class B"] == 0:
+            raise EvaluationError("Preliminary A/B evaluation requires held-out support for both classes")
+        if support["Class C"] != 0:
+            raise EvaluationError("Use the final three-class evaluation when Class C test support exists")
+        missing_images = sorted(
+            {str(record.image_path) for record in records if not record.image_path.is_file()}
+        )
+        if missing_images:
+            raise EvaluationError(f"{len(missing_images)} held-out source image(s) are missing")
+        print("PRELIMINARY MODE: Class A/B metrics only; Class C is not evaluated.")
     if args.audit_only:
         print("Audit passed: the data and label contract are ready for three-class evaluation.")
         return 0
@@ -440,22 +556,43 @@ def main() -> int:
             print(f"Evaluated {index}/{len(records)} fruit instances")
 
     predictions = pd.DataFrame(prediction_rows)
+    metric_labels = list(EXPECTED_CLASSES[:2]) if args.preliminary_ab else list(EXPECTED_CLASSES)
+    matrix_labels = list(EXPECTED_CLASSES) if args.preliminary_ab else metric_labels
     matrix, metrics, summary = compute_metrics(
-        predictions["true_label"].tolist(), predictions["predicted_label"].tolist()
+        predictions["true_label"].tolist(),
+        predictions["predicted_label"].tolist(),
+        metric_labels=metric_labels,
+        matrix_labels=matrix_labels,
     )
     if int(metrics["Support"].sum()) != len(predictions):
         raise EvaluationError("Metric support does not equal the number of evaluated fruit instances")
 
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    predictions.to_csv(args.output_dir / "instance_predictions.csv", index=False)
-    metrics.to_csv(args.output_dir / "per_class_metrics.csv", index=False)
-    pd.DataFrame(matrix, index=EXPECTED_CLASSES, columns=EXPECTED_CLASSES).to_csv(
-        args.output_dir / "confusion_matrix.csv", index_label="True / Predicted"
+    report_dir = args.output_dir / "preliminary_ab" if args.preliminary_ab else args.output_dir
+    report_dir.mkdir(parents=True, exist_ok=True)
+    predictions.to_csv(report_dir / "instance_predictions.csv", index=False)
+    metrics.to_csv(report_dir / "per_class_metrics.csv", index=False)
+    pd.DataFrame(matrix, index=matrix_labels, columns=matrix_labels).to_csv(
+        report_dir / "confusion_matrix.csv", index_label="True / Predicted"
     )
-    save_confusion_matrix(matrix, args.output_dir / "confusion_matrix.png")
+    title_suffix = " — PRELIMINARY A/B ONLY" if args.preliminary_ab else ""
+    save_confusion_matrix(
+        matrix,
+        report_dir / "confusion_matrix.png",
+        labels=matrix_labels,
+        title="DragonView per-fruit confusion matrix" + title_suffix,
+    )
+    save_metrics_chart(
+        metrics,
+        summary,
+        report_dir / "metrics_overview.png",
+        title="DragonView per-fruit classification metrics" + title_suffix,
+        macro_label="A/B Macro" if args.preliminary_ab else "Macro",
+    )
     result = {
         **summary,
-        "classes": list(EXPECTED_CLASSES),
+        "evaluation_status": "preliminary_ab_only" if args.preliminary_ab else "final_three_class",
+        "classes": metric_labels,
+        "confusion_matrix_labels": matrix_labels,
         "support": {row["Class"]: int(row["Support"]) for row in metrics.to_dict("records")},
         "confusion_matrix": matrix.tolist(),
         "model": str(args.model.resolve()),
@@ -463,11 +600,16 @@ def main() -> int:
         "annotation_exports": [str(path.resolve()) for path in files],
         "crop_padding": args.crop_padding,
     }
-    (args.output_dir / "evaluation_summary.json").write_text(
+    if args.preliminary_ab:
+        result["limitation"] = (
+            "Class C has zero true held-out instances and is excluded from per-class and macro metrics. "
+            "Predicted Class C outcomes remain visible in the confusion matrix as A/B errors."
+        )
+    (report_dir / "evaluation_summary.json").write_text(
         json.dumps(result, indent=2), encoding="utf-8"
     )
     print_results(matrix, metrics, summary)
-    print(f"\nEvaluation artifacts: {args.output_dir.resolve()}")
+    print(f"\nEvaluation artifacts: {report_dir.resolve()}")
     return 0
 
 

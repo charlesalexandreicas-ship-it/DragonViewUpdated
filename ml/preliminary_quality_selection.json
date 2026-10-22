@@ -1,0 +1,29 @@
+{
+  "purpose": "Preliminary A/B/C workflow demonstration; not final grade validation",
+  "fresh_class_a_ids": [
+    64, 68, 98, 147, 158, 166, 212, 216, 228, 233,
+    260, 266, 278, 279, 291, 294, 313, 314, 344, 355,
+    384, 405, 420, 452, 469, 524, 603, 624, 656, 683,
+    737, 746
+  ],
+  "fresh_class_b_ids": [
+    14, 26, 39, 74, 87, 94, 115, 127, 140, 165,
+    168, 177, 186, 194, 200, 206, 211, 217, 241, 248,
+    304, 307, 309, 325, 328, 331, 340, 360, 374, 376,
+    385, 393, 401, 418, 428, 434, 439, 456, 494, 536,
+    544, 560, 575, 583, 625, 641, 671, 679, 717, 734,
+    745, 765, 797, 822, 847, 885
+  ],
+  "defect_class_c_groups": {
+    "defect_visible_scars_1": [257, 272],
+    "defect_visible_scars_2": [310, 335],
+    "defect_visible_scars_3": [425, 435],
+    "defect_overripe_4": [705, 740]
+  },
+  "review_limitations": [
+    "A/B labels are visual prototype judgments from contact sheets and selected full-size images.",
+    "Class C is a visible-defect/overripe proxy; photos alone cannot confirm juice suitability.",
+    "Each consecutive defect range is one capture group, not one independent sample per photo.",
+    "Known mold-heavy and visibly rotten sequences were excluded from this selection."
+  ]
+}

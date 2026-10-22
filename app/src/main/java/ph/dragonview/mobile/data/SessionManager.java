@@ -13,6 +13,12 @@ import java.security.GeneralSecurityException;
 
 import ph.dragonview.mobile.data.model.SessionUser;
 
+/**
+ * Stores the signed-in user, cloud tokens, and selected workspace in encrypted preferences.
+ *
+ * <p>Learning note: Activities and repositories read session state through this class
+ * instead of accessing {@link SharedPreferences} directly.</p>
+ */
 public final class SessionManager {
     public static final String ACTION_SESSION_EXPIRED =
             "ph.dragonview.mobile.action.SESSION_EXPIRED";
@@ -30,6 +36,7 @@ public final class SessionManager {
     private final SharedPreferences preferences;
     private final Context applicationContext;
 
+    /** Opens the encrypted preference file using an Android Keystore-backed master key. */
     public SessionManager(Context context) {
         applicationContext = context.getApplicationContext();
         try {
@@ -47,6 +54,7 @@ public final class SessionManager {
         }
     }
 
+    /** Saves the user profile fields without changing authentication tokens. */
     public void save(SessionUser user) {
         preferences.edit()
                 .putString(USER_ID_KEY, user.getId())
@@ -55,6 +63,7 @@ public final class SessionManager {
                 .apply();
     }
 
+    /** Persists a complete authenticated session returned by Supabase. */
     public void saveAuthenticated(SessionUser user, String accessToken,
                                   String refreshToken, long expiresAt) {
         preferences.edit()
@@ -67,6 +76,7 @@ public final class SessionManager {
                 .apply();
     }
 
+    /** Reconstructs the current user, or returns null when required fields are absent. */
     public SessionUser getUser() {
         String id = preferences.getString(USER_ID_KEY, null);
         String email = preferences.getString(USER_EMAIL_KEY, null);
@@ -75,6 +85,7 @@ public final class SessionManager {
         return new SessionUser(id, email, name);
     }
 
+    /** Requires both a saved user and refresh token before opening protected screens. */
     public boolean isAuthenticated() {
         return getUser() != null && getRefreshToken() != null;
     }
@@ -83,6 +94,7 @@ public final class SessionManager {
     public String getRefreshToken() { return preferences.getString(REFRESH_TOKEN_KEY, null); }
     public long getExpiresAt() { return preferences.getLong(EXPIRES_AT_KEY, 0L); }
 
+    /** Saves the workspace context attached to subsequent repository operations. */
     public void setActiveWorkspace(String id, String name, String role) {
         preferences.edit()
                 .putString(WORKSPACE_ID_KEY, id)
@@ -91,6 +103,7 @@ public final class SessionManager {
                 .apply();
     }
 
+    /** Removes only workspace selection while preserving the signed-in account. */
     public void clearActiveWorkspace() {
         preferences.edit()
                 .remove(WORKSPACE_ID_KEY)
@@ -114,6 +127,7 @@ public final class SessionManager {
     public boolean isWorkspaceOwner() { return "OWNER".equals(getActiveWorkspaceRole()); }
     public boolean isWorkspaceFarmer() { return "FARMER".equals(getActiveWorkspaceRole()); }
 
+    /** Removes all local session data during a normal sign-out. */
     public void clear() {
         preferences.edit().clear().apply();
     }

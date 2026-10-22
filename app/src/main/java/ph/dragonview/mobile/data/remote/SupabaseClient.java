@@ -25,6 +25,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Synchronous gateway around DragonView's Supabase authentication and RPC API.
+ *
+ * <p>Learning note: {@code LocalRepository} runs these blocking calls on its worker
+ * executor, so Activities and Fragments never perform network I/O directly.</p>
+ */
 public final class SupabaseClient {
     public static final String PASSWORD_RECOVERY_REDIRECT = "ph.dragonview.mobile://auth/recover";
     public static final class AuthResult {
@@ -46,6 +52,7 @@ public final class SupabaseClient {
     private final SupabaseApi api;
     private final Gson gson = new Gson();
 
+    /** Builds the HTTP client and reads the encrypted session used for authorization. */
     public SupabaseClient(Context context) {
         session = new SessionManager(context.getApplicationContext());
         String baseUrl = BuildConfig.SUPABASE_URL.trim();
@@ -68,10 +75,12 @@ public final class SupabaseClient {
                 .build().create(SupabaseApi.class);
     }
 
+    /** Checks that the build supplied both a Supabase URL and publishable key. */
     public boolean isConfigured() {
         return api != null && !apiKey.isEmpty();
     }
 
+    /** Creates an account and converts the response into DragonView session data. */
     public AuthResult signUp(String displayName, String email, String password) throws SupabaseException {
         requireConfigured();
         JsonObject body = new JsonObject();
@@ -83,6 +92,7 @@ public final class SupabaseClient {
         return parseAuth(execute(api.signUp(apiKey, body), false), displayName);
     }
 
+    /** Exchanges credentials for the current user and cloud tokens. */
     public AuthResult signIn(String email, String password) throws SupabaseException {
         requireConfigured();
         JsonObject body = new JsonObject();
@@ -106,11 +116,13 @@ public final class SupabaseClient {
         execute(api.updatePassword(apiKey, bearer(recoveryAccessToken), body), false);
     }
 
+    /** Invokes a read-only database function with a valid bearer token. */
     public JsonElement read(String functionName, Map<String, Object> arguments)
             throws SupabaseException {
         return executeAuthenticated(functionName, arguments);
     }
 
+    /** Sends a mutation with an operation ID that makes retries idempotent. */
     public JsonElement mutate(String functionName, JsonElement payload, String operationId)
             throws SupabaseException {
         Map<String, Object> arguments = new LinkedHashMap<>();
@@ -129,6 +141,7 @@ public final class SupabaseClient {
         catch (IOException ignored) { }
     }
 
+    /** Refreshes authentication when needed, then retries one unauthorized RPC once. */
     private JsonElement executeAuthenticated(String functionName, Map<String, Object> arguments)
             throws SupabaseException {
         requireConfigured();
@@ -147,12 +160,14 @@ public final class SupabaseClient {
         return bodyOrThrow(response);
     }
 
+    /** Refreshes shortly before expiry so a request does not begin with a stale token. */
     private void ensureFreshSession() throws SupabaseException {
         if (session.getAccessToken() == null || session.getExpiresAt() <= System.currentTimeMillis() + 60_000L) {
             refreshSession();
         }
     }
 
+    /** Serializes token refresh so simultaneous requests cannot overwrite newer tokens. */
     private synchronized void refreshSession() throws SupabaseException {
         String refreshToken = session.getRefreshToken();
         if (refreshToken == null || refreshToken.isEmpty()) {
@@ -203,6 +218,7 @@ public final class SupabaseClient {
         catch (IOException error) { throw new SupabaseException("DragonView cannot reach the cloud service.", true, error); }
     }
 
+    /** Returns a successful response body or translates HTTP failure into a domain error. */
     private <T> T bodyOrThrow(Response<T> response) throws SupabaseException {
         if (response.isSuccessful() && response.body() != null) return response.body();
         String message = "Cloud request failed (" + response.code() + ").";

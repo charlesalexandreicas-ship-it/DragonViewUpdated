@@ -1,6 +1,5 @@
 package ph.dragonview.mobile.ui.inventory;
 
-import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -24,6 +22,8 @@ import ph.dragonview.mobile.R;
 import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.data.model.HarvestRequest;
 import ph.dragonview.mobile.databinding.FragmentHarvestBinding;
+import ph.dragonview.mobile.ui.date.RecordDate;
+import ph.dragonview.mobile.ui.date.RecordDateInput;
 
 public final class HarvestFragment extends Fragment {
     public static final String HARVEST_SAVED_RESULT = "harvest_saved";
@@ -58,23 +58,10 @@ public final class HarvestFragment extends Fragment {
                 android.R.layout.simple_dropdown_item_1line,
                 GRADES));
         resetEditor();
-        binding.dateInput.setOnClickListener(v -> chooseDate());
+        RecordDateInput.attach(binding.dateInput);
         binding.addItemButton.setOnClickListener(v -> addOrUpdateItem());
         binding.saveButton.setOnClickListener(v -> save());
         renderItems();
-    }
-
-    private void chooseDate() {
-        Calendar now = Calendar.getInstance();
-        new DatePickerDialog(
-                requireContext(),
-                (picker, year, month, day) -> binding.dateInput.setText(
-                        String.format(Locale.US, "%04d-%02d-%02d",
-                                year, month + 1, day)),
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH))
-                .show();
     }
 
     private boolean addOrUpdateItem() {
@@ -180,12 +167,13 @@ public final class HarvestFragment extends Fragment {
 
     private void save() {
         String batch = text(binding.batchInput.getText()).replaceFirst("^#", "");
-        String date = text(binding.dateInput.getText());
+        String enteredDate = text(binding.dateInput.getText());
+        String date = RecordDate.toIso(enteredDate);
         binding.batchLayout.setError(
                 batch.isEmpty() ? "Batch number is required." : null);
-        binding.dateLayout.setError(
-                date.isEmpty() ? "Harvest date is required." : null);
-        if (batch.isEmpty() || date.isEmpty()) return;
+        binding.dateLayout.setError(enteredDate.isEmpty() ? "Harvest date is required."
+                : date == null ? "Enter a real date as MM/DD/YYYY." : null);
+        if (batch.isEmpty() || date == null) return;
 
         // Save what is currently entered as part of the batch. This keeps the
         // two-step editor useful for multiple combinations without losing the

@@ -28,6 +28,29 @@ final class PlantGuidanceContent {
     }
     private static final int[] EN = {0, R.array.guidance_1_en, R.array.guidance_2_en, R.array.guidance_3_en, R.array.guidance_4_en, R.array.guidance_5_en, R.array.guidance_6_en, R.array.guidance_7_en, R.array.guidance_8_en};
     private static final int[] FIL = {0, R.array.guidance_1_fil, R.array.guidance_2_fil, R.array.guidance_3_fil, R.array.guidance_4_fil, R.array.guidance_5_fil, R.array.guidance_6_fil, R.array.guidance_7_fil, R.array.guidance_8_fil};
+    // Zero means no verified photo: the image panel stays absent for stages 2 and 3.
+    private static final int[] IMAGES = {0, R.drawable.guidance_stage_1, 0, 0,
+            R.drawable.guidance_stage_4, R.drawable.guidance_stage_5,
+            R.drawable.guidance_stage_6, R.drawable.guidance_stage_7,
+            R.drawable.guidance_stage_8};
+    private static final String[] IMAGE_SOURCES = {null,
+            "https://commons.wikimedia.org/wiki/File:Dragon_fruit_plant.jpg", null, null,
+            "https://commons.wikimedia.org/wiki/File:Hylocereus_undatus,_jard%C3%ADn_bot%C3%A1nico_de_Tallinn,_Estonia,_2012-08-13,_DD_01.JPG",
+            "https://commons.wikimedia.org/wiki/File:Dragon_friut_flower.jpg",
+            "https://commons.wikimedia.org/wiki/File:Hylocereus_undatus1.jpg",
+            "https://commons.wikimedia.org/wiki/File:%E0%A6%A1%E0%A7%8D%E0%A6%B0%E0%A6%BE%E0%A6%97%E0%A6%A8_%E0%A6%AB%E0%A6%B2,_%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE%E0%A6%A6%E0%A7%87%E0%A6%B6.jpg",
+            "https://commons.wikimedia.org/wiki/File:Dragonfruit_Chiayi_market.jpg"};
+    private static final String[] IMAGE_LICENSES = {null,
+            "https://creativecommons.org/licenses/by-sa/4.0/", null, null,
+            "https://creativecommons.org/licenses/by-sa/3.0/",
+            "https://creativecommons.org/licenses/by-sa/4.0/",
+            "https://creativecommons.org/licenses/by/3.0/",
+            "https://creativecommons.org/licenses/by-sa/3.0/",
+            "https://creativecommons.org/licenses/by-sa/2.0/"};
+    static int imageResource(PlantingStage stage) {
+        int stageIndex = index(stage);
+        return stageIndex == 0 ? 0 : IMAGES[stageIndex];
+    }
     static String[] get(Context context, PlantingStage stage) {
         int index = index(stage);
         return index == 0 ? null : context.getResources().getStringArray(
@@ -40,8 +63,11 @@ final class PlantGuidanceContent {
     }
     static void bind(BottomSheetStageGuidanceBinding sheet, PlantingStage stage) {
         Context context = sheet.getRoot().getContext();
-        sheet.referenceImagePanel.setVisibility(View.GONE);
-        if (index(stage) == 0) return;
+        int stageIndex = index(stage);
+        if (stageIndex == 0) {
+            sheet.referenceImagePanel.setVisibility(View.GONE);
+            return;
+        }
         MaterialButton language = new MaterialButton(context, null,
                 androidx.appcompat.R.attr.borderlessButtonStyle);
         language.setMinHeight((int) (48 * context.getResources().getDisplayMetrics().density));
@@ -63,7 +89,14 @@ final class PlantGuidanceContent {
             sheet.validationText.setText(fil ?
                     "Gabay mula sa pananaliksik at extension. Iangkop sa barayti at kondisyon ng bukid." :
                     "Research and extension guidance. Adapt to the cultivar and farm conditions.");
-            sheet.sourceText.setText(text[5] + "\n\n" + SOURCES);
+            bindImage(sheet, stageIndex, fil, text[0]);
+            String imageSources = IMAGES[stageIndex] == 0 ? "" :
+                    "\n\n" + (fil ? "Pinagmulan ng larawan" : "Photo source") + "\n" +
+                    IMAGE_SOURCES[stageIndex] + "\n" +
+                    (fil ? "Lisensiya" : "License") + "\n" + IMAGE_LICENSES[stageIndex] +
+                    "\n" + (fil ? "Walang karagdagang pag-edit sa larawan." :
+                            "No further edits to the photo.");
+            sheet.sourceText.setText(text[5] + imageSources + "\n\n" + SOURCES);
             android.text.util.Linkify.addLinks(sheet.sourceText, android.text.util.Linkify.WEB_URLS);
             translate(sheet.getRoot(), fil);
             sheet.closeButton.setContentDescription(fil ? "Isara ang gabay" : "Close guidance");
@@ -75,6 +108,20 @@ final class PlantGuidanceContent {
             render.run();
         });
         render.run();
+    }
+    /** Shows only source-traceable stage photos and refreshes the visible credit on language changes. */
+    private static void bindImage(BottomSheetStageGuidanceBinding sheet, int stageIndex,
+                                  boolean filipino, String stageTitle) {
+        int image = IMAGES[stageIndex];
+        sheet.referenceImagePanel.setVisibility(image == 0 ? View.GONE : View.VISIBLE);
+        if (image == 0) return;
+        Context context = sheet.getRoot().getContext();
+        sheet.referenceImage.setImageResource(image);
+        sheet.referenceImage.setContentDescription((filipino ? "Halimbawang larawan: " :
+                "Reference photo: ") + stageTitle);
+        String[] credits = context.getResources().getStringArray(filipino ?
+                R.array.guidance_image_credits_fil : R.array.guidance_image_credits_en);
+        sheet.referenceImageCredit.setText(credits[stageIndex - 1]);
     }
     private static final String[][] LABELS = {
         {"Expected appearance", "Palatandaan"},

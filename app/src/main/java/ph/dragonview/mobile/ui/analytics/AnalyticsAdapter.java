@@ -26,9 +26,22 @@ final class AnalyticsAdapter extends RecyclerView.Adapter<AnalyticsAdapter.Holde
         private final ItemAnalyticsSummaryBinding binding;
         Holder(ItemAnalyticsSummaryBinding binding) { super(binding.getRoot()); this.binding = binding; }
         void bind(SalesAnalytics.Summary row) {
-            binding.categoryText.setText(row.getSize().replace('_', '-') + " • Grade " + row.getGrade());
-            binding.quantityText.setText(row.getPieces() + " pieces • "
-                    + String.format(Locale.US, "%.3f kg", row.getWeightKilograms()));
+            String size = row.getSize() == null ? "Size not recorded"
+                    : row.getSize().replace('_', ' ');
+            boolean gradeMissing = row.getGrade() == null || row.getGrade().trim().isEmpty();
+            binding.categoryText.setText(size + " • " + (gradeMissing
+                    ? "Grade not recorded" : "Grade " + row.getGrade()));
+            if (gradeMissing) {
+                String weight = row.getWeightKilograms() > 0
+                        ? String.format(Locale.US, "%.3f kg", row.getWeightKilograms())
+                        : "Weight not recorded";
+                String legacy = row.getPieces() > 0
+                        ? " • " + row.getPieces() + " legacy pieces" : "";
+                binding.quantityText.setText(weight + legacy + " • Historical sale");
+            } else {
+                binding.quantityText.setText(row.getPieces() + " pieces • "
+                        + String.format(Locale.US, "%.3f kg", row.getWeightKilograms()));
+            }
             binding.revenueText.setText(NumberFormat.getCurrencyInstance(new Locale("en", "PH")).format(row.getRevenue()));
         }
     }

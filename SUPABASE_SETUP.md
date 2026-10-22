@@ -54,6 +54,13 @@ To test recovery, request a link from **Forgot password?** on the sign-in screen
 9. Turn off networking and confirm cached reads and safe queued writes remain scoped to the active workspace.
 10. Confirm sales, reductions, and regrading are blocked offline.
 11. Confirm camera/gallery scanning and LiteRT inference work in airplane mode.
+12. Before using kilogram-based historical entry, confirm migrations `20260925000100`, `20260925000200`, `20260929000100`, and `20260929000200` appear on both sides of `npx.cmd supabase migration list --linked`. The last migration allows the historical-only Blemished category. Deploy pending migrations before testing an APK built from the updated source.
+13. As an owner, enter one historical page containing an actual-sale row and an estimated-value row. Confirm each subtotal equals kilograms × price/kg, and the grand total matches all subtotals. Only the actual-sale subtotal and its known kilograms enter Analytics revenue and total weight; Inventory and completed-sale count remain unchanged. Previously saved piece-based rows must remain visibly labeled as legacy, with unknown weight.
+    Include a Blemished row with weight, price/kg, and calculated total. Confirm it saves and appears in historical records and Analytics without creating live inventory stock.
+14. As a farmer, confirm historical records cannot be opened or saved and full Analytics remains unavailable. The server RPCs independently enforce owner permission.
+15. Confirm a historical paper photo is transcribed on-device, every extracted value can be corrected before saving, and no image is uploaded by this flow. Daily Analytics must not invent an hour for a date-only paper sale.
+
+Historical records are online-only, owner-reviewed imports. Do not import the same actual sale again if it is already recorded in DragonView Sales, or revenue would be counted twice. The paper photo is used for local transcription and is not kept as cloud evidence. A full live owner/farmer test requires real test accounts; compiling the APK and applying migrations alone do not prove that path.
 
 ## Release rule
 

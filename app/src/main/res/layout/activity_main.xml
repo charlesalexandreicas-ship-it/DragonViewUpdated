@@ -17,20 +17,20 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
-            android:layout_height="108dp"
-            android:background="@drawable/dragon_gradient"
+            android:layout_height="68dp"
+            android:background="@color/botanical_header"
             android:elevation="0dp"
             android:paddingStart="12dp"
-            android:paddingTop="18dp"
+            android:paddingTop="4dp"
             android:paddingEnd="20dp"
             android:theme="@style/ThemeOverlay.Material3.ActionBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:navigationIconTint="@color/ink"
+            app:navigationIconTint="@color/white"
             app:titleCentered="false"
             app:titleTextAppearance="@style/TextAppearance.DragonView.ToolbarTitle"
-            app:titleTextColor="@color/ink" />
+            app:titleTextColor="@color/white" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nav_host"
@@ -70,9 +70,9 @@
             android:layout_height="60dp"
             android:layout_marginBottom="38dp"
             android:contentDescription="Open camera scanner"
-            android:elevation="4dp"
+            android:elevation="2dp"
             android:src="@drawable/ic_camera"
-            app:backgroundTint="@color/action_primary"
+            app:backgroundTint="@color/botanical_accent"
             app:borderWidth="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

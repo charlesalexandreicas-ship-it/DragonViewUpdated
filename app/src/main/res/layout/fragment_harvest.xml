@@ -42,8 +42,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:hint="Harvest date">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/dateInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:focusable="false" />
+                    android:hint="Harvest date (MM/DD/YYYY)">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/dateInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:maxLength="10" />
                 </com.google.android.material.textfield.TextInputLayout>
                 <LinearLayout
                     android:layout_width="match_parent"

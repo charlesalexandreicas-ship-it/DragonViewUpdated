@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.google.android.material.button.MaterialButton;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -92,21 +93,20 @@ public final class HomeCleanupInstrumentedTest {
                             LayoutInflater.from(themed(scale)));
                     // Explicit fixtures for rendering, not persisted or displayed as live farm data.
                     ui.inventoryValue.setText("12500");
-                    ui.todayRevenueValue.setText("₱125,000.00");
+                    ui.batchesValue.setText("12");
+                    ui.monthlyRevenueValue.setText("₱125,000.00");
                     ui.plantingValue.setText("16");
-                    ui.classificationValue.setText("42");
                     measure(ui.getRoot(), width, 1200);
-                    assertEquals(ui.viewInventoryAction.getHeight(), ui.recordHarvestAction.getHeight());
-                    assertEquals(ui.viewAnalyticsButton.getHeight(), ui.recordPlantingAction.getHeight());
-                    assertEquals(1, ui.todayRevenueValue.getLineCount());
-                    assertTrue(ui.todayRevenueValue.getLayout()
-                            .getEllipsisCount(ui.todayRevenueValue.getLineCount() - 1) == 0);
+                    assertEquals(ui.viewInventoryAction.getHeight(), ui.viewSalesAction.getHeight());
+                    assertEquals(ui.viewAnalyticsButton.getHeight(), ui.viewPlantGuidanceAction.getHeight());
+                    assertEquals(1, ui.monthlyRevenueValue.getLineCount());
+                    assertTrue(ui.monthlyRevenueValue.getLayout()
+                            .getEllipsisCount(ui.monthlyRevenueValue.getLineCount() - 1) == 0);
                     View[] cards = {
+                            (View) ui.batchesValue.getParent(),
                             (View) ui.inventoryValue.getParent(),
-                            (View) ui.todayRevenueValue.getParent(),
-                            (View) ui.plantingValue.getParent(),
-                            (View) ui.classificationValue.getParent(),
-                            (View) ui.revenueTrendText.getParent()
+                            (View) ui.monthlyRevenueValue.getParent(),
+                            (View) ui.plantingValue.getParent()
                     };
                     for (int index = 1; index < cards.length; index++) {
                         assertEquals(cards[0].getWidth(), cards[index].getWidth());
@@ -116,6 +116,35 @@ public final class HomeCleanupInstrumentedTest {
                 }
             }
         });
+    }
+
+    @Test public void homeQuickActionsKeepTheirIcons() {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            FragmentDashboardBinding ui = FragmentDashboardBinding.inflate(
+                    LayoutInflater.from(themed(1f)));
+            measure(ui.getRoot(), 360, 900);
+            MaterialButton[] actions = {ui.viewInventoryAction, ui.viewSalesAction,
+                    ui.viewAnalyticsButton, ui.viewPlantGuidanceAction};
+            String[] labels = {"View stock", "Sales", "Analytics", "Guidance"};
+            for (int index = 0; index < actions.length; index++) {
+                assertEquals(labels[index], actions[index].getText().toString());
+            }
+            for (MaterialButton action : actions) {
+                assertNotNull(action.getIcon());
+                assertTrue(action.getIconSize() > 0);
+            }
+        });
+    }
+
+    @Test public void attachedHomeActionsRenderWithIcons() {
+        try (ActivityScenario<LoginActivity> scenario = ActivityScenario.launch(LoginActivity.class)) {
+            scenario.onActivity(activity -> {
+                FragmentDashboardBinding ui = FragmentDashboardBinding.inflate(activity.getLayoutInflater());
+                activity.setContentView(ui.getRoot());
+                measure(ui.getRoot(), 360, 900);
+                capture(ui.getRoot(), "home-attached-360");
+            });
+        }
     }
 
     @Test public void reportingPillsWrapAndPreserveAllFourPeriodMappings() {
@@ -161,7 +190,7 @@ public final class HomeCleanupInstrumentedTest {
         });
     }
 
-    @Test public void onePointRevenueTrendStillDrawsAVisibleLine() {
+    @Test public void onePointRevenueTrendDrawsOnlyItsObservedPoint() {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             RevenueTrendChartView chart = new RevenueTrendChartView(themed(1f), null);
             chart.setData(Collections.singletonList(
@@ -170,15 +199,17 @@ public final class HomeCleanupInstrumentedTest {
             Bitmap bitmap = Bitmap.createBitmap(
                     chart.getWidth(), chart.getHeight(), Bitmap.Config.ARGB_8888);
             chart.draw(new Canvas(bitmap));
-            int expected = target().getColor(R.color.dragon_green);
+            int expected = target().getColor(R.color.dragon_magenta);
             int matchingPixels = 0;
             for (int y = 0; y < bitmap.getHeight(); y++) {
                 for (int x = 0; x < bitmap.getWidth(); x++) {
                     if (bitmap.getPixel(x, y) == expected) matchingPixels++;
                 }
             }
-            assertTrue("A one-point series must render more than a tiny dot",
-                    matchingPixels > chart.getWidth());
+            assertTrue("A one-point series must show its observed point",
+                    matchingPixels > 5);
+            assertTrue("A one-point series must not invent a horizontal line",
+                    matchingPixels < chart.getWidth());
             assertTrue(String.valueOf(chart.getContentDescription()).contains("daily"));
             save(bitmap, "analytics-single-point");
         });
@@ -248,18 +279,18 @@ public final class HomeCleanupInstrumentedTest {
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             java.util.List<int[]> routes = new java.util.ArrayList<>();
             routes.add(new int[]{R.id.viewInventoryAction, R.id.inventoryFragment});
-            routes.add(new int[]{R.id.recordHarvestAction, R.id.harvestFragment});
+            routes.add(new int[]{R.id.viewSalesAction, R.id.salesFragment});
             if (new SessionManager(target()).isWorkspaceOwner()) {
                 routes.add(new int[]{R.id.viewAnalyticsButton, R.id.analyticsFragment});
             }
-            routes.add(new int[]{R.id.recordPlantingAction, R.id.plantingFragment});
+            routes.add(new int[]{R.id.viewPlantGuidanceAction, R.id.plantingFragment});
             for (int[] route : routes) {
                 onView(withId(route[0])).perform(click());
                 assertDestination(scenario, route[1]);
                 onView(allOf(withId(R.id.dashboardFragment),
                         isDescendantOfA(withId(R.id.bottomNavigation)))).perform(click());
                 assertDestination(scenario, R.id.dashboardFragment);
-                onView(allOf(withText("Today at a glance"),
+                onView(allOf(withText("Farm overview"),
                         isDescendantOfA(withId(R.id.nav_host)))).check(matches(isDisplayed()));
             }
         }

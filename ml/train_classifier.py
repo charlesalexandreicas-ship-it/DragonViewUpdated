@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import math
 import random
 import re
@@ -59,6 +60,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--fine-tune-epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=16)
+    parser.add_argument("--dataset-dir", type=Path, default=RAW_DATASET_DIR)
+    parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
+    parser.add_argument("--asset-dir", type=Path, default=ASSET_DIR)
     parser.add_argument(
         "--allow-unsafe-dataset",
         action="store_true",
@@ -242,6 +246,20 @@ def train_and_export(args: argparse.Namespace, examples: list[Example]) -> None:
     report_split("validation", validation_examples)
     report_split("test", test_examples)
 
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    split_manifest = {
+        name: [
+            {"path": str(record.path.resolve()), "class": record.class_name,
+             "capture_group": record.capture_group, "sha256": record.sha256}
+            for record in records
+        ]
+        for name, records in (("train", train_examples), ("validation", validation_examples),
+                              ("test", test_examples))
+    }
+    (OUTPUT_DIR / "classifier_split_manifest.json").write_text(
+        json.dumps(split_manifest, indent=2), encoding="utf-8"
+    )
+
     def decode(path: "tf.Tensor", label: "tf.Tensor"):
         image = tf.io.decode_image(tf.io.read_file(path), channels=3, expand_animations=False)
         image.set_shape([None, None, 3])
@@ -391,6 +409,10 @@ def train_and_export(args: argparse.Namespace, examples: list[Example]) -> None:
 
 def main() -> int:
     args = parse_args()
+    global RAW_DATASET_DIR, OUTPUT_DIR, ASSET_DIR
+    RAW_DATASET_DIR = args.dataset_dir.resolve()
+    OUTPUT_DIR = args.output_dir.resolve()
+    ASSET_DIR = args.asset_dir.resolve()
     try:
         examples, duplicates = load_examples()
         audit(examples, duplicates, args.allow_unsafe_dataset)

@@ -9,7 +9,10 @@ build-verify.*
 lint-recheck.*
 /.android_home/
 /.vscode/
-/QA and Testing/
+/project_records/QA and Testing/
+/project_records/screenshots/
+/project_records/reference_icons/
+/project_records/terminal_artifacts/
 /app/output/
 /dragon-view-offline.db
 /dragon-view-offline.db-shm

@@ -37,6 +37,10 @@ import ph.dragonview.mobile.databinding.FragmentSalesBinding;
 import ph.dragonview.mobile.databinding.ItemWholeBatchSaleLineBinding;
 import ph.dragonview.mobile.ui.archive.ArchiveDialog;
 
+/**
+ * Displays sales history and coordinates item-based or whole-batch sale entry.
+ * Price and inventory prerequisites are loaded before the sale dialog is opened.
+ */
 public final class SalesFragment extends Fragment {
     private FragmentSalesBinding binding;
     private SalesAdapter adapter;
@@ -68,6 +72,7 @@ public final class SalesFragment extends Fragment {
         load();
     }
 
+    /** Refreshes sale history and the summary values shown above the list. */
     private void load() {
         binding.swipeRefresh.setRefreshing(true);
         LocalRepository repository = LocalRepository.get(requireContext());
@@ -97,6 +102,7 @@ public final class SalesFragment extends Fragment {
         loadSalePrerequisites(false);
     }
 
+    /** Opens immediately when prerequisites are ready or starts their shared load. */
     private void openSale() {
         if (salePrerequisitesReady) {
             showSaleDialog();
@@ -107,6 +113,7 @@ public final class SalesFragment extends Fragment {
         loadSalePrerequisites(true);
     }
 
+    /** Loads prices and stock together while a generation number rejects stale callbacks. */
     private void loadSalePrerequisites(boolean openWhenReady) {
         pendingSaleOpen |= openWhenReady;
         if (salePrerequisitesLoading) return;
@@ -171,6 +178,7 @@ public final class SalesFragment extends Fragment {
         }
     }
 
+    /** Builds the sale form and switches its line-entry behavior by sale type. */
     private void showSaleDialog() {
         if (inventory.isEmpty()) {
             binding.messageText.setText(
@@ -385,6 +393,7 @@ public final class SalesFragment extends Fragment {
         form.totalText.setText("Total: " + php.format(total));
     }
 
+    /** Validates the sale, calculates totals, and submits one complete transaction. */
     private void complete(AlertDialog dialog, DialogSaleBinding form, List<SaleLine> lines) {
         String name = text(form.nameInput.getText()), address = text(form.addressInput.getText());
         String contact = text(form.contactInput.getText()), email = text(form.emailInput.getText());
@@ -499,6 +508,7 @@ public final class SalesFragment extends Fragment {
         }
         updateTotal(form, lines);
     }
+    /** Recalculates pieces, weight, and price whenever sale lines change. */
     private void updateTotal(DialogSaleBinding form, List<SaleLine> lines) {
         double total = 0;
         for (SaleLine line : lines) total += line.subtotal();

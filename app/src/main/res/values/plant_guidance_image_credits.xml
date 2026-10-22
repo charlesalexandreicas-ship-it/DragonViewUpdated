@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="guidance_image_credits_en">
+        <item>Photo: Vimalananth V - CC BY-SA 4.0</item>
+        <item></item>
+        <item></item>
+        <item>Diego Delso, delso.photo, License CC BY-SA 3.0</item>
+        <item>Photo: Derk29 - CC BY-SA 4.0</item>
+        <item>Photo: KENPEI - CC BY 3.0</item>
+        <item>Photo: Salim Khandoker - CC BY-SA 3.0</item>
+        <item>Photo: _e.t - CC BY-SA 2.0</item>
+    </string-array>
+    <string-array name="guidance_image_credits_fil">
+        <item>Larawan: Vimalananth V - CC BY-SA 4.0</item>
+        <item></item>
+        <item></item>
+        <item>Diego Delso, delso.photo, License CC BY-SA 3.0</item>
+        <item>Larawan: Derk29 - CC BY-SA 4.0</item>
+        <item>Larawan: KENPEI - CC BY 3.0</item>
+        <item>Larawan: Salim Khandoker - CC BY-SA 3.0</item>
+        <item>Larawan: _e.t - CC BY-SA 2.0</item>
+    </string-array>
+</resources>

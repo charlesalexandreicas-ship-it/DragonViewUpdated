@@ -46,7 +46,7 @@ import ph.dragonview.mobile.R;
 import ph.dragonview.mobile.databinding.FragmentScannerBinding;
 
 /** Camera and gallery UI; the ViewModel owns decoding and optional model inference. */
-public final class ScannerFragment extends Fragment {
+public final class ScannerFragment extends Fragment { //TRULY YOURS MY NIGGA -----CAS
     @Nullable private FragmentScannerBinding binding;
     @Nullable private ProcessCameraProvider cameraProvider;
     @Nullable private Preview preview;
@@ -146,6 +146,7 @@ public final class ScannerFragment extends Fragment {
         }
     }
 
+    /** Captures immediately when permitted or starts Android's permission flow. */
     private void captureOrRequestPermission() {
         if (binding == null) return;
         if (!hasCameraPermission()) {
@@ -190,6 +191,7 @@ public final class ScannerFragment extends Fragment {
         }
     }
 
+    /** Binds CameraX preview and capture use cases to this Fragment's lifecycle. */
     private void startCamera() {
         if (binding == null || cameraStarting || cameraReady || cameraFailed
                 || !hasCameraPermission() || (scanState != null && scanState.image != null)) return;
@@ -266,6 +268,7 @@ public final class ScannerFragment extends Fragment {
         renderCameraControls();
     }
 
+    /** Releases camera bindings and observers when the preview should no longer run. */
     private void stopCamera() {
         cameraRequestVersion++;
         if (cameraStates != null && cameraStateObserver != null) {
@@ -283,12 +286,30 @@ public final class ScannerFragment extends Fragment {
         cameraStarting = false;
     }
 
+    /** Converts ViewModel state into preview, progress, result, and error UI. */
     private void renderState(@NonNull ScannerViewModel.State state) {
         scanState = state;
         if (binding == null) return;
         boolean hasImage = state.image != null;
         binding.selectedImagePreview.setImageBitmap(state.image);
         binding.selectedImagePreview.setVisibility(hasImage ? View.VISIBLE : View.GONE);
+        // Fit the preview card to the uploaded photo within a screen-friendly height.
+        // FIT_CENTER and the overlay share this space, so portrait and landscape photos stay intact.
+        binding.scannerPreviewCard.post(() -> {
+            if (binding == null) return;
+            float density = getResources().getDisplayMetrics().density;
+            int width = binding.scannerPreviewCard.getWidth();
+            if (width <= 0) return;
+            int wanted = hasImage
+                    ? Math.round(width * state.image.getHeight() / (float) state.image.getWidth())
+                    : Math.round(280 * density);
+            wanted = Math.max(Math.round(220 * density), Math.min(wanted, Math.round(440 * density)));
+            ViewGroup.LayoutParams params = binding.scannerPreviewCard.getLayoutParams();
+            if (params.height != wanted) {
+                params.height = wanted;
+                binding.scannerPreviewCard.setLayoutParams(params);
+            }
+        });
         if (detectionOverlay != null) {
             detectionOverlay.setVisibility(hasImage ? View.VISIBLE : View.GONE);
             detectionOverlay.setDetections(state.result == null ? null : state.result.detections,
@@ -343,6 +364,7 @@ public final class ScannerFragment extends Fragment {
         if (!hasImage && !state.busy) startCamera();
     }
 
+    /** Enables only controls that are valid for current permission and camera state. */
     private void renderCameraControls() {
         if (binding == null) return;
         boolean hasImage = scanState != null && scanState.image != null;

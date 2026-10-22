@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dragon_surface"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Historical records"
+            android:textAppearance="@style/TextAppearance.DragonView.TitleLarge"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Add past paper records without changing today's inventory."
+            android:textColor="@color/dragon_text_soft"
+            android:textSize="13sp" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/manualButton"
+            style="@style/Widget.DragonView.ModuleAction.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginTop="20dp"
+            android:text="Enter manually"
+            app:icon="@drawable/icon_dataset_add" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/captureButton"
+            style="@style/Widget.DragonView.ModuleAction.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginTop="10dp"
+            android:text="Capture paper record"
+            app:icon="@drawable/ic_camera" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Existing records"
+            android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
+            android:textStyle="bold" />
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp" />
+        <TextView
+            android:id="@+id/messageText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/dragon_text_soft"
+            android:textSize="13sp" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recordsList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

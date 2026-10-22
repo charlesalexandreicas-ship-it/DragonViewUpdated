@@ -12,16 +12,18 @@ import androidx.navigation.Navigation;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.List;
 
 import ph.dragonview.mobile.data.model.DashboardData;
 import ph.dragonview.mobile.data.SessionManager;
 import ph.dragonview.mobile.data.local.LocalRepository;
+import ph.dragonview.mobile.data.model.InventoryLot;
 import ph.dragonview.mobile.databinding.FragmentDashboardBinding;
 import ph.dragonview.mobile.ui.MainActivity;
 
+/** Displays the farm overview and routes each quick action to its owning feature. */
 public final class DashboardFragment extends Fragment {
     private FragmentDashboardBinding binding;
-    private int salesToday;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle state) {
@@ -36,13 +38,19 @@ public final class DashboardFragment extends Fragment {
         binding.swipeRefresh.setOnRefreshListener(this::load);
         binding.viewAnalyticsButton.setOnClickListener(clicked -> navigateToPrimaryDestination(
                 ph.dragonview.mobile.R.id.analyticsFragment));
-        binding.recordHarvestAction.setOnClickListener(clicked ->
+        binding.viewSalesAction.setOnClickListener(clicked ->
                 Navigation.findNavController(clicked)
-                        .navigate(ph.dragonview.mobile.R.id.harvestFragment));
+                        .navigate(ph.dragonview.mobile.R.id.salesFragment));
         binding.viewInventoryAction.setOnClickListener(clicked -> navigateToPrimaryDestination(
                 ph.dragonview.mobile.R.id.inventoryFragment));
-        binding.recordPlantingAction.setOnClickListener(clicked -> navigateToPrimaryDestination(
+        binding.viewPlantGuidanceAction.setOnClickListener(clicked -> navigateToPrimaryDestination(
                 ph.dragonview.mobile.R.id.plantingFragment));
+        binding.gradeOverviewToggle.setOnClickListener(clicked -> {
+            boolean opening = binding.gradeOverviewContent.getVisibility() != View.VISIBLE;
+            binding.gradeOverviewContent.setVisibility(opening ? View.VISIBLE : View.GONE);
+            binding.gradeOverviewToggle.setText(opening
+                    ? "Hide Grade Overview  ▴" : "View Grade Overview  ▾");
+        });
         load();
     }
 
@@ -50,6 +58,7 @@ public final class DashboardFragment extends Fragment {
         ((MainActivity) requireActivity()).navigateToPrimaryDestination(destinationId);
     }
 
+    /** Loads overview totals and stock grades from their existing data sources. */
     private void load() {
         binding.swipeRefresh.setRefreshing(true);
         binding.errorText.setVisibility(View.GONE);
@@ -60,7 +69,6 @@ public final class DashboardFragment extends Fragment {
                         if (binding == null) return;
                         binding.swipeRefresh.setRefreshing(false);
                         bind(data.getSummary());
-                        bindAnalytics(data.getAnalyticsOverview());
                     }
 
                     @Override
@@ -70,35 +78,39 @@ public final class DashboardFragment extends Fragment {
                         showError();
                     }
                 });
+        LocalRepository.get(requireContext()).inventory(new LocalRepository.Callback<>() {
+            @Override public void onSuccess(List<InventoryLot> lots) {
+                if (binding == null) return;
+                int a = 0, b = 0, c = 0;
+                for (InventoryLot lot : lots) {
+                    if (lot.getGrade() == null) continue;
+                    switch (lot.getGrade().trim().toUpperCase(Locale.US)) {
+                        case "A": a += lot.getAvailablePieces(); break;
+                        case "B": b += lot.getAvailablePieces(); break;
+                        case "C": c += lot.getAvailablePieces(); break;
+                        default: break;
+                    }
+                }
+                binding.gradeAText.setText("Grade A  " + a + " pcs");
+                binding.gradeBText.setText("Grade B  " + b + " pcs");
+                binding.gradeCText.setText("Grade C  " + c + " pcs");
+            }
+            @Override public void onError(String message) {
+                if (binding == null) return;
+                binding.gradeAText.setText("Grades unavailable. Pull to retry.");
+                binding.gradeBText.setText("");
+                binding.gradeCText.setText("");
+            }
+        });
     }
 
+    /** Binds only the four overview values approved for Home. */
     private void bind(DashboardData.Summary summary) {
+        binding.batchesValue.setText(String.valueOf(summary.getActiveBatches()));
         binding.inventoryValue.setText(String.valueOf(summary.getInventoryPieces()));
-        binding.inventoryContextText.setText("Current workspace");
-        salesToday = summary.getSalesToday();
-        binding.plantingValue.setText(String.valueOf(summary.getPlantingGroups()));
-        binding.classificationValue.setText(String.valueOf(summary.getClassificationsToday()));
-    }
-
-    private void bindAnalytics(DashboardData.AnalyticsOverview overview) {
         NumberFormat php = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
-        binding.todayRevenueValue.setText(php.format(overview.getRevenueToday()));
-        binding.salesContextText.setText(String.format(
-                Locale.US, "%d sales · %.2f kg",
-                salesToday, overview.getWeightSoldToday()));
-
-        Double change = overview.getRevenueChangePercent();
-        if (change == null) {
-            binding.revenueTrendText.setText("—");
-            binding.revenueTrendText.setTextColor(
-                    requireContext().getColor(ph.dragonview.mobile.R.color.dragon_green));
-        } else {
-            binding.revenueTrendText.setText(String.format(Locale.US, "%+.1f%%", change));
-            binding.revenueTrendText.setTextColor(requireContext().getColor(
-                    change >= 0
-                            ? ph.dragonview.mobile.R.color.dragon_green
-                            : ph.dragonview.mobile.R.color.dragon_error));
-        }
+        binding.monthlyRevenueValue.setText(php.format(summary.getMonthlyRevenue()));
+        binding.plantingValue.setText(String.valueOf(summary.getPlantingGroups()));
     }
 
     private void showError() {

@@ -31,6 +31,8 @@ import ph.dragonview.mobile.data.model.DashboardData;
 import ph.dragonview.mobile.data.model.FruitPrice;
 import ph.dragonview.mobile.data.model.GraftingRequest;
 import ph.dragonview.mobile.data.model.HarvestRequest;
+import ph.dragonview.mobile.data.model.HistoricalRecord;
+import ph.dragonview.mobile.data.model.HistoricalRecordDraft;
 import ph.dragonview.mobile.data.model.InventoryBatch;
 import ph.dragonview.mobile.data.model.InventoryBatchDetails;
 import ph.dragonview.mobile.data.model.InventoryDetails;
@@ -66,6 +68,7 @@ public final class LocalRepository {
     private static final Type ARCHIVE_LIST = new TypeToken<List<ArchivedRecord>>() {}.getType();
     private static final Type WORKSPACE_LIST = new TypeToken<List<Workspace>>() {}.getType();
     private static final Type MEMBER_LIST = new TypeToken<List<WorkspaceMember>>() {}.getType();
+    private static final Type HISTORICAL_LIST = new TypeToken<List<HistoricalRecord>>() {}.getType();
 
     private static volatile LocalRepository instance;
     private final Context context;
@@ -76,6 +79,7 @@ public final class LocalRepository {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
 
+    /** Creates the repository once with cloud, Room-cache, and main-thread dependencies. */
     private LocalRepository(Context context) {
         this.context = context.getApplicationContext();
         session = new SessionManager(this.context);
@@ -83,6 +87,7 @@ public final class LocalRepository {
         cache = DragonViewCacheDatabase.get(this.context).cacheDao();
     }
 
+    /** Returns the process-wide repository using double-checked singleton creation. */
     public static LocalRepository get(Context context) {
         if (instance == null) {
             synchronized (LocalRepository.class) {
@@ -92,6 +97,7 @@ public final class LocalRepository {
         return instance;
     }
 
+    /** Creates a cloud account, stores its session, and selects an initial workspace. */
     public void register(String displayName, String email, String password,
                          Callback<SessionUser> callback) {
         execute(() -> {
@@ -102,6 +108,7 @@ public final class LocalRepository {
         }, callback);
     }
 
+    /** Authenticates an existing account and prepares its workspace context. */
     public void login(String email, String password, Callback<SessionUser> callback) {
         execute(() -> {
             SupabaseClient.AuthResult auth = cloud.signIn(normalizeEmail(email), password);
@@ -126,6 +133,7 @@ public final class LocalRepository {
         }, callback);
     }
 
+    /** Clears local access immediately, then removes cloud and cached state in background. */
     public void signOut() {
         SessionUser current = session.getUser();
         String userId = current == null ? null : current.getId();
@@ -140,10 +148,15 @@ public final class LocalRepository {
         });
     }
 
+
+
+    //PRAY FOR THE LORD IS WITH YOU <3
+    /** Loads inventory totals through the shared cache-aware read pipeline. */
     public void inventory(Callback<List<InventoryLot>> callback) {
         read("inventory", "get_inventory", Collections.emptyMap(), INVENTORY_LIST, callback);
     }
 
+    /** Loads batch-level inventory used by lists and whole-batch sales. */
     public void inventoryBatches(Callback<List<InventoryBatch>> callback) {
         read("inventory-batches", "get_inventory_batches", Collections.emptyMap(), BATCH_LIST, callback);
     }
@@ -158,6 +171,7 @@ public final class LocalRepository {
                 map("p_batch_number", batchNumber), InventoryBatchDetails.class, callback);
     }
 
+    /** Commits a harvest to cloud stock before reporting success to the form. */
     public void registerHarvest(HarvestRequest request, Callback<Void> callback) {
         // Inventory is stock-sensitive business data. Only report success after
         // Supabase has committed the batch; an outbox acknowledgement would make
@@ -188,6 +202,7 @@ public final class LocalRepository {
         read("sales", "get_sales", Collections.emptyMap(), SALE_LIST, callback);
     }
 
+    /** Records a sale and lets the backend atomically reduce matching inventory. */
     public void completeSale(CompleteSaleRequest request, Callback<Void> callback) {
         mutate("complete_sale", gson.toJsonTree(request), false, callback);
     }
@@ -201,10 +216,12 @@ public final class LocalRepository {
                 map("p_planting_id", plantingId), PlantingDetails.class, callback);
     }
 
+    /** Creates a planting group; this mutation may queue when connectivity fails. */
     public void createPlanting(PlantingRequest request, Callback<Void> callback) {
         mutate("create_planting", gson.toJsonTree(request), true, callback);
     }
 
+    /** Advances a planting group and stores the date and farmer note for its stage. */
     public void updatePlantingStage(long plantingId, PlantingStage stage, String recordedDate,
                                     String note, Callback<Void> callback) {
         mutate("update_planting_stage", object("plantingId", plantingId, "stage", stage.name(),
@@ -249,16 +266,52 @@ public final class LocalRepository {
     }
 
     public void analytics(String period, String selectedDate, Callback<SalesAnalytics> callback) {
+        analytics(period, selectedDate, null, callback);
+    }
+
+    public void analytics(String period, String selectedDate, String comparisonDate,
+                          Callback<SalesAnalytics> callback) {
         if (!requireOwner(callback)) return;
         Map<String, Object> arguments = new LinkedHashMap<>();
         arguments.put("p_period", period);
         arguments.put("p_selected_date", selectedDate);
-        read("analytics-" + period + "-" + selectedDate, "get_sales_analytics",
+        if (comparisonDate != null) arguments.put("p_comparison_date", comparisonDate);
+        read("analytics-v2-" + period + "-" + selectedDate + "-" + comparisonDate,
+                "get_sales_analytics_v2",
                 arguments, SalesAnalytics.class, callback);
+    }
+
+    public void historicalRecords(Callback<List<HistoricalRecord>> callback) {
+        if (!requireOwner(callback)) return;
+        read("historical-records", "get_historical_records",
+                Collections.emptyMap(), HISTORICAL_LIST, callback);
+    }
+
+    public void saveHistoricalRecord(HistoricalRecordDraft draft, String source,
+                                     Callback<Void> callback) {
+        if (!requireOwner(callback)) return;
+        String validation = draft.validationError();
+        if (!validation.isEmpty()) { postError(callback, validation); return; }
+        executor.execute(() -> {
+            try {
+                String userId = requireUserId();
+                String workspaceId = requireWorkspaceId();
+                JsonObject payload = gson.toJsonTree(draft).getAsJsonObject();
+                payload.addProperty("source", source);
+                cloud.mutate("save_historical_record_v2", payload, UUID.randomUUID().toString());
+                cache.clearWorkspaceCache(userId, workspaceId);
+                postSuccess(callback, null);
+            } catch (Exception error) {
+                postError(callback, isRetryable(error)
+                        ? "Connect to the internet to save this historical record."
+                        : message(error));
+            }
+        });
     }
 
     public boolean isWorkspaceOwner() { return session.isWorkspaceOwner(); }
 
+    /** Selects a usable workspace when authentication succeeded without a local selection. */
     public void ensureActiveWorkspace(Callback<Void> callback) {
         if (!session.getActiveWorkspaceId().isEmpty()) {
             postSuccess(callback, null);
@@ -364,6 +417,10 @@ public final class LocalRepository {
         mutate("archive_record", object("type", type, "key", key, "reason", reason), true, callback);
     }
 
+    /**
+     * Reads cloud data on the worker thread, refreshes the Room snapshot, and falls
+     * back to the last snapshot when a retryable network error occurs.
+     */
     private <T> void read(String resource, String function, Map<String, Object> arguments,
                           Type type, Callback<T> callback) {
         executor.execute(() -> {
@@ -399,6 +456,10 @@ public final class LocalRepository {
         });
     }
 
+    /**
+     * Sends a mutation immediately; eligible operations are written to the outbox
+     * with an idempotency key when the network is temporarily unavailable.
+     */
     private void mutate(String function, JsonElement payload, boolean queueOffline,
                         Callback<Void> callback) {
         executor.execute(() -> {
@@ -432,6 +493,7 @@ public final class LocalRepository {
         });
     }
 
+    /** Copies freshly issued authentication data into encrypted local storage. */
     private void establishCloudSession(SupabaseClient.AuthResult auth) {
         session.saveAuthenticated(auth.user, auth.accessToken, auth.refreshToken, auth.expiresAt);
         session.clearActiveWorkspace();
@@ -488,6 +550,7 @@ public final class LocalRepository {
         return false;
     }
 
+    /** Runs blocking repository work off the UI thread and posts one callback result. */
     private <T> void execute(Work<T> work, Callback<T> callback) {
         executor.execute(() -> {
             try { postSuccess(callback, work.run()); }
