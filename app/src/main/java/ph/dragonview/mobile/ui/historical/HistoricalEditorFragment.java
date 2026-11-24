@@ -231,6 +231,7 @@ public final class HistoricalEditorFragment extends Fragment {
         if (iso == null) {
             showError(getString(R.string.historical_enter_date), null);
             binding.dateInput.setError(getString(R.string.historical_enter_date));
+            binding.dateInput.requestFocus();
             binding.formScroll.smoothScrollTo(0, 0);
             return null;
         }
@@ -242,6 +243,7 @@ public final class HistoricalEditorFragment extends Fragment {
             String size = text(row.sizeInput.getText());
             if (size.isEmpty()) {
                 showError(getString(R.string.historical_enter_size), row);
+                row.sizeInput.requestFocus();
                 return null;
             }
             String weight = text(row.weightInput.getText());
@@ -255,6 +257,7 @@ public final class HistoricalEditorFragment extends Fragment {
             if (!HistoricalEntryMath.paperMatches(paper, calculated)) {
                 row.paperSubtotalLayout.setVisibility(View.VISIBLE);
                 showError(getString(R.string.historical_paper_row_error, size), row);
+                row.paperSubtotalInput.requestFocus();
                 return null;
             }
             Boolean classification = HistoricalEntryMath.classification(
@@ -296,7 +299,7 @@ public final class HistoricalEditorFragment extends Fragment {
                         RecordDate.toDisplay(draft.getDate()), draft.getItems().size(),
                         currency(BigDecimal.valueOf(draft.subtotalSum())), actual,
                         draft.getItems().size() - actual))
-                .setNegativeButton(R.string.historical_cancel, null)
+                .setNegativeButton(R.string.historical_edit_entries, null)
                 .setPositiveButton(R.string.historical_save, (dialog, which) -> saveDraft(draft))
                 .show();
     }

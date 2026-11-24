@@ -1,0 +1,85 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+        <TextView
+            android:textAppearance="@style/TextAppearance.DragonView.TitleLarge"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Date range" />
+        <RadioGroup
+            android:id="@+id/rangeMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/fullYear"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Full year" />
+            <RadioButton
+                android:id="@+id/throughDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Through a date" />
+        </RadioGroup>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rangeDate"
+            style="@style/Widget.DragonView.Button.Outlined"
+            android:minHeight="48dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Choose year" />
+        <TextView
+            android:textAppearance="@style/TextAppearance.DragonView.TitleLarge"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Compare with" />
+        <RadioGroup
+            android:id="@+id/comparisonMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <RadioButton
+                android:id="@+id/previousYear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="Previous year" />
+            <RadioButton
+                android:id="@+id/anotherYear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="Another year" />
+            <RadioButton
+                android:id="@+id/comparisonOff"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="Off" />
+        </RadioGroup>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/comparisonYear"
+            style="@style/Widget.DragonView.Button.Outlined"
+            android:minHeight="48dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Choose another year" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/apply"
+            style="@style/Widget.DragonView.Button"
+            android:minHeight="48dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Apply" />
+    </LinearLayout>
+</ScrollView>

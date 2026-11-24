@@ -2,6 +2,7 @@ package ph.dragonview.mobile.ui.analytics;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -35,11 +36,13 @@ public final class RevenueTrendChartView extends View {
         grid.setColor(context.getColor(R.color.dragon_outline));
         grid.setStrokeWidth(density);
         axisText.setColor(context.getColor(R.color.muted_ink));
+        axisText.setTypeface(androidx.core.content.res.ResourcesCompat.getFont(context, R.font.manrope_400));
         axisText.setTextSize(10 * density);
-        configureLine(currentLine, context.getColor(R.color.dragon_magenta), density);
-        configureLine(comparisonLine, context.getColor(R.color.dragon_green), density);
-        currentPoint.setColor(context.getColor(R.color.dragon_magenta));
-        comparisonPoint.setColor(context.getColor(R.color.dragon_green));
+        configureLine(currentLine, context.getColor(R.color.dragon_green), density);
+        configureLine(comparisonLine, context.getColor(R.color.botanical_header), density);
+        comparisonLine.setPathEffect(new DashPathEffect(new float[]{6 * density, 5 * density}, 0));
+        currentPoint.setColor(context.getColor(R.color.dragon_green));
+        comparisonPoint.setColor(context.getColor(R.color.botanical_header));
     }
 
     private static void configureLine(Paint paint, int color, float density) {
@@ -62,8 +65,9 @@ public final class RevenueTrendChartView extends View {
         statusMessage = null;
         setContentDescription(current.isEmpty() && comparison.isEmpty()
                 ? "Revenue trend chart. No sales in either period."
+                : comparison.isEmpty() ? "Revenue trend chart. Solid green."
                 : "Revenue trend chart comparing the selected " + period
-                + " period in pink with the comparison period in green.");
+                + " period in solid green with the comparison period in dashed berry.");
         invalidate();
     }
 

@@ -230,7 +230,7 @@ public final class InventoryDetailsFragment extends Fragment {
                 .setTitle(regrade
                         ? "Regrade " + formatSize(item.getSize()) + " Grade " + item.getGrade()
                         : "Adjust " + formatSize(item.getSize()) + " Grade " + item.getGrade())
-                .setView(form)
+                .setView(ph.dragonview.mobile.ui.ScrollableForm.wrap(form))
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Save", (dialog, which) -> {
                     int count;

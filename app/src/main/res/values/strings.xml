@@ -46,6 +46,7 @@
     <string name="scanner_enable_camera">Enable camera</string>
     <string name="scanner_retry_camera">Retry camera</string>
     <string name="scanner_retake">Retake photo</string>
+    <string name="scanner_upload_retry">Try another photo</string>
     <string name="scanner_settings">Settings</string>
     <string name="scanner_result_title">Detection and grading result</string>
     <string name="scanner_awaiting_image">Awaiting photo</string>
@@ -62,6 +63,7 @@
     <string name="scanner_inference_error">The photo loaded, but offline detection or grading failed. Check the model assets or try another photo.</string>
     <string name="scanner_fruits_identified">%1$d dragon fruit(s) identified</string>
     <string name="scanner_batch_result_detail">Class A: %1$d • Class B: %2$d • Class C: %3$d\nIdentification: %4$d ms • Grading: %5$d ms\nModel predictions are not verified grades.</string>
+    <string name="scanner_fruit_detail">Fruit %1$d: %2$s (%3$d%% model score) • %4$d%% red/pink among sampled colored pixels</string>
     <string name="scanner_object_unidentified">Object unidentified</string>
     <string name="scanner_object_unidentified_detail">No dragon fruit was identified. Use a clear photo containing a dragon fruit and try again.</string>
     <string name="scanner_too_many">%1$d fruits detected</string>
@@ -117,6 +119,7 @@
     <string name="trend_close">Back</string>
     <string name="trend_expanded_title">Revenue trend</string>
     <string name="historical_cancel">Review again</string>
+    <string name="historical_edit_entries">Edit entries</string>
     <string name="historical_enter_date">Enter a valid past or current date (MM/DD/YYYY).</string>
     <string name="historical_enter_size">Choose a size or condition for each row.</string>
     <string name="historical_enter_weight_price">Enter valid kg (up to 3 decimals) and price/kg (up to 2 decimals).</string>
@@ -130,4 +133,20 @@
     <string name="historical_date_format_hint">MM/DD/YYYY</string>
     <string name="historical_expand">▾</string>
     <string name="historical_collapse">▴</string>
+    <string name="scanner_brand">DragonView</string>
+    <string name="scanner_use_full_photo">Use full photo</string>
+    <string name="scanner_adjust_crop">Adjust crop</string>
+    <string name="scanner_choose_fruit">Choose a fruit</string>
+    <string name="scanner_fruit_number">Fruit %1$d</string>
+    <string name="scanner_fruit_grade">Fruit %1$d · Grade %2$s</string>
+    <string name="scanner_detection_confidence">Detection confidence: %1$d%%</string>
+    <string name="scanner_results_heading">Results for each fruit</string>
+    <string name="scanner_fruit_result">Fruit %1$d · %2$s\nDetection %3$d%% · Grade confidence %4$d%%</string>
+    <string name="scanner_fruit_ungraded">Fruit %1$d · Grade unavailable\nDetection %2$d%%</string>
+    <string name="farm_section_add_photo">Farm section · Add photo</string>
+    <string name="farm_section_view_photo">Farm section · View photo</string>
+    <string name="farm_section_change_photo">Change section photo</string>
+    <string name="farm_section_photo_description">Photo of this planting group’s farm section</string>
+    <string name="farm_section_photo_error">This section photo could not be opened.</string>
+    <string name="farm_section_photo_save_error">Could not save this section photo. Please choose it again.</string>
 </resources>

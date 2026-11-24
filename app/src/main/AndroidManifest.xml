@@ -22,6 +22,7 @@
         android:theme="@style/Theme.DragonView">
         <activity
             android:name=".ui.MainActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.analytics.ExpandedRevenueTrendActivity"
@@ -29,6 +30,7 @@
             android:screenOrientation="landscape" />
         <activity
             android:name=".ui.PasswordRecoveryActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -41,6 +43,7 @@
         </activity>
         <activity
             android:name=".ui.LoginActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

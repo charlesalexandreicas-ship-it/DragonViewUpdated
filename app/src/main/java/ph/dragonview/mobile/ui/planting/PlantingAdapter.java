@@ -27,6 +27,8 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
         void showGuidance(PlantingGroup group, PlantingStage stage);
         void manage(PlantingGroup group);
         void archive(PlantingGroup group);
+        boolean hasSectionPhoto(PlantingGroup group);
+        void openSectionPhoto(PlantingGroup group);
     }
 
     private final List<PlantingGroup> rows = new ArrayList<>();
@@ -120,6 +122,10 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
             binding.stageContainer.removeAllViews();
             if (!expanded) return;
 
+            binding.sectionPhotoButton.setText(listener.hasSectionPhoto(row)
+                    ? R.string.farm_section_view_photo : R.string.farm_section_add_photo);
+            binding.sectionPhotoButton.setOnClickListener(v -> listener.openSectionPhoto(row));
+
             List<PlantingStage> stages = PlantingStage.forMethod(
                     row.getPropagationMethod());
             int currentIndex = stages.indexOf(row.getCurrentStage());
@@ -136,6 +142,9 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
                 stageBinding.stageNameText.setText(stage.getDisplayName());
                 stageBinding.timingText.setText(stage.getEstimatedTiming());
                 bindStatus(stageBinding, index, currentIndex);
+                // Hide only the outer ends so the rail connects adjacent stage numbers.
+                stageBinding.stageLineAbove.setVisibility(index == 0 ? View.INVISIBLE : View.VISIBLE);
+                stageBinding.stageLineBelow.setVisibility(index == stages.size() - 1 ? View.INVISIBLE : View.VISIBLE);
                 stageBinding.stageRow.setOnClickListener(
                         v -> listener.showGuidance(row, stage));
                 binding.stageContainer.addView(stageBinding.getRoot());
@@ -160,7 +169,25 @@ final class PlantingAdapter extends RecyclerView.Adapter<PlantingAdapter.Holder>
                     stageBinding.getRoot().getContext(), color);
             stageBinding.statusText.setText(status);
             stageBinding.statusText.setTextColor(resolvedColor);
-            stageBinding.stageImage.setColorFilter(resolvedColor);
+            android.content.Context context = stageBinding.getRoot().getContext();
+            boolean current = index == currentIndex;
+            android.graphics.drawable.GradientDrawable marker = new android.graphics.drawable.GradientDrawable();
+            marker.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+            marker.setColor(ContextCompat.getColor(context, current ? R.color.botanical_green
+                    : index < currentIndex ? R.color.dragon_green_soft : R.color.white));
+            if (index > currentIndex) marker.setStroke(
+                    Math.max(1, Math.round(context.getResources().getDisplayMetrics().density)),
+                    ContextCompat.getColor(context, R.color.botanical_border));
+            stageBinding.stageNumber.setBackground(marker);
+            stageBinding.stageNumber.setText(String.valueOf(index + 1));
+            stageBinding.stageNumber.setTextColor(current ? ContextCompat.getColor(context, R.color.white) : resolvedColor);
+            if (current) {
+                stageBinding.stageRow.setBackgroundTintList(null);
+                stageBinding.stageRow.setBackground(new android.graphics.drawable.RippleDrawable(
+                        ContextCompat.getColorStateList(context, R.color.focus_ripple),
+                        new android.graphics.drawable.ColorDrawable(ContextCompat.getColor(context, R.color.dragon_green_soft)),
+                        null));
+            }
         }
 
         private static String shortDate(String value) {

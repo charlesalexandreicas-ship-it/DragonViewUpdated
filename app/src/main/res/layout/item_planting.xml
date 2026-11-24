@@ -94,11 +94,20 @@
                 android:layout_height="1dp"
                 android:background="@color/botanical_border" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sectionPhotoButton"
+                style="@style/Widget.DragonView.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="56dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/farm_section_add_photo" />
+
             <TextView
                 android:id="@+id/stageProgressText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="20dp"
                 android:text="Growth stages"
                 android:textColor="@color/ink"
                 android:textSize="14sp"
@@ -114,11 +123,12 @@
                 style="@style/Widget.DragonView.BotanicalAction"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:text="View guidance" />
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:gravity="center_vertical">
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:layout_marginTop="6dp">
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/manageRecordButton"
                     style="@style/Widget.DragonView.Button.Text"
@@ -129,7 +139,7 @@
                     android:id="@+id/archiveRecordButton"
                     style="@style/Widget.DragonView.Button.Text"
                     android:layout_width="wrap_content" android:layout_height="48dp"
-                    android:layout_marginTop="6dp" android:text="Remove"
+                    android:layout_marginTop="6dp" android:layout_marginStart="12dp" android:text="Remove"
                     android:textColor="@color/dragon_error"
                     app:icon="@android:drawable/ic_menu_delete"
                     app:iconTint="@color/dragon_error" />

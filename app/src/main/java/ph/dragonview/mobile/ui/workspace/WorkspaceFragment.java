@@ -192,7 +192,8 @@ public final class WorkspaceFragment extends Fragment {
         if (invite) {
             input.setFilters(new InputFilter[]{new InputFilter.AllCaps(), new InputFilter.LengthFilter(8)});
         } else input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(80)});
-        AlertDialog dialog = new AlertDialog.Builder(requireContext()).setTitle(title).setView(input)
+        AlertDialog dialog = new AlertDialog.Builder(requireContext()).setTitle(title)
+                .setView(ph.dragonview.mobile.ui.ScrollableForm.wrap(input))
                 .setNegativeButton("Cancel", null).setPositiveButton(invite ? "Join" : "Create", null).create();
         dialog.setOnShowListener(ignored -> {
             flattenButton(dialog, AlertDialog.BUTTON_NEGATIVE);

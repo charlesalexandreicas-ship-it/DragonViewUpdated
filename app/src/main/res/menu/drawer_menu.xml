@@ -7,6 +7,7 @@
         <item android:id="@+id/settingsFragment" android:icon="@drawable/icon_streamline_settings" android:title="Settings" />
     </group>
     <group android:id="@+id/utilityDrawerGroup">
+        <item android:id="@+id/action_guides" android:icon="@drawable/icon_dataset_planting" android:title="Guides" />
         <item android:id="@+id/action_logout" android:icon="@drawable/icon_streamline_logout" android:title="Logout" />
     </group>
 </menu>

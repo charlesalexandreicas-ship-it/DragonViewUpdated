@@ -3,6 +3,7 @@ package ph.dragonview.mobile.data.sync;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.work.BackoffPolicy;
 import androidx.work.Constraints;
 import androidx.work.ExistingWorkPolicy;
@@ -11,6 +12,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+import androidx.work.WorkInfo;
 
 import com.google.gson.JsonParser;
 
@@ -47,6 +49,10 @@ public final class SyncWorker extends Worker {
         WorkManager.getInstance(context).enqueueUniqueWork(UNIQUE_WORK, ExistingWorkPolicy.KEEP, request);
     }
 
+    public static LiveData<List<WorkInfo>> observe(Context context) {
+        return WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(UNIQUE_WORK);
+    }
+
     @NonNull
     @Override
     /** Replays queued work in order and retries only failures marked as temporary. */
@@ -60,17 +66,24 @@ public final class SyncWorker extends Worker {
         CacheDao dao = DragonViewCacheDatabase.get(getApplicationContext()).cacheDao();
         SupabaseClient cloud = new SupabaseClient(getApplicationContext());
         dao.assignLegacyOutbox(user.getId(), workspaceId);
-        List<OutboxOperation> operations = dao.pendingWorkspace(user.getId(), workspaceId, 25);
-        for (OutboxOperation operation : operations) {
-            try {
-                cloud.mutate(operation.functionName, JsonParser.parseString(operation.payloadJson), operation.operationId);
-                dao.complete(operation.operationId);
-            } catch (SupabaseException error) {
-                dao.failedAttempt(operation.operationId, error.getMessage());
-                return error.isRetryable() ? Result.retry() : Result.failure();
+        // Drain the entire queue in pages so work beyond the first 25 is processed too.
+        while (!isStopped()) {
+            List<OutboxOperation> operations = dao.pendingWorkspace(user.getId(), workspaceId, 25);
+            if (operations.isEmpty()) return Result.success();
+            for (OutboxOperation operation : operations) {
+                SessionUser activeUser = session.getUser();
+                if (isStopped() || activeUser == null || !user.getId().equals(activeUser.getId())
+                        || !workspaceId.equals(session.getActiveWorkspaceId())) return Result.retry();
+                try {
+                    cloud.mutate(operation.functionName, JsonParser.parseString(operation.payloadJson), operation.operationId);
+                    dao.complete(operation.operationId);
+                    dao.clearWorkspaceCache(user.getId(), workspaceId);
+                } catch (SupabaseException error) {
+                    dao.failedAttempt(operation.operationId, error.getMessage());
+                    return error.isRetryable() ? Result.retry() : Result.failure();
+                }
             }
         }
-        if (!operations.isEmpty()) dao.clearWorkspaceCache(user.getId(), workspaceId);
-        return Result.success();
+        return Result.retry();
     }
 }

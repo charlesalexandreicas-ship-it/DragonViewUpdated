@@ -203,8 +203,33 @@ public final class LocalRepository {
     }
 
     /** Records a sale and lets the backend atomically reduce matching inventory. */
-    public void completeSale(CompleteSaleRequest request, Callback<Void> callback) {
-        mutate("complete_sale", gson.toJsonTree(request), false, callback);
+    public void completeSale(CompleteSaleRequest request, String operationId, Callback<JsonObject> callback) {
+        execute(() -> {
+            String userId = requireUserId();
+            String workspace = requireWorkspaceId();
+            JsonObject receipt = cloud.mutate("complete_sale", gson.toJsonTree(request),
+                    operationId).getAsJsonObject();
+            cache.clearWorkspaceCache(userId, workspace);
+            // The sale is already saved. A failed follow-up read must not invite a duplicate sale.
+            if (receipt.has("saleId") && workspace.equals(session.getActiveWorkspaceId())
+                    && session.getUser() != null && userId.equals(session.getUser().getId())) {
+                try {
+                    long saleId = receipt.get("saleId").getAsLong();
+                    List<SaleSummary> sales = gson.fromJson(
+                            cloud.read("get_sales", Collections.emptyMap()), SALE_LIST);
+                    for (SaleSummary sale : sales) {
+                        if (sale.getId() == saleId) {
+                            receipt.addProperty("totalAmount", sale.getTotalAmount());
+                            receipt.addProperty("transactionDate", sale.getTransactionDate());
+                            break;
+                        }
+                    }
+                } catch (Exception ignored) {
+                    // The server reference still confirms the sale when totals cannot be refreshed.
+                }
+            }
+            return receipt;
+        }, callback);
     }
 
     public void planting(Callback<List<PlantingGroup>> callback) {
@@ -279,6 +304,17 @@ public final class LocalRepository {
         read("analytics-v2-" + period + "-" + selectedDate + "-" + comparisonDate,
                 "get_sales_analytics_v2",
                 arguments, SalesAnalytics.class, callback);
+    }
+
+    /** Cutoff totals require the server to filter sales before grouping by month. */
+    public void yearlyAnalyticsThroughDate(String selectedDate, String comparisonDate,
+                                           Callback<SalesAnalytics> callback) {
+        if (!requireOwner(callback)) return;
+        Map<String, Object> arguments = new LinkedHashMap<>();
+        arguments.put("p_selected_date", selectedDate);
+        if (comparisonDate != null) arguments.put("p_comparison_date", comparisonDate);
+        read("analytics-year-cutoff-" + selectedDate + "-" + comparisonDate,
+                "get_yearly_analytics_through_date", arguments, SalesAnalytics.class, callback);
     }
 
     public void historicalRecords(Callback<List<HistoricalRecord>> callback) {
@@ -409,7 +445,14 @@ public final class LocalRepository {
             String error = cache.oldestError(userId);
             if (error != null && !error.trim().isEmpty()) return "Sync needs attention: " + error;
             if (pending > 0) return pending + (pending == 1 ? " change pending sync" : " changes pending sync");
-            return "Cloud data is synchronized";
+            try {
+                cloud.read("get_workspaces", Collections.emptyMap());
+                return "Cloud connection verified. No changes waiting to upload.";
+            } catch (SupabaseException errorState) {
+                return errorState.isRetryable()
+                        ? "Cloud connection unavailable. No changes waiting to upload."
+                        : "Could not verify cloud connection: " + message(errorState);
+            }
         }, callback);
     }
 
@@ -462,8 +505,12 @@ public final class LocalRepository {
      */
     private void mutate(String function, JsonElement payload, boolean queueOffline,
                         Callback<Void> callback) {
+        mutate(function, payload, queueOffline, UUID.randomUUID().toString(), callback);
+    }
+
+    private void mutate(String function, JsonElement payload, boolean queueOffline,
+                        String operationId, Callback<Void> callback) {
         executor.execute(() -> {
-            String operationId = UUID.randomUUID().toString();
             try {
                 String userId = requireUserId();
                 String workspaceId = requireWorkspaceId();

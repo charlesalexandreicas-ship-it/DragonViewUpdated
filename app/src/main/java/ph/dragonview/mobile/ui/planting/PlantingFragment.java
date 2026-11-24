@@ -1,6 +1,12 @@
 package ph.dragonview.mobile.ui.planting;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Looper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.util.Linkify;
@@ -9,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,12 +30,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.button.MaterialButton;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.R;
@@ -45,6 +56,7 @@ import ph.dragonview.mobile.databinding.FragmentPlantingBinding;
 import ph.dragonview.mobile.ui.archive.ArchiveDialog;
 import ph.dragonview.mobile.ui.date.RecordDate;
 import ph.dragonview.mobile.ui.date.RecordDateInput;
+import ph.dragonview.mobile.ui.scanner.ScannerImageLoader;
 
 /** Coordinates planting groups, planting/grafting forms, and stage-guidance sheets. */
 public final class PlantingFragment extends Fragment {
@@ -55,6 +67,25 @@ public final class PlantingFragment extends Fragment {
     private PlantingStage pendingPhotoStage;
     private final ActivityResultLauncher<String[]> photoPicker = registerForActivityResult(
             new ActivityResultContracts.OpenDocument(), this::saveSelectedPhoto);
+    private long sectionPhotoGroupId = -1;
+    private String sectionPhotoScope;
+    private Dialog sectionPhotoViewer;
+    private final ActivityResultLauncher<String[]> sectionPhotoPicker = registerForActivityResult(
+            new ActivityResultContracts.OpenDocument(), this::saveSectionPhoto);
+
+    @Override public void onCreate(@Nullable Bundle state) {
+        super.onCreate(state);
+        if (state != null) {
+            sectionPhotoGroupId = state.getLong("sectionPhotoGroup", -1);
+            sectionPhotoScope = state.getString("sectionPhotoScope");
+        }
+    }
+
+    @Override public void onSaveInstanceState(@NonNull Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putLong("sectionPhotoGroup", sectionPhotoGroupId);
+        state.putString("sectionPhotoScope", sectionPhotoScope);
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle state) {
@@ -82,6 +113,14 @@ public final class PlantingFragment extends Fragment {
             public void archive(PlantingGroup group) {
                 confirmArchive(group);
             }
+
+            @Override public boolean hasSectionPhoto(PlantingGroup group) {
+                return sectionPhotoUri(group.getId()) != null;
+            }
+
+            @Override public void openSectionPhoto(PlantingGroup group) {
+                showSectionPhoto(group.getId());
+            }
         }, new SessionManager(requireContext()).isWorkspaceOwner());
         binding.plantingList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.plantingList.setAdapter(adapter);
@@ -89,8 +128,133 @@ public final class PlantingFragment extends Fragment {
         binding.swipeRefresh.setOnRefreshListener(this::load);
         binding.addButton.setOnClickListener(v -> showCreateDialog());
         binding.graftButton.setOnClickListener(v -> showGraftingDialog());
+        binding.farmLayoutButton.setOnClickListener(v -> NavHostFragment.findNavController(this)
+                .navigate(R.id.action_planting_to_farm_layout));
         binding.emptyActionButton.setOnClickListener(v -> showCreateDialog());
         load();
+    }
+
+    private SharedPreferences sectionPhotoPreferences() {
+        return requireContext().getSharedPreferences("planting_section_photos", Context.MODE_PRIVATE);
+    }
+
+    /** Photos stay on this device and are isolated by account, workspace, and planting group. */
+    @Nullable private String currentPhotoScope() {
+        SessionManager session = new SessionManager(requireContext());
+        var user = session.getUser();
+        String workspace = session.getActiveWorkspaceId();
+        return user == null || workspace.isEmpty() ? null : user.getId() + "/" + workspace;
+    }
+
+    @Nullable private String sectionPhotoUri(long groupId) {
+        String scope = currentPhotoScope();
+        return scope == null ? null : sectionPhotoPreferences().getString(scope + "/" + groupId, null);
+    }
+
+    private void chooseSectionPhoto(long groupId) {
+        String scope = currentPhotoScope();
+        if (scope == null) return;
+        sectionPhotoGroupId = groupId;
+        sectionPhotoScope = scope;
+        sectionPhotoPicker.launch(new String[]{"image/*"});
+    }
+
+    /** Validate before replacing a saved URI, and ignore results after a workspace change. */
+    private void saveSectionPhoto(@Nullable Uri uri) {
+        long groupId = sectionPhotoGroupId;
+        String scope = sectionPhotoScope;
+        sectionPhotoGroupId = -1;
+        sectionPhotoScope = null;
+        if (uri == null || groupId < 0 || binding == null
+                || scope == null || !scope.equals(currentPhotoScope())) return;
+        loadSectionPhoto(uri, bitmap -> {
+            bitmap.recycle();
+            if (!scope.equals(currentPhotoScope())) return;
+            try {
+                requireContext().getContentResolver().takePersistableUriPermission(uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                sectionPhotoPreferences().edit().putString(scope + "/" + groupId, uri.toString()).apply();
+                adapter.submit(currentRows);
+            } catch (SecurityException error) {
+                Toast.makeText(requireContext(), R.string.farm_section_photo_save_error,
+                        Toast.LENGTH_LONG).show();
+            }
+        }, R.string.farm_section_photo_save_error, null);
+    }
+
+    /** Decode away from the UI thread and discard images if the originating view has closed. */
+    private void loadSectionPhoto(Uri uri, Consumer<Bitmap> ready, int errorText,
+                                  @Nullable Runnable recover) {
+        Context context = requireContext().getApplicationContext();
+        FragmentPlantingBinding origin = binding;
+        Handler main = new Handler(Looper.getMainLooper());
+        new Thread(() -> {
+            try {
+                Bitmap bitmap = ScannerImageLoader.load(context, uri, 1600);
+                main.post(() -> {
+                    if (binding == origin && isAdded()) ready.accept(bitmap);
+                    else bitmap.recycle();
+                });
+            } catch (IOException | RuntimeException error) {
+                main.post(() -> {
+                    if (binding != origin || !isAdded()) return;
+                    Toast.makeText(requireContext(), errorText, Toast.LENGTH_LONG).show();
+                    if (recover != null) recover.run();
+                });
+            }
+        }, "farm-section-photo").start();
+    }
+
+    private void showSectionPhoto(long groupId) {
+        String saved = sectionPhotoUri(groupId);
+        if (saved == null) {
+            chooseSectionPhoto(groupId);
+            return;
+        }
+        loadSectionPhoto(Uri.parse(saved), bitmap -> {
+            if (!saved.equals(sectionPhotoUri(groupId))) {
+                bitmap.recycle();
+                return;
+            }
+            if (sectionPhotoViewer != null) sectionPhotoViewer.dismiss();
+            Dialog viewer = new Dialog(requireContext(), android.R.style.Theme_Material_Light_NoActionBar);
+            sectionPhotoViewer = viewer;
+            LinearLayout panel = new LinearLayout(requireContext());
+            panel.setOrientation(LinearLayout.VERTICAL);
+            int spacing = Math.round(16 * getResources().getDisplayMetrics().density);
+            panel.setPadding(spacing, spacing, spacing, spacing);
+            ImageView image = new ImageView(requireContext());
+            image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            image.setContentDescription(getString(R.string.farm_section_photo_description));
+            image.setImageBitmap(bitmap);
+            panel.addView(image, new LinearLayout.LayoutParams(-1, 0, 1));
+            int height = Math.round(56 * getResources().getDisplayMetrics().density);
+            MaterialButton change = new MaterialButton(requireContext());
+            change.setText(R.string.farm_section_change_photo);
+            change.setMinHeight(height);
+            change.setOnClickListener(v -> {
+                viewer.dismiss();
+                chooseSectionPhoto(groupId);
+            });
+            LinearLayout.LayoutParams changeParams = new LinearLayout.LayoutParams(-1, -2);
+            changeParams.topMargin = spacing;
+            panel.addView(change, changeParams);
+            MaterialButton close = new MaterialButton(requireContext());
+            close.setText(android.R.string.cancel);
+            close.setMinHeight(height);
+            close.setOnClickListener(v -> viewer.dismiss());
+            LinearLayout.LayoutParams closeParams = new LinearLayout.LayoutParams(-1, -2);
+            closeParams.topMargin = spacing / 2;
+            panel.addView(close, closeParams);
+            viewer.setContentView(panel);
+            viewer.setOnDismissListener(dialog -> {
+                image.setImageDrawable(null);
+                if (sectionPhotoViewer == viewer) sectionPhotoViewer = null;
+            });
+            viewer.show();
+        }, R.string.farm_section_photo_error, () -> {
+            if (saved.equals(sectionPhotoUri(groupId))) chooseSectionPhoto(groupId);
+        });
     }
 
     /** Reloads planting groups and updates their summary and empty-state actions. */
@@ -228,7 +392,8 @@ public final class PlantingFragment extends Fragment {
                     .setTitle("No eligible seed record")
                     .setMessage("Create a seed-grown farm record first. Record grafting only "
                             + "after its suitability has been professionally confirmed.")
-                    .setPositiveButton("OK", null)
+                    .setNegativeButton("Cancel", null)
+                    .setPositiveButton("Record planting", (dialog, which) -> showCreateDialog())
                     .create();
             notice.setOnShowListener(ignored -> {
                 View button = notice.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -393,6 +558,7 @@ public final class PlantingFragment extends Fragment {
     }
 
     @Override public void onDestroyView() {
+        if (sectionPhotoViewer != null) sectionPhotoViewer.dismiss();
         binding = null;
         currentRows = new ArrayList<>();
         super.onDestroyView();

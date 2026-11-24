@@ -31,8 +31,6 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.theme.MaterialComponentsViewInflater;
@@ -135,18 +133,15 @@ public final class PaletteInstrumentedTest {
                         setPreviewText(view, R.id.plantingValue, "16");
                     }
                     if (layout == R.layout.fragment_analytics) {
-                        setPreviewText(view, R.id.reportingRangeText,
-                                "Reporting period: Aug 1–31, 2026");
+                        setPreviewText(view, R.id.periodInput, "Monthly");
+                        setPreviewText(view, R.id.dateInput, "Aug 2026");
                         setPreviewText(view, R.id.revenueText, "₱12,000");
                         setPreviewText(view, R.id.salesText, "24");
+                        setPreviewText(view, R.id.piecesText, "612");
                         setPreviewText(view, R.id.weightText, "185 kg");
-                        setPreviewText(view, R.id.comparisonValueText, "+33.3%");
-                        setPreviewText(view, R.id.comparisonCardLabel,
-                                "Revenue vs Jul 1–31, 2026");
-                        setPreviewText(view, R.id.comparisonText,
-                                "+33.3% vs Jul 1–31, 2026");
+                        setPreviewText(view, R.id.comparisonText, "+33.3% vs Jul 2026");
                         setPreviewText(view, R.id.trendLegendText,
-                                "● Aug 2026     ● Jul 2026\nPink: selected · Green: comparison");
+                                "━━ Aug 2026    ━ ━ Jul 2026");
                         RevenueTrendChartView chart = view.findViewById(R.id.trendChart);
                         chart.setData(Arrays.asList(
                                 new SalesAnalytics.Trend("1", 2000, 0),
@@ -272,35 +267,22 @@ public final class PaletteInstrumentedTest {
         });
     }
 
-    @Test public void reportingChipsRetainContrastWhenCheckedAndPressedInBothModes() {
+    @Test public void analyticsFilterButtonsRetainContrastInBothModes() {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            int[] chipIds = {R.id.periodDailyButton, R.id.periodWeeklyButton,
-                    R.id.periodMonthlyButton, R.id.periodAnnualButton};
             for (int nightMode : NIGHT_MODES) {
                 Context context = themed(nightMode);
                 View analytics = inflater(context).inflate(R.layout.fragment_analytics, null, false);
-                ChipGroup group = analytics.findViewById(R.id.periodInput);
-                for (int chipId : chipIds) {
-                    Chip chip = analytics.findViewById(chipId);
-                    assertNotNull(chip);
-                    for (boolean checked : new boolean[]{false, true}) {
-                        // Respect the real group's required single selection: select a
-                        // different period to exercise an unchecked chip, never weaken it.
-                        group.check(checked ? chipId : (chipId == R.id.periodDailyButton
-                                ? R.id.periodWeeklyButton : R.id.periodDailyButton));
-                        assertEquals("Reporting chip must expose requested selection", checked, chip.isChecked());
-                        for (boolean pressed : new boolean[]{false, true}) {
-                            chip.setPressed(pressed);
-                            chip.refreshDrawableState();
-                            int background = resolvedColor(chip.getChipBackgroundColor(), chip);
-                            if (pressed) {
-                                background = compositeRipple(chip.getRippleColor(), chip, background);
-                            }
-                            assertWidgetContrast(chip, background, nightMode,
-                                    "checked=" + checked + ", pressed=" + pressed);
+                for (int id : new int[]{R.id.periodInput, R.id.dateInput}) {
+                    MaterialButton button = analytics.findViewById(id);
+                    for (boolean pressed : new boolean[]{false, true}) {
+                        button.setPressed(pressed);
+                        button.refreshDrawableState();
+                        int background = resolvedColor(button.getBackgroundTintList(), button);
+                        if (pressed) {
+                            background = compositeRipple(button.getRippleColor(), button, background);
                         }
+                        assertWidgetContrast(button, background, nightMode, "pressed=" + pressed);
                     }
-                    chip.setPressed(false);
                 }
             }
         });

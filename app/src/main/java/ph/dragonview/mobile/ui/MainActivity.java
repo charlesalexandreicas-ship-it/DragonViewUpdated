@@ -34,6 +34,8 @@ public final class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private boolean sessionReceiverRegistered;
     private boolean redirectingToLogin;
+    private InAppGuide guide;
+    private int replayGuide;
     private final BroadcastReceiver sessionExpiredReceiver = new BroadcastReceiver() {
         @Override public void onReceive(Context context, Intent intent) {
             if (SessionManager.ACTION_SESSION_EXPIRED.equals(intent.getAction())) {
@@ -59,6 +61,7 @@ public final class MainActivity extends AppCompatActivity {
                 getWindow().getDecorView().getSystemUiVisibility()
                         & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         setSupportActionBar(binding.toolbar);
+        guide = new InAppGuide(this, session);
 
         NavHostFragment host = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host);
@@ -67,7 +70,6 @@ public final class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.dashboardFragment,
                 R.id.inventoryFragment,
-                R.id.scannerFragment,
                 R.id.plantingFragment,
                 R.id.analyticsFragment,
                 R.id.salesFragment,
@@ -175,6 +177,11 @@ public final class MainActivity extends AppCompatActivity {
                 .setVisible(owner);
 
         binding.navigationView.setNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.action_guides) {
+                binding.drawerLayout.closeDrawer(GravityCompat.START);
+                showGuidePicker(controller);
+                return true;
+            }
             if (item.getItemId() == R.id.action_logout) {
                 binding.drawerLayout.closeDrawer(GravityCompat.START);
                 signOut();
@@ -190,6 +197,14 @@ public final class MainActivity extends AppCompatActivity {
 
         controller.addOnDestinationChangedListener((navController, destination, arguments) -> {
             int destinationId = destination.getId();
+            binding.toolbar.setSubtitle(destinationId == R.id.scannerFragment
+                    ? destination.getLabel() : null);
+            if (destinationId == R.id.scannerFragment) {
+                binding.toolbar.setTitle(R.string.scanner_brand);
+            }
+            guide.dismiss();
+            guide.show(destinationId, replayGuide == destinationId);
+            replayGuide = 0;
             if (appBarConfiguration.getTopLevelDestinations().contains(destinationId)) {
                 binding.toolbar.setNavigationIcon(R.drawable.icon_streamline_menu);
             }
@@ -203,12 +218,54 @@ public final class MainActivity extends AppCompatActivity {
                         .setChecked(true);
             }
             boolean fullScreenDestination = destinationId == R.id.settingsFragment
-                    || destinationId == R.id.workspaceFragment;
+                    || destinationId == R.id.workspaceFragment
+                    || destinationId == R.id.scannerFragment;
             binding.bottomNavigation.setVisibility(
                     fullScreenDestination ? View.GONE : View.VISIBLE);
             binding.scannerButton.setVisibility(
                     fullScreenDestination ? View.GONE : View.VISIBLE);
         });
+    }
+
+    /** Build rows from the current role because users can switch workspaces. */
+    private void showGuidePicker(NavController controller) {
+        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        android.widget.LinearLayout rows = new android.widget.LinearLayout(this);
+        rows.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int inset = Math.round(16 * getResources().getDisplayMetrics().density);
+        rows.setPadding(inset, inset / 2, inset, inset / 2);
+        scroll.addView(rows);
+        androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("Guides")
+                .setView(scroll)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create();
+        for (int index = 0; index < InAppGuide.DESTINATIONS.length; index++) {
+            int id = InAppGuide.DESTINATIONS[index];
+            if (id == R.id.analyticsFragment && !session.isWorkspaceOwner()) continue;
+            android.view.MenuItem destination = binding.bottomNavigation.getMenu().findItem(id);
+            if (destination == null) destination = binding.navigationView.getMenu().findItem(id);
+            com.google.android.material.button.MaterialButton row = new com.google.android.material.button.MaterialButton(
+                    this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+            row.setText(InAppGuide.NAMES[index]);
+            row.setTextColor(android.graphics.Color.BLACK);
+            row.setAllCaps(false);
+            row.setGravity(android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL);
+            row.setIconSize(Math.round(24 * getResources().getDisplayMetrics().density));
+            if (destination != null) row.setIcon(destination.getIcon());
+            row.setOnClickListener(view -> {
+                dialog.dismiss();
+                if (controller.getCurrentDestination() != null && controller.getCurrentDestination().getId() == id) {
+                    guide.show(id, true);
+                } else {
+                    replayGuide = id;
+                    controller.navigate(id);
+                }
+            });
+            rows.addView(row, -1, -2);
+        }
+        dialog.show();
+        dialog.getButton(android.content.DialogInterface.BUTTON_NEGATIVE).setTextColor(android.graphics.Color.BLACK);
     }
 
     /** Maps child screens back to the primary tab that conceptually owns them. */

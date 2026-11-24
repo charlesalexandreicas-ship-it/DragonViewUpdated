@@ -1,5 +1,6 @@
 package ph.dragonview.mobile.ui.inventory;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +14,10 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -58,10 +61,36 @@ public final class HarvestFragment extends Fragment {
                 android.R.layout.simple_dropdown_item_1line,
                 GRADES));
         resetEditor();
+        binding.sizeInput.setKeyListener(null);
+        binding.gradeInput.setKeyListener(null);
+        binding.sizeInput.setShowSoftInputOnFocus(false);
+        binding.gradeInput.setShowSoftInputOnFocus(false);
         RecordDateInput.attach(binding.dateInput);
+        if (state == null) binding.dateInput.setText(RecordDate.todayDisplay());
+        binding.pickHarvestDate.setOnClickListener(v -> chooseHarvestDate());
         binding.addItemButton.setOnClickListener(v -> addOrUpdateItem());
         binding.saveButton.setOnClickListener(v -> save());
         renderItems();
+    }
+
+    /** Use the same calendar range for the picker and typed harvest dates. */
+    private void chooseHarvestDate() {
+        Calendar today = Calendar.getInstance();
+        Calendar earliest = (Calendar) today.clone();
+        earliest.add(Calendar.YEAR, -1);
+        String date = RecordDate.toIso(text(binding.dateInput.getText()));
+        String min = RecordDate.calendarIso(earliest);
+        String max = RecordDate.calendarIso(today);
+        String initial = RecordDate.isWithinRange(date, min, max) ? date : max;
+        DatePickerDialog picker = new DatePickerDialog(requireContext(), (view, year, month, day) -> {
+            if (binding == null) return;
+            binding.dateInput.setText(String.format(Locale.US, "%02d/%02d/%04d", month + 1, day, year));
+            binding.dateLayout.setError(null);
+        }, Integer.parseInt(initial.substring(0, 4)), Integer.parseInt(initial.substring(5, 7)) - 1,
+                Integer.parseInt(initial.substring(8, 10)));
+        picker.getDatePicker().setMinDate(earliest.getTimeInMillis());
+        picker.getDatePicker().setMaxDate(today.getTimeInMillis());
+        picker.show();
     }
 
     private boolean addOrUpdateItem() {
@@ -72,7 +101,11 @@ public final class HarvestFragment extends Fragment {
         binding.gradeLayout.setError(grade.isEmpty() ? "Select a grade." : null);
         binding.piecesLayout.setError(
                 pieces < 1 ? "Enter at least one piece." : null);
-        if (size.isEmpty() || grade.isEmpty() || pieces < 1) return false;
+        if (size.isEmpty() || grade.isEmpty() || pieces < 1) {
+            revealError(size.isEmpty() ? binding.sizeInput
+                    : grade.isEmpty() ? binding.gradeInput : binding.piecesInput);
+            return false;
+        }
 
         for (int index = 0; index < items.size(); index++) {
             HarvestRequest.Item item = items.get(index);
@@ -81,6 +114,7 @@ public final class HarvestFragment extends Fragment {
                     && item.getGrade().equals(grade)) {
                 binding.piecesLayout.setError(
                         "This size and grade combination is already in the batch.");
+                revealError(binding.piecesInput);
                 return false;
             }
         }
@@ -165,15 +199,35 @@ public final class HarvestFragment extends Fragment {
                 totalPieces == 1 ? "" : "s"));
     }
 
+    // Reveal the focused field after its validation message has changed the layout.
+    private void revealError(View field) {
+        field.requestFocus();
+        field.post(() -> {
+            if (field.isAttachedToWindow()) {
+                field.requestRectangleOnScreen(new android.graphics.Rect(0, 0,
+                        field.getWidth(), field.getHeight()), false);
+            }
+        });
+    }
+
     private void save() {
         String batch = text(binding.batchInput.getText()).replaceFirst("^#", "");
         String enteredDate = text(binding.dateInput.getText());
         String date = RecordDate.toIso(enteredDate);
+        Calendar today = Calendar.getInstance();
+        Calendar earliest = (Calendar) today.clone();
+        earliest.add(Calendar.YEAR, -1);
+        boolean validDate = RecordDate.isWithinRange(date,
+                RecordDate.calendarIso(earliest), RecordDate.calendarIso(today));
         binding.batchLayout.setError(
                 batch.isEmpty() ? "Batch number is required." : null);
         binding.dateLayout.setError(enteredDate.isEmpty() ? "Harvest date is required."
-                : date == null ? "Enter a real date as MM/DD/YYYY." : null);
-        if (batch.isEmpty() || date == null) return;
+                : date == null ? "Enter a real date as MM/DD/YYYY."
+                : !validDate ? "Choose a harvest date within the past year, through today." : null);
+        if (batch.isEmpty() || !validDate) {
+            revealError(batch.isEmpty() ? binding.batchInput : binding.dateInput);
+            return;
+        }
 
         // Save what is currently entered as part of the batch. This keeps the
         // two-step editor useful for multiple combinations without losing the
@@ -186,6 +240,7 @@ public final class HarvestFragment extends Fragment {
         if (items.isEmpty()) {
             binding.statusText.setText(
                     "Add at least one size and grade combination.");
+            revealError(binding.sizeInput);
             return;
         }
 
@@ -210,6 +265,8 @@ public final class HarvestFragment extends Fragment {
                         if (binding == null) return;
                         setSaving(false);
                         binding.statusText.setText(HarvestErrorMessage.display(message));
+                        Snackbar.make(binding.getRoot(), "Harvest could not be saved. Check the message below the form.",
+                                Snackbar.LENGTH_LONG).show();
                     }
                 });
     }

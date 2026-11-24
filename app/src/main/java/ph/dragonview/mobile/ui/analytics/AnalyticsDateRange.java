@@ -62,6 +62,25 @@ final class AnalyticsDateRange {
         return forDate(period, format(previous, "yyyy-MM-dd"));
     }
 
+    static String previousYearAnchor(String date) {
+        return format(forDate("yearly", date).previous().start, "yyyy-MM-dd");
+    }
+
+    static AnalyticsDateRange yearlyThrough(String cutoff, String yearAnchor) {
+        AnalyticsDateRange year = forDate("yearly", yearAnchor);
+        AnalyticsDateRange source = forDate("daily", cutoff);
+        Calendar end = (Calendar) source.end.clone();
+        // Calendar year addition clamps Feb 29 when the comparison year is not a leap year.
+        end.add(Calendar.YEAR, year.start.get(Calendar.YEAR) - end.get(Calendar.YEAR));
+        return new AnalyticsDateRange("yearly", year.start, end);
+    }
+
+    String compactLabel() {
+        if ("monthly".equals(period)) return format(start, "MMM yyyy");
+        if ("yearly".equals(period)) return format(start, "yyyy");
+        return label();
+    }
+
     String label() {
         if ("daily".equals(period)) return format(start, "MMM d, yyyy");
         if (start.get(Calendar.YEAR) != end.get(Calendar.YEAR)) {

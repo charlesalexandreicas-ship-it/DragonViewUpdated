@@ -4,67 +4,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dragon_surface"
-    android:clipToPadding="false">
+    android:background="@color/white"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="@dimen/page_gutter"
-        android:paddingTop="@dimen/space_lg"
-        android:paddingEnd="@dimen/page_gutter"
         android:paddingBottom="@dimen/space_xl">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/scanner_title"
-                    android:textAppearance="@style/TextAppearance.DragonView.TitleLarge"
-                    android:textStyle="bold" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Scan or upload a photo"
-                    android:textColor="@color/muted_ink"
-                    android:textSize="13sp" />
-            </LinearLayout>
-            <TextView
-                android:id="@+id/modelStatusBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/soft_pink_panel"
-                android:paddingStart="10dp"
-                android:paddingTop="6dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="6dp"
-                android:text="@string/scanner_model_pending"
-                android:textColor="@color/dragon_magenta_dark"
-                android:textSize="10sp"
-                android:textStyle="bold" />
-        </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/scannerPreviewCard"
             android:layout_width="match_parent"
-            android:layout_height="280dp"
-            android:layout_marginTop="12dp"
+            android:layout_height="220dp"
             app:cardBackgroundColor="@color/dragon_scanner"
-            app:cardCornerRadius="@dimen/corner_card"
+            app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
             app:strokeColor="@color/neo_highlight"
-            app:strokeWidth="1dp">
+            app:strokeWidth="0dp">
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -103,6 +60,7 @@
                     android:paddingTop="6dp"
                     android:paddingEnd="12dp"
                     android:paddingBottom="6dp"
+                    android:id="@+id/frameGuide"
                     android:text="@string/scanner_frame_guide"
                     android:textColor="@color/ink"
                     android:textSize="10sp"
@@ -122,18 +80,21 @@
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
+            android:id="@+id/scannerActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_md"
+            android:layout_marginHorizontal="@dimen/page_gutter"
             android:gravity="center"
             android:orientation="horizontal">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/uploadButton"
-                style="@style/Widget.DragonView.Button.Outlined"
+                style="@style/Widget.DragonView.Button"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/field_height"
                 android:layout_weight="1"
-                android:text="@string/scanner_upload" />
+                android:text="@string/scanner_upload"
+                app:backgroundTint="@color/botanical_header" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/captureButton"
                 style="@style/Widget.DragonView.Button"
@@ -144,41 +105,59 @@
                 android:text="@string/scanner_enable_camera"
                 app:icon="@drawable/ic_camera"
                 app:iconTint="@color/white" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/retakeButton"
+                style="@style/Widget.DragonView.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/field_height"
+                android:layout_marginStart="@dimen/space_md"
+                android:layout_weight="1"
+                android:text="@string/scanner_retake"
+                app:icon="@drawable/ic_camera"
+                android:visibility="gone" />
         </LinearLayout>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/retakeButton"
-            style="@style/Widget.DragonView.Button.Outlined"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:layout_marginTop="@dimen/space_sm"
-            android:text="@string/scanner_retake"
-            android:visibility="gone" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_lg"
+            android:layout_marginHorizontal="@dimen/page_gutter"
             app:cardBackgroundColor="@color/neo_surface_high"
-            app:cardCornerRadius="@dimen/corner_card"
+            app:cardCornerRadius="0dp"
             app:cardElevation="0dp"
             app:strokeColor="@color/neo_highlight"
-            app:strokeWidth="1dp">
+            app:strokeWidth="0dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="@dimen/card_padding">
-                <TextView
-                    android:layout_width="wrap_content"
+                android:paddingTop="@dimen/space_sm"
+                android:paddingBottom="@dimen/space_sm">
+                <LinearLayout
+                    android:id="@+id/fruitSummary"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/scanner_result_title"
-                    android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
-                    android:textStyle="bold" />
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/space_sm"
+                    android:visibility="gone">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="@dimen/space_sm"
+                        android:text="@string/scanner_results_heading"
+                        android:textColor="@color/ink"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:accessibilityLiveRegion="polite" />
+                    <LinearLayout
+                        android:id="@+id/fruitResultsList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
                 <TextView
                     android:id="@+id/resultLabelText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:text="@string/scanner_awaiting_image"
                     android:accessibilityLiveRegion="polite"
                     android:textColor="@color/dragon_magenta"

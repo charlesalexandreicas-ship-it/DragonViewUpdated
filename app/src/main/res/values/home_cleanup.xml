@@ -17,7 +17,7 @@
     </style>
     <style name="HomeMetricFigure" parent="DashboardMetricFigure">
         <item name="android:textSize">24sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textStyle">normal</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textColor">@color/ink</item>
@@ -25,7 +25,7 @@
         <item name="android:breakStrategy">simple</item>
     </style>
     <style name="HomeMetricLabel" parent="DashboardMetricLabel">
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/manrope</item>
         <item name="android:maxLines">2</item>
         <item name="android:layout_marginTop">@dimen/space_xs</item>
     </style>
@@ -35,7 +35,7 @@
         <item name="android:minWidth">@dimen/touch_target</item>
         <item name="android:padding">@dimen/space_md</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textColor">@color/ink</item>
         <item name="iconTint">@color/dragon_magenta_dark</item>
@@ -89,7 +89,7 @@
         <item name="android:minHeight">48dp</item>
         <item name="android:minWidth">0dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textColor">@color/botanical_accent</item>
         <item name="backgroundTint">@color/white</item>
         <item name="strokeColor">@color/botanical_accent</item>
@@ -103,7 +103,8 @@
 
     <style name="HomeSummaryCard" parent="DashboardMetricCard">
         <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">132dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:minHeight">132dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:background">@drawable/home_metric_background</item>
         <item name="android:padding">16dp</item>

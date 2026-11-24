@@ -52,4 +52,14 @@ public final class RecordDate {
                 today.get(Calendar.MONTH) + 1, today.get(Calendar.DAY_OF_MONTH),
                 today.get(Calendar.YEAR));
     }
+
+    public static String calendarIso(Calendar date) {
+        return String.format(Locale.US, "%04d-%02d-%02d", date.get(Calendar.YEAR),
+                date.get(Calendar.MONTH) + 1, date.get(Calendar.DAY_OF_MONTH));
+    }
+
+    /** Compare parsed ISO dates without introducing time-of-day or UTC offsets. */
+    public static boolean isWithinRange(@Nullable String date, String earliest, String latest) {
+        return date != null && date.compareTo(earliest) >= 0 && date.compareTo(latest) <= 0;
+    }
 }

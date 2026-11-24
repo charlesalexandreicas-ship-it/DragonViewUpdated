@@ -48,6 +48,16 @@
                     android:layout_height="wrap_content" android:textColor="@color/muted_ink"
                     android:textSize="13sp" />
             </LinearLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/classFilterLayout"
+                style="@style/Widget.DragonView.TextInputLayout.Dropdown"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:hint="Fruit class">
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/classFilter" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="48dp"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
             <LinearLayout android:id="@+id/emptyState" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical"
                 android:padding="28dp" android:visibility="gone">

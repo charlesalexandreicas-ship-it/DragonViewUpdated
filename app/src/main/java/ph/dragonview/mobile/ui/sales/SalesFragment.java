@@ -238,8 +238,9 @@ public final class SalesFragment extends Fragment {
                 loadWholeBatch(form, lines, batches.get(batchKey(label)));
             }
         });
+        java.util.Map<String, String> operationIds = new java.util.HashMap<>();
         dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setOnClickListener(v -> complete(dialog, form, lines)));
+                .setOnClickListener(v -> complete(dialog, form, lines, operationIds)));
         dialog.show();
     }
 
@@ -338,6 +339,10 @@ public final class SalesFragment extends Fragment {
         item.gradeInput.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, grades));
         item.sizeInput.setText("MEDIUM", false);
         item.gradeInput.setText("A", false);
+        item.sizeInput.setKeyListener(null);
+        item.gradeInput.setKeyListener(null);
+        item.sizeInput.setShowSoftInputOnFocus(false);
+        item.gradeInput.setShowSoftInputOnFocus(false);
         Runnable updateAvailability = () -> {
             String size = text(item.sizeInput.getText());
             String grade = text(item.gradeInput.getText());
@@ -350,6 +355,10 @@ public final class SalesFragment extends Fragment {
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle("Add Fruit Item").setView(item.getRoot())
                 .setNegativeButton("Cancel", null).setPositiveButton("Add", null).create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+                    | android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        }
         dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 .setOnClickListener(v -> {
                     String size = item.sizeInput.getText().toString();
@@ -379,22 +388,29 @@ public final class SalesFragment extends Fragment {
         NumberFormat php = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
         for (SaleLine line : lines) {
             TextView row = new TextView(requireContext());
-            row.setPadding(8, 12, 8, 12);
-            row.setText(line.size.replace('_', '-') + " • Grade " + line.grade + "\n"
-                    + line.pieces + " pieces • " + line.weight + " kg • "
-                    + php.format(line.subtotal()) + "\nTap to remove");
-            row.setOnClickListener(v -> {
+            row.setText(line.size.replace('_', '-') + " • Class " + line.grade + "\n"
+                    + line.pieces + " pieces • " + line.weight + " kg × "
+                    + php.format(line.price) + "/kg\nSubtotal: "
+                    + php.format(line.subtotal()));
+            form.itemsContainer.addView(row);
+            com.google.android.material.button.MaterialButton remove =
+                    new com.google.android.material.button.MaterialButton(new android.view.ContextThemeWrapper(
+                            requireContext(), ph.dragonview.mobile.R.style.Widget_DragonView_Button_Outlined));
+            remove.setText("Remove item");
+            remove.setContentDescription("Remove " + line.size.replace('_', ' ') + " Class " + line.grade);
+            remove.setOnClickListener(v -> {
                 lines.remove(line);
                 renderLines(form, lines);
             });
-            form.itemsContainer.addView(row);
+            form.itemsContainer.addView(remove);
             total += line.subtotal();
         }
         form.totalText.setText("Total: " + php.format(total));
     }
 
     /** Validates the sale, calculates totals, and submits one complete transaction. */
-    private void complete(AlertDialog dialog, DialogSaleBinding form, List<SaleLine> lines) {
+    private void complete(AlertDialog dialog, DialogSaleBinding form, List<SaleLine> lines,
+                          java.util.Map<String, String> operationIds) {
         String name = text(form.nameInput.getText()), address = text(form.addressInput.getText());
         String contact = text(form.contactInput.getText()), email = text(form.emailInput.getText());
         String method = text(form.methodInput.getText()), paidText = text(form.amountInput.getText());
@@ -406,7 +422,7 @@ public final class SalesFragment extends Fragment {
         }
         boolean exactElectronic = !"CASH".equals(method) && Math.abs(paid - total) > 0.009;
         if (name.isEmpty() || address.isEmpty() || contact.length() < 7 || !email.contains("@")
-                || lines.isEmpty() || invalidLine || paid < total || exactElectronic) {
+                || lines.isEmpty() || invalidLine || !Double.isFinite(paid) || paid < total || exactElectronic) {
             form.errorText.setText(invalidLine ? "Enter measured weight for every item and ensure all prices exist."
                     : exactElectronic ? "Electronic payment must equal the sale total."
                     : "Complete customer, items, and sufficient payment.");
@@ -432,19 +448,57 @@ public final class SalesFragment extends Fragment {
                 wholeBatch ? CompleteSaleRequest.MODE_ENTIRE_BATCH
                         : CompleteSaleRequest.MODE_SELECTED_ITEMS,
                 batchNumber, text(form.overrideReasonInput.getText()));
+        // The server recognizes a retry of the same sale after a lost response.
+        String operationId = operationIds.computeIfAbsent(new com.google.gson.Gson().toJson(request),
+                ignored -> java.util.UUID.randomUUID().toString());
+        List<SaleLine> soldItems = new ArrayList<>(lines);
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         LocalRepository.get(requireContext()).completeSale(
-                request, new LocalRepository.Callback<>() {
-                    @Override public void onSuccess(Void ignored) {
+                request, operationId, new LocalRepository.Callback<>() {
+                    @Override public void onSuccess(com.google.gson.JsonObject receipt) {
                         dialog.dismiss();
+                        if (binding == null) return;
                         binding.messageText.setText("Sale completed successfully.");
+                        showSaleReceipt(receipt, name, soldItems, request.getAmountPaid(), method);
                         load();
                     }
                     @Override public void onError(String message) {
+                        if (!dialog.isShowing()) return;
                         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                        form.errorText.setText(message);
+                        form.errorText.setText(message + " Your entries are still here. Retry the same sale if the result is uncertain.");
                     }
                 });
+    }
+
+    /** Use the committed total because prices may have changed since the form was opened. */
+    private void showSaleReceipt(com.google.gson.JsonObject receipt, String customer,
+                                 List<SaleLine> items, double amountPaid, String method) {
+        NumberFormat php = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
+        StringBuilder detail = new StringBuilder();
+        if (receipt.has("saleId")) detail.append("Sale #").append(receipt.get("saleId").getAsLong()).append("\n");
+        if (receipt.has("transactionDate") && !receipt.get("transactionDate").isJsonNull()) {
+            detail.append(receipt.get("transactionDate").getAsString()).append("\n");
+        }
+        detail.append("Customer: ").append(customer).append("\n\nItems sold");
+        for (SaleLine item : items) {
+            detail.append("\n").append(item.size.replace('_', ' ')).append(" · Class ")
+                    .append(item.grade).append(" · ").append(item.pieces).append(" pcs · ")
+                    .append(String.format(Locale.US, "%.3f kg", item.weight));
+        }
+        detail.append("\n\nPayment: ").append(method.replace('_', ' '));
+        if (receipt.has("totalAmount")) {
+            double total = receipt.get("totalAmount").getAsDouble();
+            detail.append("\nSale total: ").append(php.format(total));
+            detail.append("\nAmount paid: ").append(php.format(amountPaid));
+            if ("CASH".equals(method)) {
+                detail.append("\nCash change: ").append(php.format(Math.max(0, amountPaid - total)));
+            }
+        } else {
+            detail.append("\nAmount paid: ").append(php.format(amountPaid))
+                    .append("\nThe sale was saved. Open Sales to check the final total.");
+        }
+        new AlertDialog.Builder(requireContext()).setTitle("DragonView sale receipt")
+                .setMessage(detail).setPositiveButton("Done", null).show();
     }
 
     private int available(String size, String grade) {

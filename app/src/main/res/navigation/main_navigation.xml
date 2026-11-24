@@ -15,6 +15,10 @@
     <fragment android:id="@+id/salesFragment" android:name="ph.dragonview.mobile.ui.sales.SalesFragment" android:label="Sales" />
     <fragment android:id="@+id/plantingFragment" android:name="ph.dragonview.mobile.ui.planting.PlantingFragment" android:label="Planting &amp; Guidance">
         <action android:id="@+id/action_planting_to_details" app:destination="@id/plantingDetailsFragment" />
+        <action android:id="@+id/action_planting_to_farm_layout" app:destination="@id/farmLayoutFragment" />
+    </fragment>
+    <fragment android:id="@+id/farmLayoutFragment" android:name="ph.dragonview.mobile.ui.planting.FarmLayoutFragment" android:label="Farm Layout">
+        <action android:id="@+id/action_farm_layout_to_details" app:destination="@id/plantingDetailsFragment" />
     </fragment>
     <fragment android:id="@+id/plantingDetailsFragment" android:name="ph.dragonview.mobile.ui.planting.PlantingDetailsFragment" android:label="Plant Guidance">
         <argument android:name="plantingId" app:argType="long" />

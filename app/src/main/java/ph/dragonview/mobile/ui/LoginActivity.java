@@ -71,6 +71,7 @@ public final class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        final boolean creatingAccount = registrationMode;
         setLoading(true);
         LocalRepository.Callback<SessionUser> callback =
                 new LocalRepository.Callback<>() {
@@ -78,6 +79,11 @@ public final class LoginActivity extends AppCompatActivity {
                     public void onSuccess(SessionUser user) {
                         setLoading(false);
                         sessionManager.save(user);
+                        if (creatingAccount) {
+                            // Only a successful registration enables automatic guides for this account.
+                            getSharedPreferences("onboarding_guides", MODE_PRIVATE).edit()
+                                    .putBoolean(user.getId() + "_registered_here", true).apply();
+                        }
                         openApplication();
                     }
 

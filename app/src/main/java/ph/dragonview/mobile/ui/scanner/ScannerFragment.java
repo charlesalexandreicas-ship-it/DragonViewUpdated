@@ -3,15 +3,17 @@ package ph.dragonview.mobile.ui.scanner;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Rational;
 import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -19,13 +21,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.camera.core.Camera;
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.CameraState;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.core.UseCaseGroup;
-import androidx.camera.core.ViewPort;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
@@ -34,6 +36,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -59,6 +63,7 @@ public final class ScannerFragment extends Fragment { //TRULY YOURS MY NIGGA ---
     private boolean cameraStarting;
     private boolean cameraReady;
     private boolean cameraFailed;
+    private int selectedFruit;
     private int viewVersion;
     private int cameraRequestVersion;
     @StringRes private int cameraMessage = R.string.scanner_camera_permission;
@@ -66,8 +71,14 @@ public final class ScannerFragment extends Fragment { //TRULY YOURS MY NIGGA ---
     private final ActivityResultLauncher<String[]> imagePicker = registerForActivityResult(
             new ActivityResultContracts.OpenDocument(), uri -> {
                 if (uri != null && isAdded()) {
-                    PhotoCropDialogFragment.newInstance(uri).show(
-                            getChildFragmentManager(), PhotoCropDialogFragment.TAG);
+                    new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.scanner_upload)
+                            .setPositiveButton(R.string.scanner_use_full_photo,
+                                    (dialog, which) -> viewModel.loadImage(uri, null))
+                            .setNeutralButton(R.string.scanner_adjust_crop, (dialog, which) ->
+                                    PhotoCropDialogFragment.newInstance(uri).show(
+                                            getChildFragmentManager(), PhotoCropDialogFragment.TAG))
+                            .show();
                 }
             });
 
@@ -123,7 +134,16 @@ public final class ScannerFragment extends Fragment { //TRULY YOURS MY NIGGA ---
                     viewModel.loadImage(Uri.fromFile(cropFile), cropFile);
                 });
         binding.cameraPreview.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE);
-        binding.cameraPreview.setScaleType(PreviewView.ScaleType.FILL_CENTER);
+        binding.cameraPreview.setScaleType(PreviewView.ScaleType.FIT_CENTER);
+        binding.getRoot().addOnLayoutChangeListener((container, left, top, right, bottom,
+                oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) {
+                updatePreviewHeight();
+            }
+        });
+        if (detectionOverlay != null) {
+            detectionOverlay.setOnFruitSelected(this::showFruit);
+        }
         binding.uploadButton.setOnClickListener(clicked -> imagePicker.launch(new String[]{"image/*"}));
         binding.captureButton.setOnClickListener(clicked -> captureOrRequestPermission());
         binding.retakeButton.setOnClickListener(clicked -> {
@@ -223,20 +243,21 @@ public final class ScannerFragment extends Fragment { //TRULY YOURS MY NIGGA ---
                     showCameraFailure(R.string.scanner_camera_unavailable);
                     return;
                 }
-                preview = new Preview.Builder().build();
+                preview = new Preview.Builder()
+                        .setTargetAspectRatio(AspectRatio.RATIO_16_9).build();
                 preview.setSurfaceProvider(binding.cameraPreview.getSurfaceProvider());
                 imageCapture = new ImageCapture.Builder()
+                        .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                         .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                         .setOutputFormat(ImageCapture.OUTPUT_FORMAT_JPEG)
                         .build();
                 int rotation = binding.cameraPreview.getDisplay() == null
                         ? Surface.ROTATION_0 : binding.cameraPreview.getDisplay().getRotation();
                 imageCapture.setTargetRotation(rotation);
-                // A shared viewport keeps capture and preview on the same sensor region.
+                // Leave the capture viewport unset so CameraX does not trim it to a square.
                 UseCaseGroup useCases = new UseCaseGroup.Builder()
                         .addUseCase(preview)
                         .addUseCase(imageCapture)
-                        .setViewPort(new ViewPort.Builder(new Rational(1, 1), rotation).build())
                         .build();
                 Camera camera = cameraProvider.bindToLifecycle(getViewLifecycleOwner(), selector, useCases);
                 cameraReady = true;
@@ -288,42 +309,35 @@ public final class ScannerFragment extends Fragment { //TRULY YOURS MY NIGGA ---
 
     /** Converts ViewModel state into preview, progress, result, and error UI. */
     private void renderState(@NonNull ScannerViewModel.State state) {
+        boolean newResult = scanState == null || scanState.result != state.result;
+        if (newResult) selectedFruit = 0;
         scanState = state;
         if (binding == null) return;
         boolean hasImage = state.image != null;
         binding.selectedImagePreview.setImageBitmap(state.image);
         binding.selectedImagePreview.setVisibility(hasImage ? View.VISIBLE : View.GONE);
-        // Fit the preview card to the uploaded photo within a screen-friendly height.
-        // FIT_CENTER and the overlay share this space, so portrait and landscape photos stay intact.
-        binding.scannerPreviewCard.post(() -> {
-            if (binding == null) return;
-            float density = getResources().getDisplayMetrics().density;
-            int width = binding.scannerPreviewCard.getWidth();
-            if (width <= 0) return;
-            int wanted = hasImage
-                    ? Math.round(width * state.image.getHeight() / (float) state.image.getWidth())
-                    : Math.round(280 * density);
-            wanted = Math.max(Math.round(220 * density), Math.min(wanted, Math.round(440 * density)));
-            ViewGroup.LayoutParams params = binding.scannerPreviewCard.getLayoutParams();
-            if (params.height != wanted) {
-                params.height = wanted;
-                binding.scannerPreviewCard.setLayoutParams(params);
-            }
-        });
+        updatePreviewHeight();
         if (detectionOverlay != null) {
             detectionOverlay.setVisibility(hasImage ? View.VISIBLE : View.GONE);
             detectionOverlay.setDetections(state.result == null ? null : state.result.detections,
                     hasImage ? state.image.getWidth() : 0, hasImage ? state.image.getHeight() : 0);
         }
+        boolean showFruitSummary = state.result != null && state.result.fruitCount() > 0
+                && state.result.fruitCount() <= ScannerViewModel.MAX_FRUIT_COUNT;
+        binding.fruitSummary.setVisibility(showFruitSummary ? View.VISIBLE : View.GONE);
+        binding.resultLabelText.setVisibility(showFruitSummary ? View.GONE : View.VISIBLE);
+        binding.resultDetailsText.setVisibility(showFruitSummary ? View.GONE : View.VISIBLE);
+        if (showFruitSummary) renderFruitResults();
+        else binding.fruitResultsList.removeAllViews();
         binding.classificationProgress.setVisibility(state.busy ? View.VISIBLE : View.GONE);
         binding.retakeButton.setEnabled(hasImage && !state.busy);
         binding.retakeButton.setVisibility(hasImage ? View.VISIBLE : View.GONE);
+        binding.uploadButton.setText(state.error == ScannerViewModel.ScanError.NONE
+                ? R.string.scanner_upload : R.string.scanner_upload_retry);
         binding.uploadButton.setEnabled(!state.busy);
         if (hasImage) stopCamera();
 
         boolean modelReady = state.modelsReady();
-        binding.modelStatusBadge.setText(modelReady
-                ? R.string.scanner_model_ready : R.string.scanner_model_pending);
         if (state.busy) {
             binding.resultLabelText.setText(R.string.scanner_processing);
             binding.resultDetailsText.setText(R.string.scanner_processing_detail);
@@ -332,15 +346,9 @@ public final class ScannerFragment extends Fragment { //TRULY YOURS MY NIGGA ---
             binding.resultDetailsText.setText(state.error == ScannerViewModel.ScanError.CAPTURE
                     ? R.string.scanner_capture_error : state.error == ScannerViewModel.ScanError.IMAGE_READ
                     ? R.string.scanner_image_error : R.string.scanner_inference_error);
-        } else if (state.result != null) {
+        } else if (state.result != null && !showFruitSummary) {
             int count = state.result.fruitCount();
-            if (state.result.isGraded()) {
-                binding.resultLabelText.setText(scannerText("scanner_fruits_identified", count));
-                binding.resultDetailsText.setText(scannerText("scanner_batch_result_detail",
-                        state.result.classACount, state.result.classBCount,
-                        state.result.classCCount,
-                        state.result.detectorMillis, state.result.gradingMillis));
-            } else if (count == 0) {
+            if (count == 0) {
                 binding.resultLabelText.setText(scannerText("scanner_object_unidentified"));
                 binding.resultDetailsText.setText(scannerText("scanner_object_unidentified_detail"));
             } else if (count > ScannerViewModel.MAX_FRUIT_COUNT) {
@@ -364,6 +372,59 @@ public final class ScannerFragment extends Fragment { //TRULY YOURS MY NIGGA ---
         if (!hasImage && !state.busy) startCamera();
     }
 
+    /** Reserve most of the viewport for the photo; FIT_CENTER preserves the whole image. */
+    private void updatePreviewHeight() {
+        if (binding == null || binding.getRoot().getHeight() == 0) return;
+        int height = Math.round(binding.getRoot().getHeight() * 0.70f);
+        if (binding.scannerPreviewCard.getLayoutParams().height != height) {
+            binding.scannerPreviewCard.getLayoutParams().height = height;
+            binding.scannerPreviewCard.requestLayout();
+        }
+    }
+
+    /** Each detected fruit keeps its own detector and grade scores below the preview. */
+    private void renderFruitResults() {
+        binding.fruitResultsList.removeAllViews();
+        for (int index = 0; index < scanState.result.fruitCount(); index++) {
+            DragonFruitDetector.Detection detection = scanState.result.detections.get(index);
+            MobileNetV2Classifier.Classification grade = detection.grade;
+            MaterialButton row = new MaterialButton(requireContext());
+            row.setAllCaps(false);
+            row.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+            row.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+            row.setText(grade == null
+                    ? getString(R.string.scanner_fruit_ungraded, index + 1,
+                            Math.round(detection.confidence * 100f))
+                    : getString(R.string.scanner_fruit_result, index + 1, grade.label,
+                            Math.round(detection.confidence * 100f),
+                            Math.round(grade.confidence * 100f)));
+            int fruitIndex = index;
+            row.setOnClickListener(clicked -> showFruit(fruitIndex));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.bottomMargin = Math.round(6f * getResources().getDisplayMetrics().density);
+            binding.fruitResultsList.addView(row, params);
+        }
+        showFruit(selectedFruit);
+    }
+
+    /** Selection links a result row to its matching box without hiding other fruits. */
+    private void showFruit(int index) {
+        if (binding == null || scanState == null || scanState.result == null
+                || index >= scanState.result.fruitCount()
+                || scanState.result.fruitCount() > ScannerViewModel.MAX_FRUIT_COUNT) return;
+        selectedFruit = index;
+        for (int position = 0; position < binding.fruitResultsList.getChildCount(); position++) {
+            MaterialButton row = (MaterialButton) binding.fruitResultsList.getChildAt(position);
+            boolean selected = position == index;
+            row.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(
+                    requireContext(), selected ? R.color.dragon_magenta : R.color.neo_surface_high)));
+            row.setTextColor(ContextCompat.getColor(requireContext(),
+                    selected ? R.color.white : R.color.ink));
+        }
+        if (detectionOverlay != null) detectionOverlay.setSelectedFruit(index);
+    }
+
     /** Enables only controls that are valid for current permission and camera state. */
     private void renderCameraControls() {
         if (binding == null) return;
@@ -371,7 +432,10 @@ public final class ScannerFragment extends Fragment { //TRULY YOURS MY NIGGA ---
         boolean busy = scanState != null && scanState.busy;
         binding.cameraPreview.setVisibility(hasImage ? View.GONE : View.VISIBLE);
         binding.cameraPlaceholder.setVisibility(!hasImage && !cameraReady ? View.VISIBLE : View.GONE);
-        binding.cameraStatusText.setText(hasImage ? R.string.scanner_photo_selected : cameraMessage);
+        binding.frameGuide.setVisibility(hasImage ? View.GONE : View.VISIBLE);
+        binding.cameraStatusText.setVisibility(hasImage ? View.GONE : View.VISIBLE);
+        binding.cameraStatusText.setText(cameraMessage);
+        binding.captureButton.setVisibility(hasImage ? View.GONE : View.VISIBLE);
         binding.captureButton.setText(!hasCameraPermission()
                 ? R.string.scanner_enable_camera : cameraFailed
                 ? R.string.scanner_retry_camera : R.string.scanner_capture);
@@ -395,12 +459,6 @@ public final class ScannerFragment extends Fragment { //TRULY YOURS MY NIGGA ---
         if (identifier == 0) {
             String fallback;
             switch (name) {
-                case "scanner_fruits_identified":
-                    fallback = "%1$d dragon fruit(s) identified";
-                    break;
-                case "scanner_batch_result_detail":
-                    fallback = "Class A: %1$d  •  Class B: %2$d  •  Class C: %3$d\nIdentification: %4$d ms  •  Grading: %5$d ms";
-                    break;
                 case "scanner_object_unidentified":
                     fallback = "Object unidentified";
                     break;

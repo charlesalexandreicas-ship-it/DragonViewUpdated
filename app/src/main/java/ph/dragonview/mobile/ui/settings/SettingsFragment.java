@@ -10,17 +10,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.work.WorkInfo;
 
 import ph.dragonview.mobile.R;
 import ph.dragonview.mobile.data.SessionManager;
 import ph.dragonview.mobile.data.local.LocalRepository;
 import ph.dragonview.mobile.data.model.SessionUser;
+import ph.dragonview.mobile.data.sync.SyncWorker;
 import ph.dragonview.mobile.databinding.FragmentSettingsBinding;
 import ph.dragonview.mobile.ui.MainActivity;
 
 /** Shows account, workspace, synchronization, version, and sign-out information. */
 public final class SettingsFragment extends Fragment {
     private FragmentSettingsBinding binding;
+    private boolean syncInProgress;
+    private int statusGeneration;
 
     @Override
     public View onCreateView(
@@ -50,17 +54,45 @@ public final class SettingsFragment extends Fragment {
                 : "Loading workspace access…");
         binding.workspaceCard.setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).navigate(R.id.workspaceFragment));
-        LocalRepository.get(requireContext()).syncStatus(new LocalRepository.Callback<>() {
-            @Override public void onSuccess(String value) {
-                if (binding != null) binding.syncStatusText.setText(value);
-            }
-            @Override public void onError(String message) {
-                if (binding != null) binding.syncStatusText.setText(message);
+        refreshSyncStatus();
+        binding.syncNowButton.setOnClickListener(clicked -> {
+            statusGeneration++;
+            syncInProgress = true;
+            binding.syncStatusText.setText("Requesting sync…");
+            SyncWorker.enqueue(requireContext());
+        });
+        SyncWorker.observe(requireContext()).observe(getViewLifecycleOwner(), jobs -> {
+            if (binding == null) return;
+            boolean running = jobs.stream().anyMatch(job -> job.getState() == WorkInfo.State.RUNNING);
+            boolean pending = jobs.stream().anyMatch(job -> !job.getState().isFinished());
+            if (pending) {
+                statusGeneration++;
+                syncInProgress = true;
+                binding.syncNowButton.setEnabled(!running);
+                binding.syncStatusText.setText(running ? "Uploading queued changes…"
+                        : "Sync queued. Waiting for a connection or retry.");
+            } else if (syncInProgress) {
+                syncInProgress = false;
+                binding.syncNowButton.setEnabled(true);
+                refreshSyncStatus();
             }
         });
         binding.logoutButton.setOnClickListener(clicked -> {
             if (requireActivity() instanceof MainActivity) {
                 ((MainActivity) requireActivity()).signOut();
+            }
+        });
+    }
+
+    /** Read the current queue and server status after WorkManager reports completion. */
+    private void refreshSyncStatus() {
+        int generation = ++statusGeneration;
+        LocalRepository.get(requireContext()).syncStatus(new LocalRepository.Callback<>() {
+            @Override public void onSuccess(String value) {
+                if (binding != null && generation == statusGeneration) binding.syncStatusText.setText(value);
+            }
+            @Override public void onError(String message) {
+                if (binding != null && generation == statusGeneration) binding.syncStatusText.setText(message);
             }
         });
     }

@@ -24,7 +24,8 @@ public final class ExpandedRevenueTrendActivity extends AppCompatActivity {
         binding.closeChart.setOnClickListener(view -> finish());
 
         Intent source = getIntent();
-        binding.chartLegend.setText(source.getStringExtra("legend"));
+        AnalyticsFragment.setTrendLegend(binding.chartLegend,
+                source.getStringExtra("currentDateLabel"), source.getStringExtra("comparisonDateLabel"));
         binding.chartRange.setText(source.getStringExtra("range"));
         List<SalesAnalytics.Trend> current = readSeries(source, "current");
         List<SalesAnalytics.Trend> comparison = readSeries(source, "comparison");

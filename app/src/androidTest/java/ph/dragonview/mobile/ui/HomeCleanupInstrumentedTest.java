@@ -25,7 +25,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.chip.Chip;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import java.io.File;
@@ -41,7 +40,6 @@ import ph.dragonview.mobile.data.model.InventoryLot;
 import ph.dragonview.mobile.data.model.SalesAnalytics;
 import ph.dragonview.mobile.databinding.FragmentDashboardBinding;
 import ph.dragonview.mobile.databinding.FragmentAnalyticsBinding;
-import ph.dragonview.mobile.ui.analytics.AnalyticsFragment;
 import ph.dragonview.mobile.ui.inventory.HarvestFragment;
 import ph.dragonview.mobile.ui.analytics.RevenueTrendChartView;
 import ph.dragonview.mobile.ui.planting.PlantingFragment;
@@ -147,45 +145,19 @@ public final class HomeCleanupInstrumentedTest {
         }
     }
 
-    @Test public void reportingPillsWrapAndPreserveAllFourPeriodMappings() {
+    @Test public void analyticsFiltersFitSideBySideAtLargeTextSizes() {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             for (float scale : new float[]{1f, 1.5f}) {
                 FragmentAnalyticsBinding ui = FragmentAnalyticsBinding.inflate(LayoutInflater.from(themed(scale)));
+                ui.periodInput.setText("Monthly");
+                ui.dateInput.setText("Aug 2026");
                 measure(ui.getRoot(), 320, 900);
-                int[] ids = {R.id.periodDailyButton, R.id.periodWeeklyButton,
-                        R.id.periodMonthlyButton, R.id.periodAnnualButton};
-                String[] periods = {"daily", "weekly", "monthly", "yearly"};
-                AnalyticsFragment fragment = new AnalyticsFragment();
-                try {
-                    Field binding = AnalyticsFragment.class.getDeclaredField("binding");
-                    binding.setAccessible(true);
-                    binding.set(fragment, ui);
-                    Method selected = AnalyticsFragment.class.getDeclaredMethod("selectedPeriod");
-                    selected.setAccessible(true);
-                    assertEquals(ids[0], ui.periodInput.getCheckedChipId());
-                    for (int i = 0; i < ids.length; i++) {
-                        Chip chip = ui.periodInput.findViewById(ids[i]);
-                        chip.performClick();
-                        assertEquals(ids[i], ui.periodInput.getCheckedChipId());
-                        assertEquals(1, ui.periodInput.getCheckedChipIds().size());
-                        assertEquals(periods[i], selected.invoke(fragment));
-                        chip.performClick();
-                        assertTrue(chip.isChecked()); // Selection cannot be cleared.
-                        float density = chip.getResources().getDisplayMetrics().density;
-                        assertTrue(chip.getHeight() >= 48 * density);
-                        assertTrue(chip.getRight() <= ui.periodInput.getWidth());
-                        if (i > 0) {
-                            View previous = ui.periodInput.getChildAt(i - 1);
-                            assertTrue(chip.getTop() > previous.getTop()
-                                    || chip.getLeft() - previous.getRight() >= 8 * density);
-                        }
-                    }
-                    if (scale > 1f) assertTrue(ui.periodAnnualButton.getTop() > ui.periodDailyButton.getTop());
-                    ui.periodInput.check(ids[0]);
-                    capture(ui.getRoot(), "analytics-320-" + scale);
-                } catch (ReflectiveOperationException error) {
-                    throw new AssertionError(error);
-                }
+                float density = ui.dateInput.getResources().getDisplayMetrics().density;
+                assertTrue(ui.periodInput.getHeight() >= 48 * density);
+                assertTrue(ui.dateInput.getHeight() >= 48 * density);
+                assertEquals(ui.periodInput.getTop(), ui.dateInput.getTop());
+                assertTrue(ui.dateInput.getLeft() > ui.periodInput.getRight());
+                capture(ui.getRoot(), "analytics-320-" + scale);
             }
         });
     }
@@ -199,7 +171,7 @@ public final class HomeCleanupInstrumentedTest {
             Bitmap bitmap = Bitmap.createBitmap(
                     chart.getWidth(), chart.getHeight(), Bitmap.Config.ARGB_8888);
             chart.draw(new Canvas(bitmap));
-            int expected = target().getColor(R.color.dragon_magenta);
+            int expected = target().getColor(R.color.dragon_green);
             int matchingPixels = 0;
             for (int y = 0; y < bitmap.getHeight(); y++) {
                 for (int x = 0; x < bitmap.getWidth(); x++) {

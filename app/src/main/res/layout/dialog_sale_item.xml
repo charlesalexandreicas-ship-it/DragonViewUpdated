@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/neo_surface_high" android:orientation="vertical" android:padding="20dp">
-    <AutoCompleteTextView android:id="@+id/sizeInput" style="@style/Widget.DragonView.DialogField" android:hint="Fruit size" android:inputType="none" />
-    <AutoCompleteTextView android:id="@+id/gradeInput" style="@style/Widget.DragonView.DialogField" android:hint="Grade" android:inputType="none" />
-    <TextView android:id="@+id/availableText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:layout_marginBottom="4dp" android:text="Available: 0 pieces" android:textColor="@color/muted_ink" />
-    <EditText android:id="@+id/piecesInput" style="@style/Widget.DragonView.DialogField" android:hint="Number of pieces" android:inputType="number" />
-    <EditText android:id="@+id/weightInput" style="@style/Widget.DragonView.DialogField" android:hint="Total weight (kg)" android:inputType="numberDecimal" />
-    <TextView android:id="@+id/errorText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/dragon_error" />
-</LinearLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/neo_surface_high" android:orientation="vertical" android:padding="20dp">
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.DragonView.TextInputLayout.Dropdown"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="Fruit size">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/sizeInput" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.DragonView.TextInputLayout.Dropdown"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" android:hint="Fruit class">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/gradeInput" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <TextView android:id="@+id/availableText" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:layout_marginBottom="4dp" android:text="Available: 0 pieces" android:textColor="@color/muted_ink" />
+        <EditText android:id="@+id/piecesInput" style="@style/Widget.DragonView.DialogField" android:hint="Number of pieces" android:inputType="number" />
+        <EditText android:id="@+id/weightInput" style="@style/Widget.DragonView.DialogField" android:hint="Total weight (kg)" android:inputType="numberDecimal" />
+        <TextView android:id="@+id/errorText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/dragon_error" />
+    </LinearLayout>
+</ScrollView>

@@ -103,19 +103,17 @@ public final class MobileNetV2ClassifierTest {
     }
 
     @Test
-    public void prototypeGateUsesClassCOnlyAboveValidationThreshold() {
-        float[] baseline = {0.70f, 0.25f, 0.05f};
-        assertEquals(0, MobileNetV2Classifier.chooseWithClassCGate(
-                baseline, new float[]{0.40f, 0.31f, 0.29f}, 0, 1, 2));
-        assertEquals(2, MobileNetV2Classifier.chooseWithClassCGate(
-                baseline, new float[]{0.35f, 0.35f, 0.30f}, 0, 1, 2));
+    public void calibratedThreeClassDecisionRecoversBWithoutOverridingC() {
+        assertEquals(1, MobileNetV2Classifier.chooseThreeClass(
+                new float[]{0.55f, 0.30f, 0.15f}, 0, 1, 2));
+        assertEquals(2, MobileNetV2Classifier.chooseThreeClass(
+                new float[]{0.20f, 0.25f, 0.55f}, 0, 1, 2));
     }
 
     @Test
-    public void prototypeGatePreservesBaselineClassBDecision() {
-        assertEquals(1, MobileNetV2Classifier.chooseWithClassCGate(
-                new float[]{0.05f, 0.90f, 0.05f},
-                new float[]{0.15f, 0.60f, 0.25f}, 0, 1, 2));
+    public void calibratedThreeClassDecisionKeepsClearA() {
+        assertEquals(0, MobileNetV2Classifier.chooseThreeClass(
+                new float[]{0.80f, 0.15f, 0.05f}, 0, 1, 2));
     }
 
     @Test

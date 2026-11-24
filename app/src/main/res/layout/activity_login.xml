@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="@font/manrope_500"
                 android:letterSpacing="0.16"
                 android:text="DRAGON-VIEW"
                 android:textColor="@color/ink"

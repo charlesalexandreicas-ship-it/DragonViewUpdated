@@ -20,8 +20,8 @@
         <item name="colorOnError">@color/on_accent</item>
         <item name="colorErrorContainer">@color/fifo_urgent_soft</item>
         <item name="colorOnErrorContainer">@color/dragon_error</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/manrope</item>
+        <item name="fontFamily">@font/manrope</item>
         <item name="materialButtonStyle">@style/Widget.DragonView.Button</item>
         <item name="buttonBarButtonStyle">@style/Widget.DragonView.DialogButton</item>
         <item name="buttonBarPositiveButtonStyle">@style/Widget.DragonView.DialogButton</item>
@@ -86,7 +86,7 @@
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">16dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textSize">14sp</item>
         <item name="android:letterSpacing">0.01</item>
         <item name="iconPadding">8dp</item>
@@ -106,7 +106,7 @@
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">16dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textSize">14sp</item>
         <item name="android:letterSpacing">0.01</item>
         <item name="iconPadding">8dp</item>
@@ -127,7 +127,7 @@
         <item name="android:paddingStart">4dp</item>
         <item name="android:paddingEnd">4dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textSize">12sp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
@@ -144,7 +144,7 @@
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingEnd">12dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textSize">14sp</item>
         <item name="android:letterSpacing">0.01</item>
         <item name="iconPadding">8dp</item>
@@ -168,7 +168,7 @@
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">12dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">@color/ink</item>
         <item name="backgroundTint">@color/neo_surface_high</item>
@@ -214,7 +214,7 @@
         <item name="android:paddingBottom">10dp</item>
         <item name="android:textColor">@color/ink</item>
         <item name="android:textColorHint">@color/muted_ink</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/manrope</item>
         <item name="android:textSize">16sp</item>
     </style>
     <style name="Widget.DragonView.DialogSpinner" parent="Widget.AppCompat.Spinner.Underlined">
@@ -227,38 +227,38 @@
     </style>
 
     <style name="TextAppearance.DragonView.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textColor">@color/ink</item>
         <item name="android:textSize">24sp</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
     <style name="TextAppearance.DragonView.ToolbarTitle" parent="TextAppearance.Material3.HeadlineMedium">
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">22sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.02</item>
     </style>
     <style name="TextAppearance.DragonView.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textColor">@color/ink</item>
         <item name="android:textSize">20sp</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
     <style name="TextAppearance.DragonView.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textColor">@color/ink</item>
         <item name="android:textSize">16sp</item>
         <item name="android:letterSpacing">0</item>
     </style>
     <style name="TextAppearance.DragonView.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/manrope</item>
         <item name="android:textColor">@color/ink</item>
         <item name="android:textSize">16sp</item>
         <item name="android:lineSpacingExtra">4dp</item>
     </style>
     <style name="TextAppearance.DragonView.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/manrope</item>
         <item name="android:textColor">@color/muted_ink</item>
         <item name="android:textSize">14sp</item>
         <item name="android:lineSpacingExtra">3dp</item>
@@ -267,18 +267,18 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">5dp</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/manrope</item>
         <item name="android:textColor">@color/ink</item>
         <item name="android:textSize">15sp</item>
         <item name="android:lineSpacingExtra">4dp</item>
     </style>
     <style name="TextAppearance.DragonView.Navigation.Active" parent="TextAppearance.Material3.LabelMedium">
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textSize">11sp</item>
         <item name="android:letterSpacing">0.02</item>
     </style>
     <style name="TextAppearance.DragonView.Navigation.Inactive" parent="TextAppearance.Material3.LabelMedium">
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/manrope</item>
         <item name="android:textSize">11sp</item>
         <item name="android:letterSpacing">0.02</item>
     </style>
@@ -300,7 +300,7 @@
         <item name="android:layout_marginTop">8dp</item>
         <item name="android:textColor">@color/instrument_ink</item>
         <item name="android:textSize">30sp</item>
-        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:fontFamily">@font/manrope</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.03</item>
         <item name="android:includeFontPadding">false</item>
@@ -312,7 +312,7 @@
         <item name="android:layout_marginTop">2dp</item>
         <item name="android:textColor">@color/muted_ink</item>
         <item name="android:textSize">13sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:letterSpacing">0.01</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:maxLines">1</item>
@@ -327,7 +327,7 @@
     </style>
     <style name="AnalyticsMetricFigure" parent="DashboardMetricFigure">
         <item name="android:textSize">25sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/ink</item>
     </style>
@@ -339,7 +339,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/dragon_magenta</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textSize">18sp</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
@@ -347,7 +347,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">2dp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/manrope_500</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/muted_ink</item>
     </style>

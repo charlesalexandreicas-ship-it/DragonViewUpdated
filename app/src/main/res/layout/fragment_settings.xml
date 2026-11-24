@@ -175,12 +175,19 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="14dp"
                     android:layout_weight="1"
-                    android:text="Current application settings"
+                    android:text="Checking cloud connection…"
+                    android:accessibilityLiveRegion="polite"
                     android:textAppearance="@style/TextAppearance.DragonView.TitleMedium"
                     android:textStyle="bold" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/syncNowButton"
+            style="@style/Widget.DragonView.Button.Outlined"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="48dp" android:layout_marginTop="12dp"
+            android:text="Sync now" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

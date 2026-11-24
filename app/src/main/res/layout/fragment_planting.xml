@@ -14,10 +14,20 @@
                     android:textSize="13sp" app:icon="@drawable/icon_dataset_planting" app:iconGravity="start" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/graftButton"
                     style="@style/Widget.DragonView.BotanicalAction" android:layout_width="0dp"
-                    android:layout_height="48dp" android:minHeight="48dp" android:layout_marginStart="10dp" android:layout_weight="1"
+                    android:layout_height="48dp" android:minHeight="48dp" android:layout_marginStart="14dp" android:layout_weight="1"
                     android:text="Graft" android:textSize="13sp" app:icon="@drawable/icon_streamline_plant"
                     app:iconGravity="start" />
             </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/farmLayoutButton"
+                style="@style/Widget.DragonView.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="16dp"
+                android:text="View farm layout"
+                android:textColor="@color/botanical_accent"
+                app:icon="@drawable/icon_streamline_plant"
+                app:iconTint="@color/botanical_accent" />
             <LinearLayout android:id="@+id/listHeader" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:layout_marginTop="14dp"
                 android:orientation="vertical" android:padding="0dp">
